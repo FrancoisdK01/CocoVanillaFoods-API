@@ -21,6 +21,7 @@ namespace API.Model
 
         public string City { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("CustomerID")]
         public int? CustomerID { get; set; }
         public Customer Customer { get; set; }
