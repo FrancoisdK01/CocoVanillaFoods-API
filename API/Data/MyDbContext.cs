@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.SqlServer;
 
 namespace API.Data
 {
-    public class MyDbContext: DbContext
+    public class MyDbContext : DbContext
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
@@ -213,6 +213,13 @@ namespace API.Data
             .HasForeignKey(e => e.EventTypeID)
             .OnDelete(DeleteBehavior.Restrict);
 
+            //Event and earlyBird
+            modelBuilder.Entity<Event>()
+            .HasOne(e => e.EarlyBird)
+            .WithMany()
+            .HasForeignKey(e => e.EarlyBirdID)
+            .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Booking>()
             .HasOne(b => b.Event)
             .WithMany(e => e.Bookings)
@@ -312,11 +319,8 @@ namespace API.Data
             .HasForeignKey(el => el.SuperUserID)
             .OnDelete(DeleteBehavior.Restrict);
 
-            //Event and EarlyBird
-            modelBuilder.Entity<Event>()
-            .HasOne(e => e.EarlyBird)
-            .WithOne(eb => eb.Event)
-            .HasForeignKey<EarlyBird>(eb => eb.EventID);
+            
+
 
             base.OnModelCreating(modelBuilder);
         }
@@ -326,13 +330,13 @@ namespace API.Data
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingPayment> BookingPayments { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Discount> Discounts{ get; set; }
+        public DbSet<Discount> Discounts { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventLocation> EventLocations { get; set; }
         public DbSet<EventPrice> EventPrices { get; set; }
         public DbSet<EventType> EventTypes { get; set; }
-        public DbSet<EventReview> EventReviews{ get; set; }
+        public DbSet<EventReview> EventReviews { get; set; }
         public DbSet<EarlyBird> EarlyBird { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
@@ -364,6 +368,6 @@ namespace API.Data
         public DbSet<WriteOffItem> WriteOffItems { get; set; }
         public DbSet<WriteOff_Reason> WriteOffReasons { get; set; }
         public DbSet<SuperUser> SuperUser { get; set; }
-      
+
     }
 }
