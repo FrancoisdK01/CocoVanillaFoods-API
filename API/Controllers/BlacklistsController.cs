@@ -47,7 +47,7 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBlacklist(int id, Blacklist blacklist)
         {
-            if (id != blacklist.UserID)
+            if (id != blacklist.BlacklistID)
             {
                 return BadRequest();
             }
@@ -81,7 +81,7 @@ namespace API.Controllers
             _context.Blacklists.Add(blacklist);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBlacklist", new { id = blacklist.UserID }, blacklist);
+            return CreatedAtAction("GetBlacklist", new { id = blacklist.BlacklistID }, blacklist);
         }
 
         // DELETE: api/Blacklists/5
@@ -102,7 +102,7 @@ namespace API.Controllers
 
         private bool BlacklistExists(int id)
         {
-            return _context.Blacklists.Any(e => e.UserID == id);
+            return _context.Blacklists.Any(e => e.BlacklistID == id);
         }
     }
 }
