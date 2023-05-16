@@ -60,31 +60,32 @@ namespace API.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.HasIndex("EmployeeID")
-                        .IsUnique()
-                        .HasFilter("[EmployeeID] IS NOT NULL");
+                    b.HasIndex("EmployeeID");
 
                     b.HasIndex("ProvinceID");
 
-                    b.HasIndex("SuperUserID")
-                        .IsUnique();
+                    b.HasIndex("SuperUserID");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("API.Model.Blacklist", b =>
                 {
-                    b.Property<int>("UserID")
+                    b.Property<int>("BlacklistID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BlacklistID"), 1L, 1);
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Reason")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.HasKey("UserID");
+                    b.HasKey("BlacklistID");
 
                     b.ToTable("Blacklists");
                 });
@@ -175,14 +176,27 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Phone_Number")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Title")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserID1")
+                        .HasColumnType("int");
 
                     b.HasKey("CustomerID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
+
+                    b.HasIndex("UserID1")
+                        .IsUnique()
+                        .HasFilter("[UserID1] IS NOT NULL");
 
                     b.ToTable("Customers");
                 });
@@ -270,18 +284,12 @@ namespace API.Migrations
                     b.Property<int>("SuperUserID")
                         .HasColumnType("int");
 
-                    b.Property<int>("SystemPrivilegeID")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("EmployeeID");
 
                     b.HasIndex("SuperUserID");
-
-                    b.HasIndex("SystemPrivilegeID")
-                        .IsUnique();
 
                     b.HasIndex("UserID")
                         .IsUnique();
@@ -302,6 +310,9 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<int?>("EarlyBirdID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EventDate")
@@ -328,6 +339,8 @@ namespace API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EventID");
+
+                    b.HasIndex("EmployeeID");
 
                     b.HasIndex("EventPriceID")
                         .IsUnique();
@@ -360,6 +373,10 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("SuperUserID")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SuperUserID1")
                         .HasColumnType("int");
 
                     b.HasKey("EventLocationID");
@@ -368,6 +385,8 @@ namespace API.Migrations
                         .IsUnique();
 
                     b.HasIndex("SuperUserID");
+
+                    b.HasIndex("SuperUserID1");
 
                     b.ToTable("EventLocations");
                 });
@@ -595,8 +614,9 @@ namespace API.Migrations
                     b.Property<DateTime>("Date_of_last_update")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ProvinceName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Description")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("ProvinceID");
 
@@ -780,9 +800,6 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SuperUserID"), 1L, 1);
 
-                    b.Property<int>("AddressID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -811,15 +828,13 @@ namespace API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("SystemPrivilegeID")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("SuperUserID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserID")
+                        .IsUnique();
 
                     b.ToTable("SuperUser");
                 });
@@ -909,13 +924,26 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.SystemPrivilege", b =>
                 {
                     b.Property<int>("SystemPrivilegeID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("SystemPrivilegeDescription")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SystemPrivilegeID"), 1L, 1);
+
+                    b.Property<string>("Privilege_Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("Privilege_Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("SystemPrivilegeID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
 
                     b.ToTable("SystemPrivileges");
                 });
@@ -959,9 +987,6 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"), 1L, 1);
 
-                    b.Property<int?>("CustomerID")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserEmail")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -971,8 +996,6 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("UserID");
-
-                    b.HasIndex("CustomerID");
 
                     b.ToTable("Users");
                 });
@@ -1215,22 +1238,20 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.Address", b =>
                 {
                     b.HasOne("API.Model.Customer", "Customer")
-                        .WithMany("Addresses")
+                        .WithMany()
                         .HasForeignKey("CustomerID");
 
                     b.HasOne("API.Model.Employee", "Employee")
-                        .WithOne("Address")
-                        .HasForeignKey("API.Model.Address", "EmployeeID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("EmployeeID");
 
                     b.HasOne("API.Model.Province", "Province")
                         .WithMany()
-                        .HasForeignKey("ProvinceID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ProvinceID");
 
                     b.HasOne("API.Model.SuperUser", "SuperUser")
-                        .WithOne("Address")
-                        .HasForeignKey("API.Model.Address", "SuperUserID")
+                        .WithMany()
+                        .HasForeignKey("SuperUserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1272,6 +1293,21 @@ namespace API.Migrations
                     b.Navigation("Booking");
                 });
 
+            modelBuilder.Entity("API.Model.Customer", b =>
+                {
+                    b.HasOne("API.Model.User", "User")
+                        .WithOne()
+                        .HasForeignKey("API.Model.Customer", "UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.User", null)
+                        .WithOne("Customer")
+                        .HasForeignKey("API.Model.Customer", "UserID1");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("API.Model.EarlyBird", b =>
                 {
                     b.HasOne("API.Model.Event", "Event")
@@ -1291,12 +1327,6 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("API.Model.SystemPrivilege", "SystemPrivilege")
-                        .WithOne("Employee")
-                        .HasForeignKey("API.Model.Employee", "SystemPrivilegeID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("API.Model.User", "User")
                         .WithOne("Employee")
                         .HasForeignKey("API.Model.Employee", "UserID")
@@ -1305,13 +1335,15 @@ namespace API.Migrations
 
                     b.Navigation("SuperUser");
 
-                    b.Navigation("SystemPrivilege");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("API.Model.Event", b =>
                 {
+                    b.HasOne("API.Model.Employee", null)
+                        .WithMany("Events")
+                        .HasForeignKey("EmployeeID");
+
                     b.HasOne("API.Model.EventPrice", "EventPrice")
                         .WithOne("Event")
                         .HasForeignKey("API.Model.Event", "EventPriceID")
@@ -1334,13 +1366,18 @@ namespace API.Migrations
                     b.HasOne("API.Model.Address", "Address")
                         .WithOne("EventLocation")
                         .HasForeignKey("API.Model.EventLocation", "AddressID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API.Model.SuperUser", "SuperUser")
-                        .WithMany("EventLocations")
+                        .WithMany()
                         .HasForeignKey("SuperUserID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.SuperUser", null)
+                        .WithMany("EventLocations")
+                        .HasForeignKey("SuperUserID1");
 
                     b.Navigation("Address");
 
@@ -1487,8 +1524,8 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.SuperUser", b =>
                 {
                     b.HasOne("API.Model.User", "User")
-                        .WithMany("SuperUsers")
-                        .HasForeignKey("UserID")
+                        .WithOne("SuperUser")
+                        .HasForeignKey("API.Model.SuperUser", "UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1527,13 +1564,13 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.SystemPrivilege", b =>
                 {
-                    b.HasOne("API.Model.SuperUser", "SuperUser")
-                        .WithOne("SystemPrivilege")
-                        .HasForeignKey("API.Model.SystemPrivilege", "SystemPrivilegeID")
+                    b.HasOne("API.Model.User", "Users")
+                        .WithOne()
+                        .HasForeignKey("API.Model.SystemPrivilege", "UserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("SuperUser");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("API.Model.Ticket", b =>
@@ -1545,16 +1582,6 @@ namespace API.Migrations
                         .IsRequired();
 
                     b.Navigation("Booking");
-                });
-
-            modelBuilder.Entity("API.Model.User", b =>
-                {
-                    b.HasOne("API.Model.Customer", "Customer")
-                        .WithMany("Users")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("API.Model.Wine", b =>
@@ -1673,22 +1700,18 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.Customer", b =>
                 {
-                    b.Navigation("Addresses");
-
                     b.Navigation("Bookings");
 
                     b.Navigation("EventReviews");
 
                     b.Navigation("Orders");
 
-                    b.Navigation("Users");
-
                     b.Navigation("Wishlist");
                 });
 
             modelBuilder.Entity("API.Model.Employee", b =>
                 {
-                    b.Navigation("Address");
+                    b.Navigation("Events");
 
                     b.Navigation("Wines");
 
@@ -1758,13 +1781,9 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.SuperUser", b =>
                 {
-                    b.Navigation("Address");
-
                     b.Navigation("Employees");
 
                     b.Navigation("EventLocations");
-
-                    b.Navigation("SystemPrivilege");
                 });
 
             modelBuilder.Entity("API.Model.Supplier", b =>
@@ -1777,16 +1796,13 @@ namespace API.Migrations
                     b.Navigation("SupplierPayment");
                 });
 
-            modelBuilder.Entity("API.Model.SystemPrivilege", b =>
-                {
-                    b.Navigation("Employee");
-                });
-
             modelBuilder.Entity("API.Model.User", b =>
                 {
+                    b.Navigation("Customer");
+
                     b.Navigation("Employee");
 
-                    b.Navigation("SuperUsers");
+                    b.Navigation("SuperUser");
                 });
 
             modelBuilder.Entity("API.Model.Varietal", b =>

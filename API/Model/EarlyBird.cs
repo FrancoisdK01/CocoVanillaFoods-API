@@ -12,11 +12,5 @@ namespace API.Model
 
         [Range(0, 999)]
         public int Limit { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey("EventID")]
-        public int EventID { get; set; }
-        [JsonIgnore]
-        public Event Event { get; set; }
     }
 }
