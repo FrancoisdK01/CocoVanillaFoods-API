@@ -265,36 +265,6 @@ namespace API.Data
                 .HasForeignKey(e => e.SuperUserID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            ////SuperUser and Address
-            //modelBuilder.Entity<Address>()
-            //.HasOne(s => s.SuperUser)
-            //.WithOne(a => a.Address)
-            //.HasForeignKey<SuperUser>(a => a.AddressID);
-
-            ////Address and Employee
-            //modelBuilder.Entity<Employee>()
-            //.HasOne(a => a.Address)
-            //.WithOne(e => e.Employee)
-            //.HasForeignKey<Address>(a => a.AddressID)
-            //.OnDelete(DeleteBehavior.NoAction);
-
-            ////Address and Province
-            //modelBuilder.Entity<Address>()
-            //    .Property(a => a.AddressID)
-            //    .ValueGeneratedOnAdd();
-            //modelBuilder.Entity<Address>()
-            //    .HasOne(a => a.Province)
-            //    .WithMany()
-            //    .HasForeignKey(a => a.ProvinceID)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            ////EventLocation Address
-            //modelBuilder.Entity<EventLocation>()
-            //.HasOne(e => e.Address)
-            //.WithOne(a => a.EventLocations)
-            //.HasForeignKey<EventLocation>(e => e.AddressID)
-            //.OnDelete(DeleteBehavior.Restrict);
-
             //SuperUser and EventLocation
             modelBuilder.Entity<EventLocation>()
                 .HasOne(el => el.SuperUser)
@@ -303,11 +273,6 @@ namespace API.Data
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //Event and EarlyBird
-            modelBuilder.Entity<Event>()
-            .HasOne(e => e.EarlyBird)
-            .WithOne(eb => eb.Event)
-            .HasForeignKey<EarlyBird>(eb => eb.EventID);
 
             modelBuilder.Entity<SystemPrivilege>()
             .HasKey(sp => sp.SystemPrivilegeID);
@@ -318,7 +283,6 @@ namespace API.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        //public DbSet<Address> Addresses { get; set; }
         public DbSet<Blacklist> Blacklists { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingPayment> BookingPayments { get; set; }

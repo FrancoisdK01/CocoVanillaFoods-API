@@ -233,9 +233,6 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EarlyBirdID"), 1L, 1);
 
-                    b.Property<int>("EventID")
-                        .HasColumnType("int");
-
                     b.Property<int>("Limit")
                         .HasColumnType("int");
 
@@ -243,9 +240,6 @@ namespace API.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("EarlyBirdID");
-
-                    b.HasIndex("EventID")
-                        .IsUnique();
 
                     b.ToTable("EarlyBird");
                 });
@@ -339,6 +333,8 @@ namespace API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EventID");
+
+                    b.HasIndex("EarlyBirdID");
 
                     b.HasIndex("EmployeeID");
 
@@ -942,8 +938,7 @@ namespace API.Migrations
 
                     b.HasKey("SystemPrivilegeID");
 
-                    b.HasIndex("UserID")
-                        .IsUnique();
+                    b.HasIndex("UserID");
 
                     b.ToTable("SystemPrivileges");
                 });
@@ -1308,17 +1303,6 @@ namespace API.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("API.Model.EarlyBird", b =>
-                {
-                    b.HasOne("API.Model.Event", "Event")
-                        .WithOne("EarlyBird")
-                        .HasForeignKey("API.Model.EarlyBird", "EventID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
             modelBuilder.Entity("API.Model.Employee", b =>
                 {
                     b.HasOne("API.Model.SuperUser", "SuperUser")
@@ -1340,6 +1324,10 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.Event", b =>
                 {
+                    b.HasOne("API.Model.EarlyBird", "EarlyBird")
+                        .WithMany()
+                        .HasForeignKey("EarlyBirdID");
+
                     b.HasOne("API.Model.Employee", null)
                         .WithMany("Events")
                         .HasForeignKey("EmployeeID");
@@ -1355,6 +1343,8 @@ namespace API.Migrations
                         .HasForeignKey("EventTypeID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("EarlyBird");
 
                     b.Navigation("EventPrice");
 
@@ -1565,9 +1555,9 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.SystemPrivilege", b =>
                 {
                     b.HasOne("API.Model.User", "Users")
-                        .WithOne()
-                        .HasForeignKey("API.Model.SystemPrivilege", "UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Users");
@@ -1721,8 +1711,6 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.Event", b =>
                 {
                     b.Navigation("Bookings");
-
-                    b.Navigation("EarlyBird");
                 });
 
             modelBuilder.Entity("API.Model.EventPrice", b =>
