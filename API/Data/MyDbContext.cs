@@ -315,13 +315,6 @@ namespace API.Data
             modelBuilder.Entity<User>()
                 .HasKey(u => u.UserID);
 
-            modelBuilder.Entity<SystemPrivilege>()
-                .HasOne(sp => sp.Users)
-                .WithOne()
-                .HasForeignKey<SystemPrivilege>(sp => sp.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-
             base.OnModelCreating(modelBuilder);
         }
 
