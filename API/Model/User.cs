@@ -15,13 +15,10 @@ namespace API.Model
         [MaxLength(50)]
         public string UserPassword { get; set; }
 
-        [ForeignKey("CustomerID")]
-        public int? CustomerID { get; set; }
-        public Customer Customer { get; set; }
-
         [JsonIgnore]
-        public List<SuperUser> SuperUsers { get; set; }
-
+        public Customer Customer { get; set; }
+        [JsonIgnore]
+        public SuperUser SuperUser { get; set; }
         [JsonIgnore]
         public Employee Employee { get; set; }
     }

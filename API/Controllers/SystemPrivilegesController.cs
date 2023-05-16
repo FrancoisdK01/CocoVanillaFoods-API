@@ -47,12 +47,17 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSystemPrivilege(int id, SystemPrivilege systemPrivilege)
         {
-            if (id != systemPrivilege.SystemPrivilegeID)
+            var existingSystemPrivilege = await _context.SystemPrivileges.FindAsync(id);
+
+            if (existingSystemPrivilege == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(systemPrivilege).State = EntityState.Modified;
+            // Update the properties of the existingSystemPrivilege with the new values
+            existingSystemPrivilege.Privilege_Name = systemPrivilege.Privilege_Name;
+            existingSystemPrivilege.Privilege_Description = systemPrivilege.Privilege_Description;
+            // Update other properties as needed
 
             try
             {
@@ -70,7 +75,7 @@ namespace API.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(existingSystemPrivilege);
         }
 
         // POST: api/SystemPrivileges
@@ -79,21 +84,7 @@ namespace API.Controllers
         public async Task<ActionResult<SystemPrivilege>> PostSystemPrivilege(SystemPrivilege systemPrivilege)
         {
             _context.SystemPrivileges.Add(systemPrivilege);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (SystemPrivilegeExists(systemPrivilege.SystemPrivilegeID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSystemPrivilege", new { id = systemPrivilege.SystemPrivilegeID }, systemPrivilege);
         }
@@ -111,7 +102,7 @@ namespace API.Controllers
             _context.SystemPrivileges.Remove(systemPrivilege);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(systemPrivilege);
         }
 
         private bool SystemPrivilegeExists(int id)
@@ -119,4 +110,5 @@ namespace API.Controllers
             return _context.SystemPrivileges.Any(e => e.SystemPrivilegeID == id);
         }
     }
+    // WRITTEN AND SIGNED BY DIHAN DE BOD - TIMESTAMP 11:42 15/05/2023 
 }

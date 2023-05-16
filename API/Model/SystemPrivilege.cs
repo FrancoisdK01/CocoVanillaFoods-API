@@ -1,19 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.CodeAnalysis.Options;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace API.Model
 {
     public class SystemPrivilege
     {
+        [Key]
         public int SystemPrivilegeID { get; set; }
 
+        public int UserID { get; set; }
+        [JsonIgnore]
+        public User Users { get; set; }
+
+        [MaxLength(50)]
+        public string Privilege_Name { get; set; }
+
         [MaxLength(255)]
-        public string SystemPrivilegeDescription { get; set;}
-
-        [JsonIgnore]
-        public Employee Employee { get; set; }
-
-        [JsonIgnore]
-        public SuperUser SuperUser { get; set; }
+        public string Privilege_Description { get; set; }
     }
 }

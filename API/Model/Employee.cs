@@ -25,23 +25,24 @@ namespace API.Model
         public string ID_Number { get; set; }
 
         public DateTime Hire_Date { get; set; }
-        [JsonIgnore]
-        public List<WriteOff> WriteOffs { get; set; }
-        [JsonIgnore]
-        public List<Wine> Wines { get; set; }
 
-        [ForeignKey("UserID")]
         public int UserID { get; set; }
+        [JsonIgnore]
         public User User { get; set; }
 
-        [ForeignKey("SystemPrivilegeID")]
-        public int SystemPrivilegeID { get; set; }
-        public SystemPrivilege SystemPrivilege { get; set; }
-
-        [ForeignKey("SuperUserID")]
         public int SuperUserID { get; set; }
+        [JsonIgnore]
         public SuperUser SuperUser { get; set; }
+        //public int AddressID { get; set; }
 
-        public Address Address { get; set; }
+        //[JsonIgnore]
+        //public Address Address { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Wine> Wines { get; set; }
+        [JsonIgnore]
+        public ICollection<WriteOff> WriteOffs { get; set; }
+        [JsonIgnore]
+        public ICollection<Event> Events { get; set; }
     }
 }
