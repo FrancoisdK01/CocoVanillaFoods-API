@@ -10,7 +10,12 @@ namespace API.Model
         [Key]
         public int CustomerID { get; set; }
 
-        [MaxLength(50)]
+        [ForeignKey("User")]
+        public int UserID { get; set; }
+        [JsonIgnore]
+        public User User { get; set; }
+
+        [MaxLength(5)]
         public string Title { get; set; }
 
         [MaxLength(50)]
@@ -22,7 +27,7 @@ namespace API.Model
         [MaxLength(50)]
         public string Email { get; set; }
 
-        [MaxLength(50)]
+        [MaxLength(10)]
         public string Phone_Number { get; set; }
 
         [MaxLength(13)]
@@ -35,18 +40,13 @@ namespace API.Model
 
         public DateTime Date_of_last_update { get; set; }
 
+        [JsonIgnore]
         public Wishlist Wishlist { get; set; }
-
+        [JsonIgnore]
+        public List<Order> Orders { get; set; }
         [JsonIgnore]
         public List<Booking> Bookings { get; set; }
         [JsonIgnore]
         public List<EventReview> EventReviews { get; set; }
-        [JsonIgnore]
-        public List<User> Users { get; set; }
-        [JsonIgnore]
-        public List<Address> Addresses { get; set; }
-        [JsonIgnore]
-        public List<Order> Orders { get; set; }
-
     }
 }

@@ -33,22 +33,16 @@ namespace API.Model
         [Required]
         public DateTime Hire_Date { get; set; }
 
-        [ForeignKey("UserID")]
         public int UserID { get; set; }
+        [JsonIgnore]
         public User User { get; set; }
 
-        [ForeignKey("SystemPrivilegeID")]
-        public int SystemPrivilegeID { get; set; }
-        public SystemPrivilege SystemPrivilege { get; set; }
-
+        //public int AddressID { get; set; }
+        //[JsonIgnore]
+        //public Address Address { get; set; }
         [JsonIgnore]
-        public List<Employee> Employees { get; set; }
-
-        [ForeignKey("Address")]
-        public int AddressID { get; set; }
-        public Address Address { get; set; }
-
+        public ICollection<Employee> Employees { get; set; }
         [JsonIgnore]
-        public List<EventLocation> EventLocations { get; set; }
+        public ICollection<EventLocation> EventLocations { get; set; }
     }
 }

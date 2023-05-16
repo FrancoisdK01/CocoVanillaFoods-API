@@ -47,12 +47,26 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, Employee employee)
         {
-            if (id != employee.EmployeeID)
+            var existingEmployee = await _context.Employees.FindAsync(id);
+
+            if (existingEmployee == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(employee).State = EntityState.Modified;
+            // Update the properties of the existingSystemPrivilege with the new values
+            existingEmployee.EmployeeID = existingEmployee.EmployeeID;
+            existingEmployee.Hire_Date = existingEmployee.Hire_Date;
+
+            existingEmployee.First_Name = employee.First_Name;
+            existingEmployee.Last_Name = employee.Last_Name;
+            existingEmployee.Email = employee.Email;
+            existingEmployee.Phone_Number = employee.Phone_Number;
+            existingEmployee.ID_Number = employee.ID_Number;
+            existingEmployee.SuperUserID = employee.SuperUserID;
+            existingEmployee.UserID = existingEmployee.UserID;
+
+            // Update other properties as needed
 
             try
             {
@@ -69,10 +83,8 @@ namespace API.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok(existingEmployee);
         }
-
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

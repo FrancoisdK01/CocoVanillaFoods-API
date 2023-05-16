@@ -196,10 +196,10 @@ namespace API.Data
              .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<WriteOff>()
-            .HasOne(w => w.Employee)
-            .WithMany(e => e.WriteOffs)
-            .HasForeignKey(w => w.EmployeeID)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(w => w.Employee)
+                .WithMany(e => e.WriteOffs)
+                .HasForeignKey(w => w.EmployeeID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Event>()
             .HasOne(e => e.EventPrice)
@@ -211,13 +211,6 @@ namespace API.Data
             .HasOne(e => e.EventType)
             .WithMany(et => et.Events)
             .HasForeignKey(e => e.EventTypeID)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            //Event and earlyBird
-            modelBuilder.Entity<Event>()
-            .HasOne(e => e.EarlyBird)
-            .WithMany()
-            .HasForeignKey(e => e.EarlyBirdID)
             .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Booking>()
@@ -250,82 +243,89 @@ namespace API.Data
             .HasForeignKey(r => r.CustomerID)
             .OnDelete(DeleteBehavior.Restrict);
 
-            //User and Customer
+            modelBuilder.Entity<User>().Property<int>("UserID").ValueGeneratedOnAdd().HasColumnType("int").UseIdentityColumn();
             modelBuilder.Entity<User>()
-            .HasOne(u => u.Customer)
-            .WithMany(c => c.Users)
-            .HasForeignKey(u => u.CustomerID)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasOne<Customer>()
+            .WithOne(c => c.User)
+            .HasForeignKey<Customer>(c => c.UserID)
+            .OnDelete(DeleteBehavior.Restrict);
 
             //User and SuperUser
             modelBuilder.Entity<SuperUser>()
-            .HasOne(su => su.User)
-            .WithMany(u => u.SuperUsers)
-            .HasForeignKey(su => su.UserID)
-            .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(su => su.User)
+                .WithOne(u => u.SuperUser)
+                .HasForeignKey<SuperUser>(su => su.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            //Employee and SystemPrivilege
-            modelBuilder.Entity<Employee>()
-            .HasOne(e => e.SystemPrivilege)
-            .WithOne(sp => sp.Employee)
-            .HasForeignKey<Employee>(e => e.SystemPrivilegeID)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            //SystemPrivelege and SuperUser
-            modelBuilder.Entity<SuperUser>()
-            .HasOne(su => su.SystemPrivilege)
-            .WithOne(sp => sp.SuperUser)
-            .HasForeignKey<SystemPrivilege>(sp => sp.SystemPrivilegeID)
-            .OnDelete(DeleteBehavior.Restrict);
 
             //SuperUser and Employee
             modelBuilder.Entity<Employee>()
-            .HasOne(e => e.SuperUser)
-            .WithMany(su => su.Employees)
-            .HasForeignKey(e => e.SuperUserID)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(e => e.SuperUser)
+                .WithMany(su => su.Employees)
+                .HasForeignKey(e => e.SuperUserID)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //SuperUser and Address
-            modelBuilder.Entity<SuperUser>()
-            .HasOne(s => s.Address)
-            .WithOne(a => a.SuperUser)
-            .HasForeignKey<Address>(a => a.SuperUserID);
+            ////SuperUser and Address
+            //modelBuilder.Entity<Address>()
+            //.HasOne(s => s.SuperUser)
+            //.WithOne(a => a.Address)
+            //.HasForeignKey<SuperUser>(a => a.AddressID);
 
-            //Address and Employee
-            modelBuilder.Entity<Address>()
-            .HasOne(a => a.Employee)
-            .WithOne(e => e.Address)
-            .HasForeignKey<Address>(a => a.EmployeeID)
-            .OnDelete(DeleteBehavior.Restrict);
+            ////Address and Employee
+            //modelBuilder.Entity<Employee>()
+            //.HasOne(a => a.Address)
+            //.WithOne(e => e.Employee)
+            //.HasForeignKey<Address>(a => a.AddressID)
+            //.OnDelete(DeleteBehavior.NoAction);
 
-            //Address and Employee
-            modelBuilder.Entity<Address>()
-            .HasOne(a => a.Province)
-            .WithMany()
-            .HasForeignKey(a => a.ProvinceID)
-            .OnDelete(DeleteBehavior.Restrict);
+            ////Address and Province
+            //modelBuilder.Entity<Address>()
+            //    .Property(a => a.AddressID)
+            //    .ValueGeneratedOnAdd();
+            //modelBuilder.Entity<Address>()
+            //    .HasOne(a => a.Province)
+            //    .WithMany()
+            //    .HasForeignKey(a => a.ProvinceID)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
-            //EbventLocation Address
-            modelBuilder.Entity<EventLocation>()
-            .HasOne(e => e.Address)
-            .WithOne(a => a.EventLocation)
-            .HasForeignKey<EventLocation>(e => e.AddressID)
-            .OnDelete(DeleteBehavior.Restrict);
+            ////EventLocation Address
+            //modelBuilder.Entity<EventLocation>()
+            //.HasOne(e => e.Address)
+            //.WithOne(a => a.EventLocations)
+            //.HasForeignKey<EventLocation>(e => e.AddressID)
+            //.OnDelete(DeleteBehavior.Restrict);
 
             //SuperUser and EventLocation
-            modelBuilder.Entity<SuperUser>()
-            .HasMany(su => su.EventLocations)
-            .WithOne(el => el.SuperUser)
-            .HasForeignKey(el => el.SuperUserID)
-            .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<EventLocation>()
+                .HasOne(el => el.SuperUser)
+                .WithMany()
+                .HasForeignKey(el => el.SuperUserID)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            
+            //Event and EarlyBird
+            modelBuilder.Entity<Event>()
+            .HasOne(e => e.EarlyBird)
+            .WithOne(eb => eb.Event)
+            .HasForeignKey<EarlyBird>(eb => eb.EventID);
+
+            modelBuilder.Entity<SystemPrivilege>()
+            .HasKey(sp => sp.SystemPrivilegeID);
+
+            modelBuilder.Entity<User>()
+                .HasKey(u => u.UserID);
+
+            modelBuilder.Entity<SystemPrivilege>()
+                .HasOne(sp => sp.Users)
+                .WithOne()
+                .HasForeignKey<SystemPrivilege>(sp => sp.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<Address> Addresses { get; set; }
+        //public DbSet<Address> Addresses { get; set; }
         public DbSet<Blacklist> Blacklists { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingPayment> BookingPayments { get; set; }
