@@ -21,5 +21,9 @@ namespace API.Model
         public SuperUser SuperUser { get; set; }
         [JsonIgnore]
         public Employee Employee { get; set; }
+
+        [JsonIgnore]
+        public ICollection<SystemPrivilege> SystemPrivileges { get; set; }
+
     }
 }
