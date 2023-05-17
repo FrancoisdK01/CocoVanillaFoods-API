@@ -56,7 +56,7 @@ namespace API.Controllers
 
             // Update the properties of the existingSystemPrivilege with the new values
             existingEmployee.EmployeeID = existingEmployee.EmployeeID;
-            existingEmployee.Hire_Date = existingEmployee.Hire_Date;
+            existingEmployee.Hire_Date = employee.Hire_Date;
 
             existingEmployee.First_Name = employee.First_Name;
             existingEmployee.Last_Name = employee.Last_Name;
