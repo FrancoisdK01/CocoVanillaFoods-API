@@ -86,19 +86,19 @@ namespace API.Data
              .HasForeignKey<SupplierPayment>(sp => sp.SupplierOrderID)
              .OnDelete(DeleteBehavior.Restrict);
 
-            //Wine and WineType
+            // Wine and WineType relationship
             modelBuilder.Entity<Wine>()
-             .HasOne<WineType>(w => w.WineType)
-             .WithMany(wt => wt.Wines)
-             .HasForeignKey(w => w.WineTypeID)
-             .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(w => w.WineType)
+                .WithMany(wt => wt.Wines)
+                .HasForeignKey(w => w.WineTypeID)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //Wine and WineVarietal
+            // Wine and Varietal relationship
             modelBuilder.Entity<Wine>()
-            .HasOne(w => w.Varietal)
-            .WithMany(v => v.Wines)
-            .HasForeignKey(w => w.VarietalID)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(w => w.Varietal)
+                .WithMany(v => v.Wines)
+                .HasForeignKey(w => w.VarietalID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             //OrderItem and Order
             modelBuilder.Entity<OrderItem>()

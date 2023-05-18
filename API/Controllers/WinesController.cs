@@ -52,6 +52,10 @@ namespace API.Controllers
                 return BadRequest();
             }
 
+            // Fetch the WineType and Varietal entities based on the provided IDs
+            wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
+            wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
+
             _context.Entry(wine).State = EntityState.Modified;
 
             try
@@ -78,6 +82,10 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Wine>> PostWine(Wine wine)
         {
+            // Fetch the WineType and Varietal entities based on the provided IDs
+            wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
+            wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
+
             _context.Wines.Add(wine);
             await _context.SaveChangesAsync();
 
@@ -105,4 +113,5 @@ namespace API.Controllers
             return _context.Wines.Any(e => e.WineID == id);
         }
     }
+
 }

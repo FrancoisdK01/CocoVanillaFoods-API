@@ -30,13 +30,22 @@ namespace API.Model
 
         public double WinePrice { get; set; }
 
-        [ForeignKey("WineTypeID")]
-        public int WineTypeID { get; set; }
-        public WineType WineType { get; set; }
+        public int WineTypeID { get; set; } // Foreign key for WineType
 
-        [ForeignKey("VarietalID")]
-        public int VarietalID { get; set; }
-        public Varietal Varietal { get; set; }
+        public int VarietalID { get; set; } // Foreign key for Varietal
+
+        // Navigation properties
+        public virtual WineType WineType { get; set; } // Reference to WineType entity
+
+        public virtual Varietal Varietal { get; set; } // Reference to Varietal entity
+
+        //[ForeignKey("WineTypeID")]
+        //public int WineTypeID { get; set; }
+        //public WineType WineType { get; set; }
+
+        //[ForeignKey("VarietalID")]
+        //public int VarietalID { get; set; }
+        //public Varietal Varietal { get; set; }
 
         //[ForeignKey("EmployeeID")]
         //public int EmployeeID { get; set; }

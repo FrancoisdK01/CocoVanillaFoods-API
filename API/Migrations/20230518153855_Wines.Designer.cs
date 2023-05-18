@@ -4,6 +4,7 @@ using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230518153855_Wines")]
+    partial class Wines
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1062,7 +1064,7 @@ namespace API.Migrations
                     b.Property<int>("RestockLimit")
                         .HasColumnType("int");
 
-                    b.Property<int>("VarietalID")
+                    b.Property<int?>("VarietalID")
                         .HasColumnType("int");
 
                     b.Property<string>("Vintage")
@@ -1076,8 +1078,14 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("WineTypeID")
+                    b.Property<string>("WineType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("WineTypeID")
                         .HasColumnType("int");
+
+                    b.Property<string>("WineVarietal")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("WineID");
 
@@ -1580,21 +1588,13 @@ namespace API.Migrations
                         .WithMany("Wines")
                         .HasForeignKey("EmployeeID");
 
-                    b.HasOne("API.Model.Varietal", "Varietal")
+                    b.HasOne("API.Model.Varietal", null)
                         .WithMany("Wines")
-                        .HasForeignKey("VarietalID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("VarietalID");
 
-                    b.HasOne("API.Model.WineType", "WineType")
+                    b.HasOne("API.Model.WineType", null)
                         .WithMany("Wines")
-                        .HasForeignKey("WineTypeID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Varietal");
-
-                    b.Navigation("WineType");
+                        .HasForeignKey("WineTypeID");
                 });
 
             modelBuilder.Entity("API.Model.Wishlist", b =>
