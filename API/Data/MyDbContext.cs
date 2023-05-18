@@ -149,11 +149,7 @@ namespace API.Data
              .OnDelete(DeleteBehavior.Restrict);
 
             //WriteOffReason and WriteOffItem
-            modelBuilder.Entity<WriteOffItem>()
-             .HasOne<WriteOff_Reason>(woi => woi.WriteOff_Reason)
-             .WithMany(wor => wor.WriteOffItems)
-             .HasForeignKey(woi => woi.WriteOffReasonID)
-             .OnDelete(DeleteBehavior.Restrict);
+            
 
             //WriteOff and WriteOffItem
             modelBuilder.Entity<WriteOff>()
