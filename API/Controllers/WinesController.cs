@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using Microsoft.AspNetCore.Hosting;
 
 namespace API.Controllers
 {
@@ -15,10 +16,12 @@ namespace API.Controllers
     public class WinesController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public WinesController(MyDbContext context)
+        public WinesController(MyDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         // GET: api/Wines
@@ -43,9 +46,8 @@ namespace API.Controllers
         }
 
         // PUT: api/Wines/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutWine(int id, Wine wine)
+        public async Task<IActionResult> PutWine(int id, [FromForm] Wine wine)
         {
             if (id != wine.WineID)
             {
@@ -55,6 +57,20 @@ namespace API.Controllers
             // Fetch the WineType and Varietal entities based on the provided IDs
             wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
             wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
+
+            if (wine.ImageFile != null)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(wine.ImageFile.FileName);
+                string filePath = Path.Combine(_hostEnvironment.WebRootPath, fileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await wine.ImageFile.CopyToAsync(fileStream);
+                }
+
+                // Save the file path (or URL if it's a public folder) in the ImageUrl property
+                wine.ImageUrl = fileName;
+            }
 
             _context.Entry(wine).State = EntityState.Modified;
 
@@ -77,11 +93,26 @@ namespace API.Controllers
             return NoContent();
         }
 
+
         // POST: api/Wines
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Wine>> PostWine(Wine wine)
+        public async Task<ActionResult<Wine>> PostWine([FromForm] Wine wine, IFormFile imageFile)
         {
+            if (imageFile != null)
+            {
+                // Process and save the image file to a designated folder
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                string filePath = Path.Combine(_hostEnvironment.WebRootPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                wine.ImageUrl = fileName;
+            }
+
             // Fetch the WineType and Varietal entities based on the provided IDs
             wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
             wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);

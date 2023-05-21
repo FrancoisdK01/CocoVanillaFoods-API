@@ -22,8 +22,12 @@ namespace API.Model
         [Range(0, 999)]
         public int RestockLimit { get; set; }
 
+        // New property for storing the image URL after file is uploaded
         [StringLength(255)]
         public string ImageUrl { get; set; }
+
+        [NotMapped] // We don't want to store the file in the database
+        public IFormFile ImageFile { get; set; }
 
         [StringLength(255)]
         public string WineTastingNote { get; set; }
@@ -38,18 +42,6 @@ namespace API.Model
         public virtual WineType WineType { get; set; } // Reference to WineType entity
 
         public virtual Varietal Varietal { get; set; } // Reference to Varietal entity
-
-        //[ForeignKey("WineTypeID")]
-        //public int WineTypeID { get; set; }
-        //public WineType WineType { get; set; }
-
-        //[ForeignKey("VarietalID")]
-        //public int VarietalID { get; set; }
-        //public Varietal Varietal { get; set; }
-
-        //[ForeignKey("EmployeeID")]
-        //public int EmployeeID { get; set; }
-        //public Employee Employee { get; set; }
 
         [JsonIgnore]
         public List<Inventory> Inventories { get; set; }
