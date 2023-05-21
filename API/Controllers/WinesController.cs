@@ -28,7 +28,14 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Wine>>> GetWines()
         {
-            return await _context.Wines.ToListAsync();
+            var wines = await _context.Wines.ToListAsync();
+
+            foreach (var wine in wines)
+            {
+                wine.ImageUrl = Url.Content($"~/Images/{wine.WineID}.jpg");
+            }
+
+            return wines;
         }
 
         // GET: api/Wines/5
