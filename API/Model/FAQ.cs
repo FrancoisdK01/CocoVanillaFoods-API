@@ -2,6 +2,8 @@
 
 namespace API.Model
 {
+    //Add Model for FAQ
+
     public class FAQ
     {
         [Key]
