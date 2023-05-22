@@ -22,10 +22,12 @@ namespace API.Model
         [Required]
         public string Email { get; set; }
 
-        [MaxLength(50)]
+        // [MinLength(10)] - REMEMBER TO ADD
+        [MaxLength(10)]
         [Required]
         public string Phone_Number { get; set; }
 
+        // [MinLength(13)] - REMEMBER TO ADD
         [MaxLength(13)]
         [Required]
         public string ID_Number { get; set; }

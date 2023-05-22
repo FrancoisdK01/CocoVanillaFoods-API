@@ -18,9 +18,11 @@ namespace API.Model
         [MaxLength(50)]
         public string Email { get; set; }
 
+        // [MinLength(10)] - REMEMBER TO ADD
         [MaxLength(10)]
         public string Phone_Number { get; set; }
 
+        // [MinLength(13)] - REMEMBER TO ADD
         [MaxLength(13)]
         public string ID_Number { get; set; }
 
