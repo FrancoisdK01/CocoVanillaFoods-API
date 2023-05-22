@@ -61,7 +61,6 @@ namespace API.Controllers
                 return BadRequest();
             }
 
-            // Fetch the WineType and Varietal entities based on the provided IDs
             wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
             wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
 
@@ -75,8 +74,7 @@ namespace API.Controllers
                     await wine.ImageFile.CopyToAsync(fileStream);
                 }
 
-                // Save the file path (or URL if it's a public folder) in the ImageUrl property
-                wine.ImageUrl = fileName;
+                wine.ImageUrl = Path.Combine("/wwwroot", fileName);
             }
 
             _context.Entry(wine).State = EntityState.Modified;
@@ -108,7 +106,6 @@ namespace API.Controllers
         {
             if (imageFile != null)
             {
-                // Process and save the image file to a designated folder
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
                 string filePath = Path.Combine(_hostEnvironment.WebRootPath, fileName);
 
@@ -117,10 +114,9 @@ namespace API.Controllers
                     await imageFile.CopyToAsync(stream);
                 }
 
-                wine.ImageUrl = fileName;
+                wine.ImageUrl = Path.Combine("/wwwroot", fileName);
             }
 
-            // Fetch the WineType and Varietal entities based on the provided IDs
             wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
             wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
 
@@ -129,6 +125,7 @@ namespace API.Controllers
 
             return CreatedAtAction("GetWine", new { id = wine.WineID }, wine);
         }
+
 
         // DELETE: api/Wines/5
         [HttpDelete("{id}")]

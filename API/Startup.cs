@@ -4,26 +4,47 @@ namespace API
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+            // ... other services
             services.AddDirectoryBrowser();
-            // ...
-
-            services.Configure<IISServerOptions>(options =>
-            {
-                options.MaxRequestBodySize = 104857600; // Set the maximum request body size (e.g., 100MB)
-            });
-
-            // ...
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // ...
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
 
-            app.UseStaticFiles(); // Add this line to enable serving static files
+            app.UseHttpsRedirection();
 
-            // ...
+            // Use static files before UseRouting
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                // ... other endpoints
+            });
         }
+
     }
 }
