@@ -9,6 +9,8 @@ using API.Data;
 using API.Model;
 
 namespace API.Controllers
+
+    //final discountscontroller
 {
     [Route("api/[controller]")]
     [ApiController]
