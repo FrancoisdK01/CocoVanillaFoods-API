@@ -2,6 +2,8 @@
 
 namespace API.Model
 {
+    //Add Model for VAT
+
     public class VAT
     {
         [Key]
