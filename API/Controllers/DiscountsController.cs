@@ -10,7 +10,7 @@ using API.Model;
 
 namespace API.Controllers
 
-    //final discountscontroller
+    //final discountscontroller final
 {
     [Route("api/[controller]")]
     [ApiController]
