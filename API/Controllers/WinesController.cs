@@ -16,12 +16,10 @@ namespace API.Controllers
     public class WinesController : ControllerBase
     {
         private readonly MyDbContext _context;
-        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public WinesController(MyDbContext context, IWebHostEnvironment hostEnvironment)
+        public WinesController(MyDbContext context)
         {
             _context = context;
-            _hostEnvironment = hostEnvironment;
         }
 
         // GET: api/Wines
@@ -29,11 +27,6 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<Wine>>> GetWines()
         {
             var wines = await _context.Wines.ToListAsync();
-
-            foreach (var wine in wines)
-            {
-                wine.ImageUrl = Url.Content($"~/Images/{wine.WineID}.jpg");
-            }
 
             return wines;
         }
@@ -64,19 +57,6 @@ namespace API.Controllers
             wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
             wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
 
-            if (wine.ImageFile != null)
-            {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(wine.ImageFile.FileName);
-                string filePath = Path.Combine(_hostEnvironment.WebRootPath, fileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await wine.ImageFile.CopyToAsync(fileStream);
-                }
-
-                wine.ImageUrl = Path.Combine("/wwwroot", fileName);
-            }
-
             _context.Entry(wine).State = EntityState.Modified;
 
             try
@@ -98,25 +78,11 @@ namespace API.Controllers
             return NoContent();
         }
 
-
         // POST: api/Wines
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Wine>> PostWine([FromForm] Wine wine, IFormFile imageFile)
+        public async Task<ActionResult<Wine>> PostWine([FromForm] Wine wine)
         {
-            if (imageFile != null)
-            {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                string filePath = Path.Combine(_hostEnvironment.WebRootPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
-
-                wine.ImageUrl = Path.Combine("/wwwroot", fileName);
-            }
-
             wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
             wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
 
@@ -125,7 +91,6 @@ namespace API.Controllers
 
             return CreatedAtAction("GetWine", new { id = wine.WineID }, wine);
         }
-
 
         // DELETE: api/Wines/5
         [HttpDelete("{id}")]

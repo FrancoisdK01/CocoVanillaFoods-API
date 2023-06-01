@@ -22,13 +22,6 @@ namespace API.Model
         [Range(0, 999)]
         public int RestockLimit { get; set; }
 
-        // New property for storing the image URL after file is uploaded
-        [StringLength(255)]
-        public string ImageUrl { get; set; }
-
-        [NotMapped] // We don't want to store the file in the database
-        public IFormFile ImageFile { get; set; }
-
         [StringLength(255)]
         public string WineTastingNote { get; set; }
 
