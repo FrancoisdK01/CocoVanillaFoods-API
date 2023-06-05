@@ -303,7 +303,7 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("EarlyBirdID")
+                    b.Property<int>("EarlyBirdID")
                         .HasColumnType("int");
 
                     b.Property<int?>("EmployeeID")
@@ -317,14 +317,11 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("EventPriceID")
+                        .HasMaxLength(255)
                         .HasColumnType("int");
 
                     b.Property<int>("EventTypeID")
                         .HasColumnType("int");
-
-                    b.Property<string>("Image_URL")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Tickets_Available")
                         .HasColumnType("int");
@@ -360,6 +357,9 @@ namespace API.Migrations
                     b.Property<DateTime>("Date_of_last_update")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EventID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Postal_Code")
                         .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
@@ -369,10 +369,6 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("SuperUserID")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SuperUserID1")
                         .HasColumnType("int");
 
                     b.HasKey("EventLocationID");
@@ -380,9 +376,9 @@ namespace API.Migrations
                     b.HasIndex("AddressID")
                         .IsUnique();
 
-                    b.HasIndex("SuperUserID");
+                    b.HasIndex("EventID");
 
-                    b.HasIndex("SuperUserID1");
+                    b.HasIndex("SuperUserID");
 
                     b.ToTable("EventLocations");
                 });
@@ -395,8 +391,8 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventPriceID"), 1L, 1);
 
-                    b.Property<double>("Amount")
-                        .HasColumnType("float");
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -821,8 +817,8 @@ namespace API.Migrations
 
                     b.Property<string>("Phone_Number")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<int>("UserID")
                         .HasColumnType("int");
@@ -1049,10 +1045,6 @@ namespace API.Migrations
 
                     b.Property<int?>("EmployeeID")
                         .HasColumnType("int");
-
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1324,7 +1316,9 @@ namespace API.Migrations
                 {
                     b.HasOne("API.Model.EarlyBird", "EarlyBird")
                         .WithMany()
-                        .HasForeignKey("EarlyBirdID");
+                        .HasForeignKey("EarlyBirdID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("API.Model.Employee", null)
                         .WithMany("Events")
@@ -1357,19 +1351,17 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("API.Model.SuperUser", "SuperUser")
+                    b.HasOne("API.Model.Event", "Event")
                         .WithMany()
-                        .HasForeignKey("SuperUserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("EventID");
 
                     b.HasOne("API.Model.SuperUser", null)
                         .WithMany("EventLocations")
-                        .HasForeignKey("SuperUserID1");
+                        .HasForeignKey("SuperUserID");
 
                     b.Navigation("Address");
 
-                    b.Navigation("SuperUser");
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("API.Model.EventReview", b =>

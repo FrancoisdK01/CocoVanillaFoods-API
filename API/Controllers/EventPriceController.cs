@@ -12,47 +12,47 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventTypeController : ControllerBase
+    public class EventPriceController : ControllerBase
     {
         private readonly MyDbContext _context;
 
-        public EventTypeController(MyDbContext context)
+        public EventPriceController(MyDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/EventTypes
+        // GET: api/EventPrices
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventType>>> GetEventTypes()
+        public async Task<ActionResult<IEnumerable<EventPrice>>> GetEventPrices()
         {
-            return await _context.EventTypes.ToListAsync();
+            return await _context.EventPrices.ToListAsync();
         }
 
-        // GET: api/EventTypes/5
+        // GET: api/EventPrices/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<EventType>> GetEventType(int id)
+        public async Task<ActionResult<EventPrice>> GetEventPrice(int id)
         {
-            var eventType = await _context.EventTypes.FindAsync(id);
+            var eventPrice = await _context.EventPrices.FindAsync(id);
 
-            if (eventType == null)
+            if (eventPrice == null)
             {
                 return NotFound();
             }
 
-            return eventType;
+            return eventPrice;
         }
 
-        // PUT: api/EventTypes/5
+        // PUT: api/EventPrices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEventType(int id, EventType eventType)
+        public async Task<IActionResult> PutEventPrice(int id, EventPrice eventPrice)
         {
-            if (id != eventType.EventTypeID)
+            if (id != eventPrice.EventPriceID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(eventType).State = EntityState.Modified;
+            _context.Entry(eventPrice).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EventTypeExists(id))
+                if (!EventPriceExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace API.Controllers
             return NoContent();
         }
 
-        // POST: api/EventTypes
+        // POST: api/EventPrices
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<EventType>> PostEventType(EventType eventType)
+        public async Task<ActionResult<EventPrice>> PostEventPrice(EventPrice eventPrice)
         {
-            _context.EventTypes.Add(eventType);
+            _context.EventPrices.Add(eventPrice);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEventType", new { id = eventType.EventTypeID }, eventType);
+            return CreatedAtAction("GetEventPrice", new { id = eventPrice.EventPriceID }, eventPrice);
         }
 
-        // DELETE: api/EventTypes/5
+        // DELETE: api/EventPrices/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEventType(int id)
+        public async Task<IActionResult> DeleteEventPrice(int id)
         {
-            var eventType = await _context.EventTypes.FindAsync(id);
-            if (eventType == null)
+            var eventPrice = await _context.EventPrices.FindAsync(id);
+            if (eventPrice == null)
             {
                 return NotFound();
             }
 
-            _context.EventTypes.Remove(eventType);
+            _context.EventPrices.Remove(eventPrice);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool EventTypeExists(int id)
+        private bool EventPriceExists(int id)
         {
-            return _context.EventTypes.Any(e => e.EventTypeID == id);
+            return _context.EventPrices.Any(e => e.EventPriceID == id);
         }
     }
 }

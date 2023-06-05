@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 
 namespace API.Model
 {
@@ -8,10 +11,12 @@ namespace API.Model
         [Key]
         public int EventPriceID { get; set; }
 
-        public double Amount { get; set; }
+        public int Amount { get; set; }
 
         public DateTime Date { get; set; }
 
-        public Event Event { get; set; }
+
+       
+        public virtual Event Event { get; set; }
     }
 }
