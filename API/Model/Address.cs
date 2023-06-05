@@ -25,14 +25,17 @@ namespace API.Model
         public int? CustomerID { get; set; }
         public Customer Customer { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("SuperUser")]
         public int SuperUserID { get; set; }
         public SuperUser SuperUser { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("EmployeeID")]
         public int? EmployeeID { get; set; }
         public Employee Employee { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("ProvinceID")]
         public int? ProvinceID { get; set; }
         public Province Province { get; set; }

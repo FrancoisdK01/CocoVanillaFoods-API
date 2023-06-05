@@ -20,8 +20,10 @@ namespace API.Model
         public int AddressID { get; set; }
         public Address Address { get; set; }
 
-        [ForeignKey("SuperUser")]
-        public int? SuperUserID { get; set; }
-        public SuperUser SuperUser { get; set; }
+        public Event Event { get; set; }
+
+        //[ForeignKey("SuperUser")]
+        //public int? SuperUserID { get; set; }
+        //public SuperUser SuperUser { get; set; }
     }
 }
