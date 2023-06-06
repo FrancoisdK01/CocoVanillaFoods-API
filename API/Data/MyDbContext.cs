@@ -198,18 +198,6 @@ namespace API.Data
                 .HasForeignKey(w => w.EmployeeID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Event>()
-            .HasOne(e => e.EventPrice)
-            .WithOne(ep => ep.Event)
-            .HasForeignKey<Event>(e => e.EventPriceID)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Event>()
-            .HasOne(e => e.EventType)
-            .WithMany(et => et.Events)
-            .HasForeignKey(e => e.EventTypeID)
-            .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Booking>()
             .HasOne(b => b.Event)
             .WithMany(e => e.Bookings)
@@ -262,13 +250,6 @@ namespace API.Data
                 .HasForeignKey(e => e.SuperUserID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //SuperUser and EventLocation
-            modelBuilder.Entity<EventLocation>()
-                .HasOne(el => el.SuperUser)
-                .WithMany()
-                .HasForeignKey(el => el.SuperUserID)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
 
 
             modelBuilder.Entity<SystemPrivilege>()
