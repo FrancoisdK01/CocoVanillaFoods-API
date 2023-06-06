@@ -31,6 +31,9 @@ namespace API.Model
 
         public int VarietalID { get; set; } // Foreign key for Varietal
 
+        [Required]
+        public string FilePath { get; set; }
+
         // Navigation properties
         public virtual WineType WineType { get; set; } // Reference to WineType entity
 
