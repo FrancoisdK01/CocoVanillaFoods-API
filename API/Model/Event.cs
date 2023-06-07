@@ -23,7 +23,24 @@ namespace API.Model
         [MaxLength(255)]
         public string Description { get; set; }
 
-        public double EventPrice { get; set; }
+        public int EventPrice { get; set; }
+
+
+        //public int? EventPriceID { get; set; }
+
+        //public int? EarlyBirdID { get; set; }
+
+        //public int? EventTypeID { get; set; }
+
+        //public virtual EventPrice EventPrice { get; set; }
+
+        //public virtual EarlyBird EarlyBird { get; set; }
+
+        //public virtual EventType EventType { get; set; }
+
+
+
+        
 
         [JsonIgnore]
         public List<Booking> Bookings { get; set; }
