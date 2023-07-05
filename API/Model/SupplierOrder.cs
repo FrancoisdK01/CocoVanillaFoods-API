@@ -14,14 +14,10 @@ namespace API.Model
 
         [ForeignKey("WineID")]
         public int WineID { get; set; }
-        public Wine Wine { get; set; }
+        public virtual Wine Wine { get; set; }
 
         [ForeignKey("SupplierID")]
         public int SupplierID { get; set; }
-        public Supplier Supplier { get; set; }
-
-        [ForeignKey("SupplierPaymentID")]
-        public int SupplierPaymentID { get; set; }
-        public SupplierPayment SupplierPayment { get; set; }
+        public virtual Supplier Supplier { get; set; }
     }
 }
