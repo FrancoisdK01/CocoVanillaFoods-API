@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Options;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Options;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -9,7 +10,7 @@ namespace API.Model
     {
         [Key]
         public int SystemPrivilegeID { get; set; }
-        public int UserID { get; set; }
+        public string UserID { get; set; }
 
         [ForeignKey("UserID")]
         [JsonIgnore]

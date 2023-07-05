@@ -30,7 +30,7 @@ namespace API.Controllers
 
         // GET: api/SuperUsers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SuperUser>> GetSuperUser(int id)
+        public async Task<ActionResult<SuperUser>> GetSuperUser(string id)
         {
             var superUser = await _context.SuperUser.FindAsync(id);
 
@@ -45,9 +45,9 @@ namespace API.Controllers
         // PUT: api/SuperUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSuperUser(int id, SuperUser superUser)
+        public async Task<IActionResult> PutSuperUser(string id, SuperUser superUser)
         {
-            if (id != superUser.SuperUserID)
+            if (id != superUser.Id)
             {
                 return BadRequest();
             }
@@ -81,12 +81,12 @@ namespace API.Controllers
             _context.SuperUser.Add(superUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSuperUser", new { id = superUser.SuperUserID }, superUser);
+            return CreatedAtAction("GetSuperUser", new { id = superUser.Id }, superUser);
         }
 
         // DELETE: api/SuperUsers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSuperUser(int id)
+        public async Task<IActionResult> DeleteSuperUser(string id)
         {
             var superUser = await _context.SuperUser.FindAsync(id);
             if (superUser == null)
@@ -100,9 +100,9 @@ namespace API.Controllers
             return NoContent();
         }
 
-        private bool SuperUserExists(int id)
+        private bool SuperUserExists(string id)
         {
-            return _context.SuperUser.Any(e => e.SuperUserID == id);
+            return _context.SuperUser.Any(e => e.Id == id);
         }
     }
 }

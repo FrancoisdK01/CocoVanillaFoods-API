@@ -14,6 +14,6 @@ namespace API.Model
 
         [ForeignKey("SupplierOrderID")]
         public int SupplierOrderID { get; set; }
-        public SupplierOrder SupplierOrder { get; set; }
+        public virtual SupplierOrder SupplierOrder { get; set; }
     }
 }

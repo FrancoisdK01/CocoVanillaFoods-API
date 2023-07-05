@@ -11,9 +11,9 @@ namespace API.Model
         public int CustomerID { get; set; }
 
         [ForeignKey("User")]
-        public int UserID { get; set; }
+        public string UserID { get; set; }
         [JsonIgnore]
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
         [MaxLength(5)]
         public string Title { get; set; }

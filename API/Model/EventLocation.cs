@@ -16,10 +16,6 @@ namespace API.Model
 
         public DateTime Date_of_last_update { get; set; }
 
-        [ForeignKey("AddressID")]
-        public int AddressID { get; set; }
-        public Address Address { get; set; }
-
         public Event Event { get; set; }
 
         //[ForeignKey("SuperUser")]

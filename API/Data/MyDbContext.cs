@@ -1,6 +1,8 @@
-﻿using API.Model;
+﻿using API.Identity;
+using API.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using System.Linq;
 
 namespace API.Data
 {
@@ -40,12 +42,7 @@ namespace API.Data
             // .HasForeignKey(w => w.EmployeeID)
             // .OnDelete(DeleteBehavior.Restrict);
 
-            //Employee and User
-            modelBuilder.Entity<Employee>()
-             .HasOne(e => e.User)
-             .WithOne(u => u.Employee)
-             .HasForeignKey<Employee>(e => e.UserID)
-             .OnDelete(DeleteBehavior.Cascade);
+            
 
             //Customer and Order
             modelBuilder.Entity<Order>()
@@ -79,12 +76,6 @@ namespace API.Data
             .WithMany(s => s.SupplierOrders)
             .HasForeignKey(so => so.SupplierID)
             .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<SupplierOrder>()
-             .HasOne(s => s.SupplierPayment)
-             .WithOne(sp => sp.SupplierOrder)
-             .HasForeignKey<SupplierPayment>(sp => sp.SupplierOrderID)
-             .OnDelete(DeleteBehavior.Restrict);
 
             // Wine and WineType relationship
             modelBuilder.Entity<Wine>()
@@ -228,35 +219,16 @@ namespace API.Data
             .HasForeignKey(r => r.CustomerID)
             .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<User>().Property<int>("UserID").ValueGeneratedOnAdd().HasColumnType("int").UseIdentityColumn();
-            modelBuilder.Entity<User>()
-            .HasOne<Customer>()
-            .WithOne(c => c.User)
-            .HasForeignKey<Customer>(c => c.UserID)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            //User and SuperUser
-            modelBuilder.Entity<SuperUser>()
-                .HasOne(su => su.User)
-                .WithOne(u => u.SuperUser)
-                .HasForeignKey<SuperUser>(su => su.UserID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-
-            //SuperUser and Employee
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.SuperUser)
                 .WithMany(su => su.Employees)
-                .HasForeignKey(e => e.SuperUserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-
+                .HasForeignKey(e => e.SuperUserID);
 
             modelBuilder.Entity<SystemPrivilege>()
             .HasKey(sp => sp.SystemPrivilegeID);
 
             modelBuilder.Entity<User>()
-                .HasKey(u => u.UserID);
+                .HasKey(u => u.Id);
 
             base.OnModelCreating(modelBuilder);
         }
