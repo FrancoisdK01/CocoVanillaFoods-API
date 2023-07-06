@@ -129,6 +129,46 @@ namespace API.Controllers
             });
         }
 
+        [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UpdateLoginDetails(string id, LoginUpdateViewModel model)
+        {
+            var loggedInUser = await _userManager.FindByIdAsync(id);
+
+            if (loggedInUser == null)
+            {
+                return NotFound();
+            }
+
+            // Update the email address if provided
+            if (!string.IsNullOrEmpty(model.NewEmail))
+            {
+                loggedInUser.Email = model.NewEmail;
+                loggedInUser.UserName = model.UserName; // Set the username to the new email as well
+            }
+
+            // Update the password if provided
+            if (!string.IsNullOrEmpty(model.NewPassword) && !string.IsNullOrEmpty(model.ConfirmPassword))
+            {
+                var passwordChangeResult = await _userManager.ChangePasswordAsync(loggedInUser, model.CurrentPassword, model.NewPassword);
+
+                if (!passwordChangeResult.Succeeded)
+                {
+                    return BadRequest(passwordChangeResult.Errors);
+                }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(loggedInUser);
+
+            if (!updateResult.Succeeded)
+            {
+                return BadRequest(updateResult.Errors);
+            }
+
+            return Ok(loggedInUser);
+        }
+
+
         //Test Authentication
         [HttpGet]
         [Route("testAuth")]
