@@ -167,11 +167,32 @@ namespace API.Controllers
             {
                 return NotFound();
             }
+            else
+            {
+                var user = await _userManager.FindByIdAsync(employee.UserId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    try
+                    {
+                        _context.Employees.Remove(employee);
+                        await _userManager.DeleteAsync(user);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch(Exception ex)
+                    {
+                        return BadRequest(ex.Message);
+                    }
+                }
+            }
 
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
+            
+           
 
-            return NoContent();
+            return Ok("User has been removed from the system");
         }
 
         private bool EmployeeExists(string id)
