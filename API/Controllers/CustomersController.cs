@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Controllers
 {
@@ -15,10 +16,12 @@ namespace API.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public CustomersController(MyDbContext context)
+        public CustomersController(MyDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/Customers
@@ -30,7 +33,7 @@ namespace API.Controllers
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        public async Task<ActionResult<Customer>> GetCustomer(string id)
         {
             var customer = await _context.Customers.FindAsync(id);
 
@@ -45,14 +48,34 @@ namespace API.Controllers
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, Customer customer)
+        public async Task<IActionResult> PutCustomer(string id, Customer customer)
         {
-            if (id != customer.CustomerID)
+            var existingCustomer = await _context.Customers.FindAsync(id);
+
+            if (existingCustomer == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(customer).State = EntityState.Modified;
+            var existingUser = await _userManager.FindByIdAsync(existingCustomer.UserID);
+
+            // Update the properties of the existingSystemPrivilege with the new values
+            existingCustomer.Id = existingCustomer.Id;
+            existingCustomer.Date_Created = existingCustomer.Date_Created;
+            existingCustomer.Date_of_last_update = DateTime.Now;
+
+            existingCustomer.First_Name = customer.First_Name;
+            existingCustomer.Last_Name = customer.Last_Name;
+            existingCustomer.Email = customer.Email;
+            existingCustomer.PhoneNumber = customer.PhoneNumber;
+            existingCustomer.ID_Number = customer.ID_Number;
+            existingCustomer.Gender = customer.Gender;
+            existingCustomer.Title = customer.Title;
+
+            existingUser.UserName = customer.First_Name;
+            existingUser.Email = customer.Email;
+            existingUser.DisplayName = customer.First_Name;
+            //existingEmployee.Id = existingEmployee.Id;
 
             try
             {
@@ -69,40 +92,56 @@ namespace API.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok(existingCustomer);
         }
+        //// POST: api/Customers
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
+        //{
+        //    _context.Customers.Add(customer);
+        //    await _context.SaveChangesAsync();
 
-        // POST: api/Customers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
-        {
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCustomer", new { id = customer.CustomerID }, customer);
-        }
+        //    return CreatedAtAction("GetCustomer", new { id = customer.
+        //    }, customer);
+        //}
 
         // DELETE: api/Customers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
+        public async Task<IActionResult> DeleteCustomer(string id)
         {
             var customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();
             }
-
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            else
+            {
+                var user = await _userManager.FindByIdAsync(customer.UserID);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    try
+                    {
+                        _context.Customers.Remove(customer);
+                        await _userManager.DeleteAsync(user);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex.Message);
+                    }
+                }
+            }
+            return Ok("User has been removed from the system");
         }
 
-        private bool CustomerExists(int id)
+        private bool CustomerExists(string id)
         {
-            return _context.Customers.Any(e => e.CustomerID == id);
+            return _context.Customers.Any(e => e.Id.Equals(id));
         }
     }
 }

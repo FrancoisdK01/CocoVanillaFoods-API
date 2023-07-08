@@ -18,7 +18,7 @@ namespace API.Controllers
     {
         private readonly MyDbContext _context;
         private readonly UserManager<User> _userManager;
-
+        private static Random random = new Random();
         public EmployeesController(MyDbContext context, UserManager<User> userManager)
         {
             _context = context;
@@ -123,7 +123,7 @@ namespace API.Controllers
             var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            var result = await _userManager.CreateAsync(user, registerModel.Password);
+            var result = await _userManager.CreateAsync(user, registerModel.Password); // Change to GeneratePassword();
             if (!result.Succeeded)
             {
                 // Handle user account creation failure
@@ -198,6 +198,46 @@ namespace API.Controllers
         private bool EmployeeExists(string id)
         {
             return _context.Employees.Any(e => e.Id.Equals(id));
+        }
+        
+        public static string GeneratePassword()
+        {
+            string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string specialCharacters = "!@#$&*";
+            string digits = "0123456789";
+            string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+
+            char[] password = new char[12];
+
+            // Select one character from each requirement
+            password[0] = GetRandomCharacter(uppercaseLetters);
+            password[1] = GetRandomCharacter(specialCharacters);
+            password[2] = GetRandomCharacter(digits);
+            password[3] = GetRandomCharacter(lowercaseLetters);
+
+            // Fill the remaining characters
+            for (int i = 4; i < 12; i++)
+            {
+                string allCharacters = uppercaseLetters + specialCharacters + digits + lowercaseLetters;
+                password[i] = GetRandomCharacter(allCharacters);
+            }
+
+            // Shuffle the password characters
+            for (int i = 0; i < 12; i++)
+            {
+                int randomIndex = random.Next(i, 12);
+                char temp = password[randomIndex];
+                password[randomIndex] = password[i];
+                password[i] = temp;
+            }
+
+            return new string(password);
+        }
+
+        private static char GetRandomCharacter(string characterSet)
+        {
+            int randomIndex = random.Next(0, characterSet.Length);
+            return characterSet[randomIndex];
         }
     }
 }

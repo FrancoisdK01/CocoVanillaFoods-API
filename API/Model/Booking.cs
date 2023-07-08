@@ -21,7 +21,7 @@ namespace API.Model
         public BookingPayment BookingPayment { get; set; }
 
         [ForeignKey("CustomerID")]
-        public int? CustomerId { get; set; }
+        public string CustomerId { get; set; }
         public Customer Customer { get; set; }
     }
 }
