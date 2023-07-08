@@ -225,7 +225,7 @@ namespace API.Data
                 .HasForeignKey(e => e.SuperUserID);
 
             modelBuilder.Entity<SystemPrivilege>()
-            .HasKey(sp => sp.SystemPrivilegeID);
+            .HasKey(sp => sp.Id);
 
             modelBuilder.Entity<User>()
                 .HasKey(u => u.Id);

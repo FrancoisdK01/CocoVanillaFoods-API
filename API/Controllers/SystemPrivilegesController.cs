@@ -7,19 +7,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
+using API.ViewModels;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Superuser")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SystemPrivilegesController : ControllerBase
     {
         private readonly MyDbContext _context;
-
-        public SystemPrivilegesController(MyDbContext context)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public SystemPrivilegesController(MyDbContext context, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _roleManager = roleManager;
         }
+
 
         // GET: api/SystemPrivileges
         [HttpGet]
@@ -30,7 +39,7 @@ namespace API.Controllers
 
         // GET: api/SystemPrivileges/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SystemPrivilege>> GetSystemPrivilege(int id)
+        public async Task<ActionResult<SystemPrivilege>> GetSystemPrivilege(string id)
         {
             var systemPrivilege = await _context.SystemPrivileges.FindAsync(id);
 
@@ -45,7 +54,7 @@ namespace API.Controllers
         // PUT: api/SystemPrivileges/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSystemPrivilege(int id, SystemPrivilege systemPrivilege)
+        public async Task<IActionResult> PutSystemPrivilege(string id, SystemPrivilege systemPrivilege)
         {
             var existingSystemPrivilege = await _context.SystemPrivileges.FindAsync(id);
 
@@ -54,8 +63,17 @@ namespace API.Controllers
                 return NotFound();
             }
 
+            // Get the role from the AspNetRoles table
+            var role = await _roleManager.FindByIdAsync(existingSystemPrivilege.RoleId);
+            if (role != null)
+            {
+                // Update the role name with the new privilege name
+                role.Name = systemPrivilege.Name;
+                await _roleManager.UpdateAsync(role);
+            }
+
             // Update the properties of the existingSystemPrivilege with the new values
-            existingSystemPrivilege.Privilege_Name = systemPrivilege.Privilege_Name;
+            existingSystemPrivilege.Name = systemPrivilege.Name;
             existingSystemPrivilege.Privilege_Description = systemPrivilege.Privilege_Description;
             // Update other properties as needed
 
@@ -78,25 +96,71 @@ namespace API.Controllers
             return Ok(existingSystemPrivilege);
         }
 
+
         // POST: api/SystemPrivileges
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<SystemPrivilege>> PostSystemPrivilege(SystemPrivilege systemPrivilege)
+        public async Task<ActionResult<SystemPrivilege>> PostSystemPrivilege(SystemPrivilegeViewModel viewModel)
         {
-            _context.SystemPrivileges.Add(systemPrivilege);
+            // Check if the role name already exists in SystemPrivileges
+            if (await _context.SystemPrivileges.AnyAsync(s => s.Name == viewModel.Name))
+            {
+                return Conflict("Role name already exists in SystemPrivileges.");
+            }
+
+            // Check if the role name already exists in AspNetRoles
+            if (await _roleManager.RoleExistsAsync(viewModel.Name))
+            {
+                return Conflict("Role name already exists in AspNetRoles.");
+            }
+
+            var role = new IdentityRole { Name = viewModel.Name};
+
+            // Add role to the AspNetRoles table
+            var result = await _roleManager.CreateAsync(role);
+            if (!result.Succeeded)
+            {
+                // Handle the error if role creation fails
+                return StatusCode(500, "Failed to create role in AspNetRoles table.");
+            }
+
+            var privilege = new SystemPrivilege
+            {
+                Name = viewModel.Name,
+                RoleId = role.Id,
+                Privilege_Description = viewModel.Description
+            };
+
+            _context.SystemPrivileges.Add(privilege);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSystemPrivilege", new { id = systemPrivilege.SystemPrivilegeID }, systemPrivilege);
+            return CreatedAtAction("GetSystemPrivilege", new { id = privilege.Id }, privilege);
         }
+
+        // YOU ARE HERE
+
 
         // DELETE: api/SystemPrivileges/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSystemPrivilege(int id)
+        public async Task<IActionResult> DeleteSystemPrivilege(string id)
         {
             var systemPrivilege = await _context.SystemPrivileges.FindAsync(id);
             if (systemPrivilege == null)
             {
                 return NotFound();
+            }
+
+            // Get the role from the AspNetRoles table
+            var role = await _roleManager.FindByIdAsync(systemPrivilege.RoleId);
+            if (role != null)
+            {
+                // Remove the role from the AspNetRoles table
+                var result = await _roleManager.DeleteAsync(role);
+                if (!result.Succeeded)
+                {
+                    // Handle the error if role deletion fails
+                    return StatusCode(500, "Failed to delete role from AspNetRoles table.");
+                }
             }
 
             _context.SystemPrivileges.Remove(systemPrivilege);
@@ -105,9 +169,10 @@ namespace API.Controllers
             return Ok(systemPrivilege);
         }
 
-        private bool SystemPrivilegeExists(int id)
+
+        private bool SystemPrivilegeExists(string id)
         {
-            return _context.SystemPrivileges.Any(e => e.SystemPrivilegeID == id);
+            return _context.SystemPrivileges.Any(e => e.Id.Equals(id));
         }
     }
     // WRITTEN AND SIGNED BY DIHAN DE BOD - TIMESTAMP 11:42 15/05/2023 

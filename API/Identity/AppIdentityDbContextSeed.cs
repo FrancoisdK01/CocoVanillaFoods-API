@@ -58,20 +58,35 @@ namespace API.Identity
         }
 
 
-        public static async Task SeedUserRolesAsync(IServiceProvider serviceProvider)
+        public static async Task SeedUserRolesAsync(IServiceProvider serviceProvider, MyDbContext context, AppIdentityDbContext identityDbContext)
         {
             try
             {
                 var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
                 var roles = new List<string> { "Superuser", "Admin", "Employee", "Customer" };
-
+                var descriptions = new List<string> { "Access to the entire system", "Access to the wine and events system", "Access to the inventory system", "Access to the customer system" };
+                var count = 0;
                 foreach (var roleName in roles)
                 {
                     var roleExists = await roleManager.RoleExistsAsync(roleName);
                     if (!roleExists)
                     {
                         await roleManager.CreateAsync(new IdentityRole(roleName));
+                        var role = new SystemPrivilege
+                        {
+                            Name = roleName,
+                            Privilege_Description = descriptions[count]
+                        };
+
+                        var roleIdentity = await identityDbContext.Roles.FirstOrDefaultAsync(x => x.Name == role.Name);
+                        if (roleIdentity != null)
+                        {
+                            role.RoleId = roleIdentity.Id;
+                            context.SystemPrivileges.Add(role);
+                            await context.SaveChangesAsync();
+                        }
+                        count++;
                     }
                 }
             }

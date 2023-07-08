@@ -86,7 +86,7 @@ try
 {
     await context.Database.MigrateAsync();
     await identityContext.Database.MigrateAsync();
-    await AppIdentityDbContextSeed.SeedUserRolesAsync(services);
+    await AppIdentityDbContextSeed.SeedUserRolesAsync(services, context, identityContext);
     await AppIdentityDbContextSeed.SeedUsersAsync(userManager, context, identityContext);
 }
 catch (Exception ex)

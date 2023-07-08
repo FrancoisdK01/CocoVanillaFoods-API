@@ -168,7 +168,90 @@ namespace API.Controllers
             return Ok(loggedInUser);
         }
 
+        // ASSIGN AND REMOVE ROLES
+       
+        [HttpGet]
+        [Route("GetAllUsers")]
+        public async Task<ActionResult<IEnumerable<UserRolesViewModel>>> GetAllUsers()
+        {
+            var users = await _context.Users.ToListAsync();
 
+            var userRolesViewModels = new List<UserRolesViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                var userViewModel = new UserRolesViewModel
+                {
+                    UserEmail = user.Email,
+                    IsCustomer = roles.Contains("Customer"),
+                    IsEmployee = roles.Contains("Employee"),
+                    IsAdmin = roles.Contains("Admin"),
+                    IsSuperUser = roles.Contains("Superuser")
+                };
+
+                userRolesViewModels.Add(userViewModel);
+            }
+
+            return userRolesViewModels;
+        }
+
+        [HttpPost]
+        [Route("UpdateUserRoles")]
+        public async Task<IActionResult> UpdateUserRoles(UserRolesViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.UserEmail);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Update user roles based on the checkbox selections
+            if (model.IsCustomer)
+            {
+                await _userManager.AddToRoleAsync(user, "Customer");
+            }
+            else
+            {
+                await _userManager.RemoveFromRoleAsync(user, "Customer");
+            }
+
+            if (model.IsEmployee)
+            {
+                await _userManager.AddToRoleAsync(user, "Employee");
+            }
+            else
+            {
+                await _userManager.RemoveFromRoleAsync(user, "Employee");
+            }
+
+            if (model.IsAdmin)
+            {
+                await _userManager.AddToRoleAsync(user, "Admin");
+            }
+            else
+            {
+                await _userManager.RemoveFromRoleAsync(user, "Admin");
+            }
+
+            if (model.IsSuperUser)
+            {
+                await _userManager.AddToRoleAsync(user, "Superuser");
+            }
+            else
+            {
+                await _userManager.RemoveFromRoleAsync(user, "Superuser");
+            }
+
+            return Ok();
+        }
+
+
+
+
+        // AUTH CHECKING
         //Test Authentication
         [HttpGet]
         [Route("testAuth")]
@@ -197,12 +280,6 @@ namespace API.Controllers
             return "Super secret text for Superusers only";
         }
 
-        [HttpGet]
-        [Route("GetAllUsers")]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
-        {
-            return await _context.Users.ToListAsync();
-        }
 
         [HttpGet]
         [Route("testEmployeeAuth")]
