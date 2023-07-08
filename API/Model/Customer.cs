@@ -1,14 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace API.Model
 {
-    public class Customer
+    public class Customer : IdentityUser
     {
-        [Key]
-        public int CustomerID { get; set; }
+        //[Key]
+        //public int CustomerID { get; set; }
 
         [ForeignKey("User")]
         public string UserID { get; set; }
@@ -24,11 +25,11 @@ namespace API.Model
         [MaxLength(50)]
         public string Last_Name { get; set; }
 
-        [MaxLength(50)]
-        public string Email { get; set; }
+        //[MaxLength(50)]
+        //public string Email { get; set; }
 
-        [MaxLength(10)]
-        public string Phone_Number { get; set; }
+        //[MaxLength(10)]
+        //public string Phone_Number { get; set; }
 
         [MaxLength(13)]
         public string ID_Number { get; set; }

@@ -68,11 +68,27 @@ namespace API.Controllers
                 {
                     UserName = rvm.Email,
                     Email = rvm.Email,
-                    DisplayName = rvm.DisplayName
+                    DisplayName = rvm.DisplayName,
+                };
+
+                var customer = new Customer
+                {
+                    First_Name = rvm.FirstName,
+                    Last_Name = rvm.LastName,
+                    Email = rvm.Email,
+                    PhoneNumber = rvm.PhoneNumber,
+                    ID_Number = rvm.IDNumber,
+                    Date_Created = DateTime.Now,
+                    UserID = user.Id,
+                    Title = rvm.Title,
+                    Gender = rvm.Gender,
+                    Date_of_last_update = DateTime.Now
                 };
 
                 var result = await _userManager.CreateAsync(user, rvm.Password);
-
+                _context.Users.Add(user);
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
                 if (result.Succeeded)
                 {
                     // Add the default role to the user

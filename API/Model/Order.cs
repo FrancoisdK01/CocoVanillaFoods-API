@@ -16,7 +16,7 @@ namespace API.Model
         public ShippingDetails ShippingDetails { get; set; }
 
         [ForeignKey("CustomerID")]
-        public int CustomerID { get; set; }
+        public string CustomerID { get; set; }
         public Customer Customer { get; set; }
 
         public OrderPayment OrderPayment { get; set; }
