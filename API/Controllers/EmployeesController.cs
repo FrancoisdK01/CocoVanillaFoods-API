@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Org.BouncyCastle.Asn1.Cmp;
 
 namespace API.Controllers
 {
@@ -19,10 +20,12 @@ namespace API.Controllers
         private readonly MyDbContext _context;
         private readonly UserManager<User> _userManager;
         private static Random random = new Random();
-        public EmployeesController(MyDbContext context, UserManager<User> userManager)
+        private readonly IEmailService _emailService;
+        public EmployeesController(MyDbContext context, UserManager<User> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         // GET: api/Employees
@@ -123,7 +126,8 @@ namespace API.Controllers
             var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            var result = await _userManager.CreateAsync(user, registerModel.Password); // Change to GeneratePassword();
+            var generatedPassword = GeneratePassword();
+            var result = await _userManager.CreateAsync(user, generatedPassword); // Change to GeneratePassword();
             if (!result.Succeeded)
             {
                 // Handle user account creation failure
@@ -153,6 +157,25 @@ namespace API.Controllers
                 await _userManager.AddToRoleAsync(user, "Employee");
                 await _userManager.AddToRoleAsync(user, "Customer");
             }
+
+            var evm = new EmailViewModel
+            {
+                To = registerModel.Email,
+                Subject = "Welcome to the Promenade",
+                Body = $@"
+                        <h1>Welcome to the team {registerModel.FirstName}</h1>
+                        <p>We are so happy to have you working for us.</p>
+                        <p>Please find your login details below and feel free to update your details once you have settled in with the system.</p>
+                        <ul>
+                            <li>Email Address: {registerModel.Email}</li>
+                            <li>Password: {generatedPassword}</li>
+                        </ul>
+                        <p>We can't wait to see you in our offices.</p>
+                        <p>Kind regards,</p>
+                        <p>The Promenade Team</p>
+                        "
+            };
+            _emailService.SendEmail(evm);
 
 
             return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);

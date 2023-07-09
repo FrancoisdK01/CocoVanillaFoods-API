@@ -1,12 +1,11 @@
+global using API.Services.EmailService;
 using API;
 using API.Data;
 using API.Identity;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +50,7 @@ builder.Services.AddSwaggerGen(c =>
                         }
                     });
 });
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 //DB Context
 builder.Services.AddIdentityServices(builder.Configuration);
