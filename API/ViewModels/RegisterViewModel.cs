@@ -1,5 +1,6 @@
 ﻿using Microsoft.Build.Graph;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace API.ViewModels
 {
@@ -15,9 +16,11 @@ namespace API.ViewModels
         public string LastName { get; set; }
 
         [Required]
+        [RegularExpression("^0[0-9]{9}$", ErrorMessage = "Phone number must start with 0 and be 10 characters long")]
         public string PhoneNumber { get; set; }
 
         [Required]
+        [RegularExpression("^[0-9]{13}$", ErrorMessage = "ID number must be a 13-digit number")]
         public string IDNumber { get; set; }
 
         [Required]

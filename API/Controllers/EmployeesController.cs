@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
-using Org.BouncyCastle.Asn1.Cmp;
 
 namespace API.Controllers
 {
@@ -56,44 +55,58 @@ namespace API.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PutEmployee(string id, Employee employee)
         {
+            var employeeDetailsBeforeUpdate = await _context.Employees.FindAsync(id);
             var existingEmployee = await _context.Employees.FindAsync(id);
+            var existingUser = await _userManager.FindByIdAsync(existingEmployee.UserId);
 
             if (existingEmployee == null)
             {
-                return NotFound();
+                return NotFound("There is no employee that has the ID you provided");
             }
-
-            var existingUser = await _userManager.FindByIdAsync(existingEmployee.UserId);
-
-            // Update the properties of the existingSystemPrivilege with the new values
-            existingEmployee.Id = existingEmployee.Id;
-            existingEmployee.Hire_Date = employee.Hire_Date;
-
-            existingEmployee.First_Name = employee.First_Name;
-            existingEmployee.Last_Name = employee.Last_Name;
-            existingEmployee.Email = employee.Email;
-            existingEmployee.PhoneNumber = employee.PhoneNumber;
-            existingEmployee.ID_Number = employee.ID_Number;
-            existingEmployee.SuperUserID = existingEmployee.SuperUserID;
-
-            existingUser.UserName = employee.First_Name;
-            existingUser.Email = employee.Email;
-            existingUser.DisplayName = employee.First_Name;
-            //existingEmployee.Id = existingEmployee.Id;
-
-            try
+            else
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmployeeExists(id))
+                existingEmployee.Id = existingEmployee.Id;
+                existingEmployee.Hire_Date = employee.Hire_Date;
+
+                existingEmployee.First_Name = employee.First_Name;
+                existingEmployee.Last_Name = employee.Last_Name;
+                existingEmployee.Email = employee.Email;
+                existingEmployee.PhoneNumber = employee.PhoneNumber;
+                existingEmployee.ID_Number = employee.ID_Number;
+                existingEmployee.SuperUserID = existingEmployee.SuperUserID;
+
+                var savedEmployeeChanges = await _context.SaveChangesAsync();
+                if(savedEmployeeChanges > 0)
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
+                    if(existingUser == null) 
+                    {
+                        // Revert employee details to their original state
+                        existingEmployee.Hire_Date = employeeDetailsBeforeUpdate.Hire_Date;
+                        existingEmployee.First_Name = employeeDetailsBeforeUpdate.First_Name;
+                        existingEmployee.Last_Name = employeeDetailsBeforeUpdate.Last_Name;
+                        existingEmployee.Email = employeeDetailsBeforeUpdate.Email;
+                        existingEmployee.PhoneNumber = employeeDetailsBeforeUpdate.PhoneNumber;
+                        existingEmployee.ID_Number = employeeDetailsBeforeUpdate.ID_Number;
+
+                        await _context.SaveChangesAsync();
+
+                        return NotFound("The user account linked to the employee account doesn't exist");
+                    }
+                    else
+                    {
+                        existingUser.UserName = employee.First_Name;
+                        existingUser.Email = employee.Email;
+                        existingUser.DisplayName = employee.First_Name;
+
+                        try
+                        {
+                            await _context.SaveChangesAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            return BadRequest(ex.Message);
+                        }
+                    }
                 }
             }
             return Ok(existingEmployee);
@@ -108,77 +121,87 @@ namespace API.Controllers
             EmployeeViewModel employeeModel = viewModel.EmployeeModel;
 
             // Retrieve the superuser ID from the logged-in user
-            var superuser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var superuserEmail = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Retrieve the superuser based on their email
-            var superUser = await _userManager.FindByEmailAsync(superuser);
+            var superUser = await _userManager.FindByEmailAsync(superuserEmail);
             if (superUser == null)
             {
-                // Handle superuser not found
                 return BadRequest("Superuser not found");
             }
-
-            // Get the ID of the superuser
-            var superuserID = superUser.Id;
-
-
-            // Create the user account
-            var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            var generatedPassword = GeneratePassword();
-            var result = await _userManager.CreateAsync(user, generatedPassword); // Change to GeneratePassword();
-            if (!result.Succeeded)
+            else
             {
-                // Handle user account creation failure
-                return BadRequest(result.Errors);
+                var superuserID = superUser.Id;
+
+                var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName };
+                _context.Users.Add(user);
+                var userSavedChanges = await _context.SaveChangesAsync();
+
+                if (userSavedChanges > 0)
+                {
+                    var generatedPassword = GeneratePassword();
+                    var result = await _userManager.CreateAsync(user, generatedPassword);
+
+                    if (!result.Succeeded)
+                    {
+                        await _userManager.DeleteAsync(user);
+
+                        return BadRequest(result.Errors);
+                    }
+                    else
+                    {
+                        var employee = new Employee
+                        {
+                            First_Name = employeeModel.FirstName,
+                            Last_Name = employeeModel.LastName,
+                            Email = registerModel.Email,
+                            PhoneNumber = employeeModel.PhoneNumber,
+                            ID_Number = employeeModel.IDNumber,
+                            Hire_Date = DateTime.Now,
+                            UserId = user.Id,
+                            SuperUserID = superuserID
+                        };
+
+                        _context.Employees.Add(employee);
+                        var employeeSavedChanges = await _context.SaveChangesAsync();
+
+                        if (employeeSavedChanges > 0)
+                        {
+                            await _userManager.AddToRoleAsync(user, "Employee");
+                            await _userManager.AddToRoleAsync(user, "Customer");
+
+                            var evm = new EmailViewModel
+                            {
+                                To = registerModel.Email,
+                                Subject = "Welcome to the Promenade",
+                                Body = $@"
+                                        <h1>Welcome to the team {registerModel.FirstName}</h1>
+                                        <p>We are so happy to have you working for us.</p>
+                                        <p>Please find your login details below and feel free to update your details once you have settled in with the system.</p>
+                                        <ul>
+                                            <li>Email Address: {registerModel.Email}</li>
+                                            <li>Password: {generatedPassword}</li>
+                                        </ul>
+                                        <p>We can't wait to see you in our offices.</p>
+                                        <p>Kind regards,</p>
+                                        <p>The Promenade Team</p>
+                                        "};
+
+                            _emailService.SendEmail(evm);
+
+                            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+                        }
+                        else
+                        {
+                            return BadRequest("Failed to add employee account to the database");
+                        }
+                    }
+                }
+                else
+                {
+                    return BadRequest("Adding the user account failed");
+                }
             }
-
-            // Create the employee account
-            var employee = new Employee
-            {
-                First_Name = employeeModel.FirstName,
-                Last_Name = employeeModel.LastName,
-                Email = registerModel.Email,
-                PhoneNumber = employeeModel.PhoneNumber,
-                ID_Number = employeeModel.IDNumber,
-                Hire_Date = DateTime.Now,
-                UserId = user.Id,
-                SuperUserID = superuserID
-            };
-
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
-
-            if (_context.Entry(employee).State == EntityState.Unchanged)
-            {
-                // Changes have been saved
-                // Add roles to the user account
-                await _userManager.AddToRoleAsync(user, "Employee");
-                await _userManager.AddToRoleAsync(user, "Customer");
-            }
-
-            var evm = new EmailViewModel
-            {
-                To = registerModel.Email,
-                Subject = "Welcome to the Promenade",
-                Body = $@"
-                        <h1>Welcome to the team {registerModel.FirstName}</h1>
-                        <p>We are so happy to have you working for us.</p>
-                        <p>Please find your login details below and feel free to update your details once you have settled in with the system.</p>
-                        <ul>
-                            <li>Email Address: {registerModel.Email}</li>
-                            <li>Password: {generatedPassword}</li>
-                        </ul>
-                        <p>We can't wait to see you in our offices.</p>
-                        <p>Kind regards,</p>
-                        <p>The Promenade Team</p>
-                        "
-            };
-            _emailService.SendEmail(evm);
-
-
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
         }
 
         // DELETE: api/Employees/5
@@ -211,10 +234,6 @@ namespace API.Controllers
                     }
                 }
             }
-
-            
-           
-
             return Ok("User has been removed from the system");
         }
 

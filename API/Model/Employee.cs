@@ -10,9 +10,11 @@ namespace API.Model
         //[Key]
         //public int EmployeeID { get; set; }
 
+        [Required]
         [MaxLength(50)]
         public string First_Name { get; set; }
 
+        [Required]
         [MaxLength(50)]
         public string Last_Name { get; set; }
 
@@ -24,17 +26,21 @@ namespace API.Model
         //public string Phone_Number { get; set; }
 
         // [MinLength(13)] - REMEMBER TO ADD
-        [MaxLength(13)]
+        [Required]
+        [RegularExpression("^[0-9]{13}$", ErrorMessage = "ID number must be a 13-digit number")]
         public string ID_Number { get; set; }
 
+        [Required]
         public DateTime Hire_Date { get; set; }
 
+        [Required]
         [ForeignKey("Id")]
         public string UserId { get; set; }
 
         [JsonIgnore]
         public virtual User User { get; set; }
 
+        [Required]
         [ForeignKey("Id")]
         public string SuperUserID { get; set; }
         [JsonIgnore]
