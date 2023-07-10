@@ -37,7 +37,7 @@ namespace API.Controllers
         {
             try
             {
-                var credential = GoogleCredential.FromFile(_configuration["GCPAuthStoargeAuthFile"]);
+                var credential = GoogleCredential.FromFile(_configuration["GCPAuthStorageAuthFile"]);
                 var storageClient = StorageClient.Create(credential);
                 var bucket = storageClient.GetBucket(_bucketName);
                 var objectName = $"images/{fileName}";
