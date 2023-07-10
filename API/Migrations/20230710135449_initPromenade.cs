@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace API.Migrations
 {
-    public partial class ajsnjas : Migration
+    public partial class initPromenade : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -31,7 +31,7 @@ namespace API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DiscountCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     DiscountDescription = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    DiscountAmount = table.Column<double>(type: "float", nullable: false)
+                    DiscountPercentage = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,20 +50,6 @@ namespace API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EarlyBird", x => x.EarlyBirdID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EventPrices",
-                columns: table => new
-                {
-                    EventPriceID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<double>(type: "float", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EventPrices", x => x.EventPriceID);
                 });
 
             migrationBuilder.CreateTable(
@@ -178,17 +164,45 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "SystemPrivileges",
                 columns: table => new
                 {
-                    UserID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserEmail = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    UserPassword = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Privilege_Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserID);
+                    table.PrimaryKey("PK_SystemPrivileges", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -234,6 +248,20 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WriteOffReasons",
+                columns: table => new
+                {
+                    WriteOff_ReasonID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Date_of_last_update = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WriteOffReasons", x => x.WriteOff_ReasonID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefundReasons",
                 columns: table => new
                 {
@@ -257,80 +285,74 @@ namespace API.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    CustomerID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true),
-                    First_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Last_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Phone_Number = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    ID_Number = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    First_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Last_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ID_Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Date_Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Date_of_last_update = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserID1 = table.Column<int>(type: "int", nullable: true)
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customers", x => x.CustomerID);
+                    table.PrimaryKey("PK_Customers", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Customers_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Customers_Users_UserID1",
-                        column: x => x.UserID1,
-                        principalTable: "Users",
-                        principalColumn: "UserID");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "SuperUser",
                 columns: table => new
                 {
-                    SuperUserID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     First_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Last_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Phone_Number = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ID_Number = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    ID_Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Hire_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: false)
+                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SuperUser", x => x.SuperUserID);
+                    table.PrimaryKey("PK_SuperUser", x => x.Id);
                     table.ForeignKey(
                         name: "FK_SuperUser_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SystemPrivileges",
-                columns: table => new
-                {
-                    SystemPrivilegeID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    Privilege_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Privilege_Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SystemPrivileges", x => x.SystemPrivilegeID);
-                    table.ForeignKey(
-                        name: "FK_SystemPrivileges_Users_UserID",
-                        column: x => x.UserID,
-                        principalTable: "Users",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -342,7 +364,7 @@ namespace API.Migrations
                     Rating = table.Column<int>(type: "int", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Review_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: true)
+                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -351,7 +373,7 @@ namespace API.Migrations
                         name: "FK_EventReviews_Customers_CustomerID",
                         column: x => x.CustomerID,
                         principalTable: "Customers",
-                        principalColumn: "CustomerID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -363,7 +385,7 @@ namespace API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Order_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ShippingID = table.Column<int>(type: "int", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: false),
+                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     OrderStatusID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -373,7 +395,7 @@ namespace API.Migrations
                         name: "FK_Orders_Customers_CustomerID",
                         column: x => x.CustomerID,
                         principalTable: "Customers",
-                        principalColumn: "CustomerID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Orders_OrderStatus_OrderStatusID",
@@ -389,7 +411,7 @@ namespace API.Migrations
                 {
                     WishlistID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerID = table.Column<int>(type: "int", nullable: false)
+                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -398,7 +420,7 @@ namespace API.Migrations
                         name: "FK_Wishlists_Customers_CustomerID",
                         column: x => x.CustomerID,
                         principalTable: "Customers",
-                        principalColumn: "CustomerID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -406,31 +428,42 @@ namespace API.Migrations
                 name: "Employees",
                 columns: table => new
                 {
-                    EmployeeID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    First_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Last_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Phone_Number = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    ID_Number = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: true),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    First_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Last_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ID_Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Hire_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    SuperUserID = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SuperUserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => x.EmployeeID);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Employees_SuperUser_SuperUserID",
                         column: x => x.SuperUserID,
                         principalTable: "SuperUser",
-                        principalColumn: "SuperUserID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Employees_Users_UserID",
-                        column: x => x.UserID,
+                        name: "FK_Employees_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -478,47 +511,6 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Address",
-                columns: table => new
-                {
-                    AddressID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Street_Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Postal_Code = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: true),
-                    Date_of_last_update = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CustomerID = table.Column<int>(type: "int", nullable: true),
-                    SuperUserID = table.Column<int>(type: "int", nullable: false),
-                    EmployeeID = table.Column<int>(type: "int", nullable: true),
-                    ProvinceID = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Address", x => x.AddressID);
-                    table.ForeignKey(
-                        name: "FK_Address_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID");
-                    table.ForeignKey(
-                        name: "FK_Address_Employees_EmployeeID",
-                        column: x => x.EmployeeID,
-                        principalTable: "Employees",
-                        principalColumn: "EmployeeID");
-                    table.ForeignKey(
-                        name: "FK_Address_Provinces_ProvinceID",
-                        column: x => x.ProvinceID,
-                        principalTable: "Provinces",
-                        principalColumn: "ProvinceID");
-                    table.ForeignKey(
-                        name: "FK_Address_SuperUser_SuperUserID",
-                        column: x => x.SuperUserID,
-                        principalTable: "SuperUser",
-                        principalColumn: "SuperUserID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Events",
                 columns: table => new
                 {
@@ -529,37 +521,23 @@ namespace API.Migrations
                     Tickets_Available = table.Column<int>(type: "int", nullable: false),
                     Tickets_Sold = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Image_URL = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    EventPriceID = table.Column<int>(type: "int", nullable: false),
-                    EventTypeID = table.Column<int>(type: "int", nullable: false),
-                    EarlyBirdID = table.Column<int>(type: "int", nullable: true),
-                    EmployeeID = table.Column<int>(type: "int", nullable: true)
+                    EventPrice = table.Column<double>(type: "float", nullable: false),
+                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    EventTypeID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Events", x => x.EventID);
                     table.ForeignKey(
-                        name: "FK_Events_EarlyBird_EarlyBirdID",
-                        column: x => x.EarlyBirdID,
-                        principalTable: "EarlyBird",
-                        principalColumn: "EarlyBirdID");
-                    table.ForeignKey(
-                        name: "FK_Events_Employees_EmployeeID",
-                        column: x => x.EmployeeID,
+                        name: "FK_Events_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalTable: "Employees",
-                        principalColumn: "EmployeeID");
-                    table.ForeignKey(
-                        name: "FK_Events_EventPrices_EventPriceID",
-                        column: x => x.EventPriceID,
-                        principalTable: "EventPrices",
-                        principalColumn: "EventPriceID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Events_EventTypes_EventTypeID",
                         column: x => x.EventTypeID,
                         principalTable: "EventTypes",
-                        principalColumn: "EventTypeID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "EventTypeID");
                 });
 
             migrationBuilder.CreateTable(
@@ -572,21 +550,21 @@ namespace API.Migrations
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Vintage = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     RestockLimit = table.Column<int>(type: "int", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     WineTastingNote = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     WinePrice = table.Column<double>(type: "float", nullable: false),
                     WineTypeID = table.Column<int>(type: "int", nullable: false),
                     VarietalID = table.Column<int>(type: "int", nullable: false),
-                    EmployeeID = table.Column<int>(type: "int", nullable: true)
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Wines", x => x.WineID);
                     table.ForeignKey(
-                        name: "FK_Wines_Employees_EmployeeID",
-                        column: x => x.EmployeeID,
+                        name: "FK_Wines_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalTable: "Employees",
-                        principalColumn: "EmployeeID");
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Wines_Varietals_VarietalID",
                         column: x => x.VarietalID,
@@ -608,7 +586,7 @@ namespace API.Migrations
                     WriteOffID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     WriteOff_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EmployeeID = table.Column<int>(type: "int", nullable: false)
+                    EmployeeID = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -617,7 +595,34 @@ namespace API.Migrations
                         name: "FK_WriteOffs_Employees_EmployeeID",
                         column: x => x.EmployeeID,
                         principalTable: "Employees",
-                        principalColumn: "EmployeeID",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    BookingID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.BookingID);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "EventID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -630,57 +635,42 @@ namespace API.Migrations
                     Street_Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Postal_Code = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: true),
                     Date_of_last_update = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AddressID = table.Column<int>(type: "int", nullable: false),
-                    SuperUserID = table.Column<int>(type: "int", nullable: false),
-                    SuperUserID1 = table.Column<int>(type: "int", nullable: true)
+                    EventID = table.Column<int>(type: "int", nullable: true),
+                    SuperUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventLocations", x => x.EventLocationID);
                     table.ForeignKey(
-                        name: "FK_EventLocations_Address_AddressID",
-                        column: x => x.AddressID,
-                        principalTable: "Address",
-                        principalColumn: "AddressID",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_EventLocations_Events_EventID",
+                        column: x => x.EventID,
+                        principalTable: "Events",
+                        principalColumn: "EventID");
                     table.ForeignKey(
-                        name: "FK_EventLocations_SuperUser_SuperUserID",
-                        column: x => x.SuperUserID,
+                        name: "FK_EventLocations_SuperUser_SuperUserId",
+                        column: x => x.SuperUserId,
                         principalTable: "SuperUser",
-                        principalColumn: "SuperUserID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_EventLocations_SuperUser_SuperUserID1",
-                        column: x => x.SuperUserID1,
-                        principalTable: "SuperUser",
-                        principalColumn: "SuperUserID");
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bookings",
+                name: "EventPrices",
                 columns: table => new
                 {
-                    BookingID = table.Column<int>(type: "int", nullable: false)
+                    EventPriceID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EventId = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: true)
+                    Amount = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EventID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Bookings", x => x.BookingID);
+                    table.PrimaryKey("PK_EventPrices", x => x.EventPriceID);
                     table.ForeignKey(
-                        name: "FK_Bookings_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Events_EventId",
-                        column: x => x.EventId,
+                        name: "FK_EventPrices_Events_EventID",
+                        column: x => x.EventID,
                         principalTable: "Events",
-                        principalColumn: "EventID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "EventID");
                 });
 
             migrationBuilder.CreateTable(
@@ -740,8 +730,7 @@ namespace API.Migrations
                     Quantity_Ordered = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     WineID = table.Column<int>(type: "int", nullable: false),
-                    SupplierID = table.Column<int>(type: "int", nullable: false),
-                    SupplierPaymentID = table.Column<int>(type: "int", nullable: false)
+                    SupplierID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -783,6 +772,40 @@ namespace API.Migrations
                         column: x => x.WishlistID,
                         principalTable: "Wishlists",
                         principalColumn: "WishlistID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WriteOffItems",
+                columns: table => new
+                {
+                    WriteOffItemID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WriteOff_Quantity = table.Column<int>(type: "int", nullable: false),
+                    WineID = table.Column<int>(type: "int", nullable: false),
+                    WriteOffReasonID = table.Column<int>(type: "int", nullable: false),
+                    WriteOff_ReasonID = table.Column<int>(type: "int", nullable: true),
+                    WriteOffID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WriteOffItems", x => x.WriteOffItemID);
+                    table.ForeignKey(
+                        name: "FK_WriteOffItems_Wines_WineID",
+                        column: x => x.WineID,
+                        principalTable: "Wines",
+                        principalColumn: "WineID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WriteOffItems_WriteOffReasons_WriteOff_ReasonID",
+                        column: x => x.WriteOff_ReasonID,
+                        principalTable: "WriteOffReasons",
+                        principalColumn: "WriteOff_ReasonID");
+                    table.ForeignKey(
+                        name: "FK_WriteOffItems_WriteOffs_WriteOffID",
+                        column: x => x.WriteOffID,
+                        principalTable: "WriteOffs",
+                        principalColumn: "WriteOffID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -911,77 +934,8 @@ namespace API.Migrations
                         column: x => x.SupplierOrderID,
                         principalTable: "SupplierOrders",
                         principalColumn: "SupplierOrderID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WriteOffItems",
-                columns: table => new
-                {
-                    WriteOffItemID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    WriteOff_Quantity = table.Column<int>(type: "int", nullable: false),
-                    WineID = table.Column<int>(type: "int", nullable: false),
-                    WriteOffReasonID = table.Column<int>(type: "int", nullable: false),
-                    WriteOffID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WriteOffItems", x => x.WriteOffItemID);
-                    table.ForeignKey(
-                        name: "FK_WriteOffItems_Wines_WineID",
-                        column: x => x.WineID,
-                        principalTable: "Wines",
-                        principalColumn: "WineID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_WriteOffItems_WriteOffs_WriteOffID",
-                        column: x => x.WriteOffID,
-                        principalTable: "WriteOffs",
-                        principalColumn: "WriteOffID",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "WriteOffReasons",
-                columns: table => new
-                {
-                    WriteOff_ReasonID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Date_of_last_update = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    WriteOffItemID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WriteOffReasons", x => x.WriteOff_ReasonID);
-                    table.ForeignKey(
-                        name: "FK_WriteOffReasons_WriteOffItems_WriteOffItemID",
-                        column: x => x.WriteOffItemID,
-                        principalTable: "WriteOffItems",
-                        principalColumn: "WriteOffItemID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Address_CustomerID",
-                table: "Address",
-                column: "CustomerID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Address_EmployeeID",
-                table: "Address",
-                column: "EmployeeID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Address_ProvinceID",
-                table: "Address",
-                column: "ProvinceID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Address_SuperUserID",
-                table: "Address",
-                column: "SuperUserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookingPayments_BookingId",
@@ -1002,15 +956,7 @@ namespace API.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_UserID",
                 table: "Customers",
-                column: "UserID",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_UserID1",
-                table: "Customers",
-                column: "UserID1",
-                unique: true,
-                filter: "[UserID1] IS NOT NULL");
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_SuperUserID",
@@ -1018,26 +964,24 @@ namespace API.Migrations
                 column: "SuperUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_UserID",
+                name: "IX_Employees_UserId",
                 table: "Employees",
-                column: "UserID",
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventLocations_AddressID",
+                name: "IX_EventLocations_EventID",
                 table: "EventLocations",
-                column: "AddressID",
-                unique: true);
+                column: "EventID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventLocations_SuperUserID",
+                name: "IX_EventLocations_SuperUserId",
                 table: "EventLocations",
-                column: "SuperUserID");
+                column: "SuperUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventLocations_SuperUserID1",
-                table: "EventLocations",
-                column: "SuperUserID1");
+                name: "IX_EventPrices_EventID",
+                table: "EventPrices",
+                column: "EventID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventReviews_CustomerID",
@@ -1045,20 +989,9 @@ namespace API.Migrations
                 column: "CustomerID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_EarlyBirdID",
+                name: "IX_Events_EmployeeId",
                 table: "Events",
-                column: "EarlyBirdID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Events_EmployeeID",
-                table: "Events",
-                column: "EmployeeID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Events_EventPriceID",
-                table: "Events",
-                column: "EventPriceID",
-                unique: true);
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_EventTypeID",
@@ -1135,8 +1068,7 @@ namespace API.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_SuperUser_UserID",
                 table: "SuperUser",
-                column: "UserID",
-                unique: true);
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SupplierOrders_SupplierID",
@@ -1151,13 +1083,7 @@ namespace API.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_SupplierPayments_SupplierOrderID",
                 table: "SupplierPayments",
-                column: "SupplierOrderID",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SystemPrivileges_UserID",
-                table: "SystemPrivileges",
-                column: "UserID");
+                column: "SupplierOrderID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_BookingId",
@@ -1165,9 +1091,9 @@ namespace API.Migrations
                 column: "BookingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Wines_EmployeeID",
+                name: "IX_Wines_EmployeeId",
                 table: "Wines",
-                column: "EmployeeID");
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Wines_VarietalID",
@@ -1193,7 +1119,8 @@ namespace API.Migrations
                 name: "IX_Wishlists_CustomerID",
                 table: "Wishlists",
                 column: "CustomerID",
-                unique: true);
+                unique: true,
+                filter: "[CustomerID] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WriteOffItems_WineID",
@@ -1201,52 +1128,23 @@ namespace API.Migrations
                 column: "WineID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_WriteOffItems_WriteOff_ReasonID",
+                table: "WriteOffItems",
+                column: "WriteOff_ReasonID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WriteOffItems_WriteOffID",
                 table: "WriteOffItems",
                 column: "WriteOffID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WriteOffItems_WriteOffReasonID",
-                table: "WriteOffItems",
-                column: "WriteOffReasonID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WriteOffReasons_WriteOffItemID",
-                table: "WriteOffReasons",
-                column: "WriteOffItemID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WriteOffs_EmployeeID",
                 table: "WriteOffs",
                 column: "EmployeeID");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_WriteOffItems_WriteOffReasons_WriteOffReasonID",
-                table: "WriteOffItems",
-                column: "WriteOffReasonID",
-                principalTable: "WriteOffReasons",
-                principalColumn: "WriteOff_ReasonID",
-                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Wines_Employees_EmployeeID",
-                table: "Wines");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_WriteOffs_Employees_EmployeeID",
-                table: "WriteOffs");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_WriteOffItems_Wines_WineID",
-                table: "WriteOffItems");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_WriteOffItems_WriteOffReasons_WriteOffReasonID",
-                table: "WriteOffItems");
-
             migrationBuilder.DropTable(
                 name: "Blacklists");
 
@@ -1257,7 +1155,13 @@ namespace API.Migrations
                 name: "Discounts");
 
             migrationBuilder.DropTable(
+                name: "EarlyBird");
+
+            migrationBuilder.DropTable(
                 name: "EventLocations");
+
+            migrationBuilder.DropTable(
+                name: "EventPrices");
 
             migrationBuilder.DropTable(
                 name: "EventReviews");
@@ -1267,6 +1171,9 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderPayments");
+
+            migrationBuilder.DropTable(
+                name: "Provinces");
 
             migrationBuilder.DropTable(
                 name: "Refunds");
@@ -1293,7 +1200,7 @@ namespace API.Migrations
                 name: "WishlistItems");
 
             migrationBuilder.DropTable(
-                name: "Address");
+                name: "WriteOffItems");
 
             migrationBuilder.DropTable(
                 name: "OrderItems");
@@ -1320,7 +1227,10 @@ namespace API.Migrations
                 name: "Wishlists");
 
             migrationBuilder.DropTable(
-                name: "Provinces");
+                name: "WriteOffReasons");
+
+            migrationBuilder.DropTable(
+                name: "WriteOffs");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -1332,6 +1242,9 @@ namespace API.Migrations
                 name: "Suppliers");
 
             migrationBuilder.DropTable(
+                name: "Wines");
+
+            migrationBuilder.DropTable(
                 name: "Events");
 
             migrationBuilder.DropTable(
@@ -1341,40 +1254,22 @@ namespace API.Migrations
                 name: "OrderStatus");
 
             migrationBuilder.DropTable(
-                name: "EarlyBird");
-
-            migrationBuilder.DropTable(
-                name: "EventPrices");
-
-            migrationBuilder.DropTable(
-                name: "EventTypes");
-
-            migrationBuilder.DropTable(
-                name: "Employees");
-
-            migrationBuilder.DropTable(
-                name: "SuperUser");
-
-            migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Wines");
-
-            migrationBuilder.DropTable(
                 name: "Varietals");
 
             migrationBuilder.DropTable(
                 name: "WineTypes");
 
             migrationBuilder.DropTable(
-                name: "WriteOffReasons");
+                name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "WriteOffItems");
+                name: "EventTypes");
 
             migrationBuilder.DropTable(
-                name: "WriteOffs");
+                name: "SuperUser");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
