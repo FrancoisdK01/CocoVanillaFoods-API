@@ -29,8 +29,8 @@ namespace API.Model
         //[Required]
         //public string Phone_Number { get; set; }
 
-        [MaxLength(13)]
         [Required]
+        [RegularExpression("^[0-9]{13}$", ErrorMessage = "ID number must be a 13-digit number")]
         public string ID_Number { get; set; }
 
         [Required]

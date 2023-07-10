@@ -35,7 +35,6 @@ namespace API.Controllers
         [Route("Login")]
         public async Task<ActionResult<UserViewModel>> Login(LoginViewModel lvm)
         {
-
             var user = await _userManager.FindByEmailAsync(lvm.email);
 
             if (user != null && await _userManager.CheckPasswordAsync(user, lvm.password))
@@ -61,8 +60,9 @@ namespace API.Controllers
         public async Task<ActionResult<UserViewModel>> Register(RegisterViewModel rvm)
         {
             var user = await _userManager.FindByEmailAsync(rvm.Email);
+            var cust = await _context.Customers.FindAsync(rvm.Email);
 
-            if (user == null)
+            if (user == null && cust == null)
             {
                 user = new User
                 {
@@ -84,26 +84,51 @@ namespace API.Controllers
                     Gender = rvm.Gender,
                     Date_of_last_update = DateTime.Now
                 };
-
                 var result = await _userManager.CreateAsync(user, rvm.Password);
-                _context.Users.Add(user);
-                _context.Customers.Add(customer);
-                await _context.SaveChangesAsync();
+                
                 if (result.Succeeded)
                 {
-                    // Add the default role to the user
-                    await _userManager.AddToRoleAsync(user, "Customer");
+                    _context.Users.Add(user);
+                    var userSavedChanges = await _context.SaveChangesAsync();
+
+                    if(userSavedChanges > 0)
+                    {
+                        _context.Customers.Add(customer);
+                        var customerSavedChanges = await _context.SaveChangesAsync();
+
+                        if(customerSavedChanges > 0)
+                        {
+                            await _userManager.AddToRoleAsync(user, "Customer");
+
+                            return Ok("Your account has been created!");
+                        }
+                        else
+                        {
+                            var reverseAction = await _userManager.FindByEmailAsync(user.Email);
+                            await _userManager.DeleteAsync(reverseAction);
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("Failed to add customer details to the database");
+                    }
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error. Please contact support.");
+                    var reverserUser = await _userManager.FindByEmailAsync(user.Email);
+                    var reverseCustomer = await _context.Customers.FindAsync(user.Email);
+
+                    _context.Customers.Remove(reverseCustomer);
+                    _context.SaveChanges();
+                    await _userManager.DeleteAsync(reverserUser);
+
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Creating the user account failed, please contact support");
                 }
             }
             else
             {
                 return Forbid("Account already exists.");
             }
-
             return Ok(user);
         }
 
@@ -155,33 +180,33 @@ namespace API.Controllers
             {
                 return NotFound();
             }
-
-            // Update the email address if provided
-            if (!string.IsNullOrEmpty(model.NewEmail))
-            {
-                loggedInUser.Email = model.NewEmail;
-                loggedInUser.UserName = model.UserName; // Set the username to the new email as well
-            }
-
-            // Update the password if provided
-            if (!string.IsNullOrEmpty(model.NewPassword) && !string.IsNullOrEmpty(model.ConfirmPassword))
-            {
-                var passwordChangeResult = await _userManager.ChangePasswordAsync(loggedInUser, model.CurrentPassword, model.NewPassword);
-
-                if (!passwordChangeResult.Succeeded)
+            else {
+                if (!string.IsNullOrEmpty(model.NewEmail))
                 {
-                    return BadRequest(passwordChangeResult.Errors);
+                    loggedInUser.Email = model.NewEmail;
+                    loggedInUser.UserName = model.UserName;
                 }
+
+                // Update the password if provided
+                if (!string.IsNullOrEmpty(model.NewPassword) && !string.IsNullOrEmpty(model.ConfirmPassword))
+                {
+                    var passwordChangeResult = await _userManager.ChangePasswordAsync(loggedInUser, model.CurrentPassword, model.NewPassword);
+
+                    if (!passwordChangeResult.Succeeded)
+                    {
+                        return BadRequest(passwordChangeResult.Errors);
+                    }
+                }
+
+                var updateResult = await _userManager.UpdateAsync(loggedInUser);
+
+                if (!updateResult.Succeeded)
+                {
+                    return BadRequest(updateResult.Errors);
+                }
+
+                return Ok(loggedInUser);
             }
-
-            var updateResult = await _userManager.UpdateAsync(loggedInUser);
-
-            if (!updateResult.Succeeded)
-            {
-                return BadRequest(updateResult.Errors);
-            }
-
-            return Ok(loggedInUser);
         }
 
         // ASSIGN AND REMOVE ROLES

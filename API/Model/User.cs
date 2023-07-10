@@ -7,6 +7,7 @@ namespace API.Model
 {
     public class User : IdentityUser
     {
+        [Required]
         public string DisplayName { get; set; }
     }
 }
