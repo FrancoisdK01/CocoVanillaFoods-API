@@ -204,11 +204,11 @@ namespace API.Data
             .HasForeignKey(b => b.EventId)
             .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Booking>()
-            .HasMany(b => b.Tickets)
-            .WithOne(t => t.Booking)
-            .HasForeignKey(t => t.BookingId)
-            .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<Booking>()
+            //.HasMany(b => b.Tickets)
+            //.WithOne(t => t.Booking)
+            //.HasForeignKey(t => t.BookingId)
+            //.OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Booking>()
             .HasOne(b => b.BookingPayment)
