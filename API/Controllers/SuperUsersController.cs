@@ -7,18 +7,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
+using Microsoft.AspNetCore.Identity;
+using API.ViewModels;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Superuser")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SuperUsersController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public SuperUsersController(MyDbContext context)
+        public SuperUsersController(MyDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/SuperUsers
@@ -30,7 +40,7 @@ namespace API.Controllers
 
         // GET: api/SuperUsers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SuperUser>> GetSuperUser(int id)
+        public async Task<ActionResult<SuperUser>> GetSuperUser(string id)
         {
             var superUser = await _context.SuperUser.FindAsync(id);
 
@@ -45,14 +55,24 @@ namespace API.Controllers
         // PUT: api/SuperUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSuperUser(int id, SuperUser superUser)
+        public async Task<IActionResult> PutSuperUser(string id, SuperUser superUser)
         {
-            if (id != superUser.SuperUserID)
+            var existingSuperUser = await _context.SuperUser.FindAsync(id);
+
+            if (existingSuperUser == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(superUser).State = EntityState.Modified;
+            // Update the properties of the existingSystemPrivilege with the new values
+            existingSuperUser.Id = existingSuperUser.Id;
+            existingSuperUser.Hire_Date = existingSuperUser.Hire_Date;
+
+            existingSuperUser.First_Name = superUser.First_Name;
+            existingSuperUser.Last_Name = superUser.Last_Name;
+            existingSuperUser.Email = superUser.Email;
+            existingSuperUser.PhoneNumber = superUser.PhoneNumber;
+            existingSuperUser.ID_Number = superUser.ID_Number;
 
             try
             {
@@ -69,40 +89,88 @@ namespace API.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok(existingSuperUser);
         }
 
         // POST: api/SuperUsers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<SuperUser>> PostSuperUser(SuperUser superUser)
+        public async Task<ActionResult<SuperUser>> PostSuperUser(SuperUserRegistrationViewModel viewModel)
         {
-            _context.SuperUser.Add(superUser);
+            RegisterViewModel registerModel = viewModel.RegisterModel;
+            SuperUserViewModel superUserModel = viewModel.SuperUserModel;
+
+            // Create the user account
+            var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName };
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            var result = await _userManager.CreateAsync(user, registerModel.Password);
+            if (!result.Succeeded)
+            {
+                // Handle user account creation failure
+                return BadRequest(result.Errors);
+            }
+
+            // Create the employee account
+            var superuser = new SuperUser
+            {
+                First_Name = superUserModel.FirstName,
+                Last_Name = superUserModel.LastName,
+                Email = registerModel.Email,
+                PhoneNumber = superUserModel.PhoneNumber,
+                ID_Number = superUserModel.IDNumber,
+                Hire_Date = DateTime.Now,
+                UserID = user.Id,
+            };
+
+            _context.SuperUser.Add(superuser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSuperUser", new { id = superUser.SuperUserID }, superUser);
+            if (_context.Entry(superuser).State == EntityState.Unchanged)
+            {
+                // Changes have been saved
+                // Add roles to the user account
+                await _userManager.AddToRoleAsync(user, "Superuser");
+                await _userManager.AddToRoleAsync(user, "Customer");
+            }
+            return CreatedAtAction("GetSuperUser", new { id = superuser.Id }, superuser);
         }
 
         // DELETE: api/SuperUsers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSuperUser(int id)
+        public async Task<IActionResult> DeleteSuperUser(string id)
         {
-            var superUser = await _context.SuperUser.FindAsync(id);
-            if (superUser == null)
+            var superuser = await _context.SuperUser.FindAsync(id);
+            if (superuser == null)
             {
                 return NotFound();
             }
-
-            _context.SuperUser.Remove(superUser);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            else
+            {
+                var user = await _userManager.FindByIdAsync(superuser.UserID);
+                if(user == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    try
+                    {
+                        _context.SuperUser.Remove(superuser);
+                        await _userManager.DeleteAsync(user);
+                        await _context.SaveChangesAsync();
+                    }catch (Exception ex)
+                    {
+                        return BadRequest(ex.Message);
+                    }
+                }
+            }
+            return Ok("The superuser has been removed from the system");
         }
 
-        private bool SuperUserExists(int id)
+        private bool SuperUserExists(string id)
         {
-            return _context.SuperUser.Any(e => e.SuperUserID == id);
+            return _context.SuperUser.Any(e => e.Id == id);
         }
     }
 }

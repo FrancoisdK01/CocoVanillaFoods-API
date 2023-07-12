@@ -16,7 +16,7 @@ namespace API.Model
         public DateTime Review_Date { get; set; }
 
         [ForeignKey("CustomerID")]
-        public int? CustomerID { get; set; }
+        public string CustomerID { get; set; }
         public Customer Customer { get; set; }
     }
 }

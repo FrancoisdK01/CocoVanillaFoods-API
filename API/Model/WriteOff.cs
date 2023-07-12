@@ -14,8 +14,8 @@ namespace API.Model
         [JsonIgnore]
         public List<WriteOffItem> WriteOffItems { get; set; }
 
-        [ForeignKey("EmployeeID")]
-        public int EmployeeID { get; set; }
+        [ForeignKey("Id")]
+        public string EmployeeID { get; set; }
 
         [JsonIgnore]
         public Employee Employee { get; set; }

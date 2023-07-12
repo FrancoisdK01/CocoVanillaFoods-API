@@ -22,53 +22,6 @@ namespace API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("API.Model.Address", b =>
-                {
-                    b.Property<int>("AddressID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressID"), 1L, 1);
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CustomerID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Date_of_last_update")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("EmployeeID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Postal_Code")
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
-
-                    b.Property<int?>("ProvinceID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Street_Address")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("SuperUserID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AddressID");
-
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("EmployeeID");
-
-                    b.HasIndex("ProvinceID");
-
-                    b.HasIndex("SuperUserID");
-
-                    b.ToTable("Address");
-                });
-
             modelBuilder.Entity("API.Model.Blacklist", b =>
                 {
                     b.Property<int>("BlacklistID")
@@ -101,8 +54,8 @@ namespace API.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("EventId")
                         .HasColumnType("int");
@@ -143,11 +96,14 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.Customer", b =>
                 {
-                    b.Property<int>("CustomerID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"), 1L, 1);
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Date_Created")
                         .HasColumnType("datetime2");
@@ -156,47 +112,72 @@ namespace API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("First_Name")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Gender")
+                        .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("ID_Number")
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Last_Name")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Phone_Number")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(5)
                         .HasColumnType("nvarchar(5)");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<int?>("UserID1")
-                        .HasColumnType("int");
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("CustomerID");
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("UserID")
-                        .IsUnique();
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserID1")
-                        .IsUnique()
-                        .HasFilter("[UserID1] IS NOT NULL");
+                    b.HasIndex("UserID");
 
                     b.ToTable("Customers");
                 });
@@ -246,17 +227,23 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.Employee", b =>
                 {
-                    b.Property<int>("EmployeeID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeID"), 1L, 1);
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("First_Name")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -264,29 +251,57 @@ namespace API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ID_Number")
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Last_Name")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Phone_Number")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("SuperUserID")
-                        .HasColumnType("int");
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("EmployeeID");
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SuperUserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("SuperUserID");
 
-                    b.HasIndex("UserID")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Employees");
                 });
@@ -303,11 +318,8 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("EarlyBirdID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeID")
-                        .HasColumnType("int");
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
@@ -316,11 +328,10 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("EventPriceID")
-                        .HasMaxLength(255)
-                        .HasColumnType("int");
+                    b.Property<double>("EventPrice")
+                        .HasColumnType("float");
 
-                    b.Property<int>("EventTypeID")
+                    b.Property<int?>("EventTypeID")
                         .HasColumnType("int");
 
                     b.Property<int>("Tickets_Available")
@@ -331,12 +342,7 @@ namespace API.Migrations
 
                     b.HasKey("EventID");
 
-                    b.HasIndex("EarlyBirdID");
-
-                    b.HasIndex("EmployeeID");
-
-                    b.HasIndex("EventPriceID")
-                        .IsUnique();
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("EventTypeID");
 
@@ -350,9 +356,6 @@ namespace API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventLocationID"), 1L, 1);
-
-                    b.Property<int>("AddressID")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date_of_last_update")
                         .HasColumnType("datetime2");
@@ -368,17 +371,14 @@ namespace API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("SuperUserID")
-                        .HasColumnType("int");
+                    b.Property<string>("SuperUserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("EventLocationID");
 
-                    b.HasIndex("AddressID")
-                        .IsUnique();
-
                     b.HasIndex("EventID");
 
-                    b.HasIndex("SuperUserID");
+                    b.HasIndex("SuperUserId");
 
                     b.ToTable("EventLocations");
                 });
@@ -397,7 +397,12 @@ namespace API.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EventID")
+                        .HasColumnType("int");
+
                     b.HasKey("EventPriceID");
+
+                    b.HasIndex("EventID");
 
                     b.ToTable("EventPrices");
                 });
@@ -414,8 +419,8 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("CustomerID")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
@@ -504,8 +509,8 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"), 1L, 1);
 
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("OrderStatusID")
                         .HasColumnType("int");
@@ -786,16 +791,20 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.SuperUser", b =>
                 {
-                    b.Property<int>("SuperUserID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SuperUserID"), 1L, 1);
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("First_Name")
                         .IsRequired()
@@ -807,26 +816,49 @@ namespace API.Migrations
 
                     b.Property<string>("ID_Number")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Last_Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Phone_Number")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
 
-                    b.HasKey("SuperUserID");
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("UserID")
-                        .IsUnique();
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("SuperUser");
                 });
@@ -873,9 +905,6 @@ namespace API.Migrations
                     b.Property<int>("SupplierID")
                         .HasColumnType("int");
 
-                    b.Property<int>("SupplierPaymentID")
-                        .HasColumnType("int");
-
                     b.Property<int>("WineID")
                         .HasColumnType("int");
 
@@ -907,34 +936,33 @@ namespace API.Migrations
 
                     b.HasKey("SupplierPaymentID");
 
-                    b.HasIndex("SupplierOrderID")
-                        .IsUnique();
+                    b.HasIndex("SupplierOrderID");
 
                     b.ToTable("SupplierPayments");
                 });
 
             modelBuilder.Entity("API.Model.SystemPrivilege", b =>
                 {
-                    b.Property<int>("SystemPrivilegeID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SystemPrivilegeID"), 1L, 1);
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Privilege_Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Privilege_Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.HasKey("SystemPrivilegeID");
-
-                    b.HasIndex("UserID");
+                    b.HasKey("Id");
 
                     b.ToTable("SystemPrivileges");
                 });
@@ -972,21 +1000,56 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.User", b =>
                 {
-                    b.Property<int>("UserID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"), 1L, 1);
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserEmail")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserPassword")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserID");
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
@@ -1043,8 +1106,12 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("EmployeeID")
-                        .HasColumnType("int");
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1073,7 +1140,7 @@ namespace API.Migrations
 
                     b.HasKey("WineID");
 
-                    b.HasIndex("EmployeeID");
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("VarietalID");
 
@@ -1111,13 +1178,14 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishlistID"), 1L, 1);
 
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("WishlistID");
 
                     b.HasIndex("CustomerID")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CustomerID] IS NOT NULL");
 
                     b.ToTable("Wishlists");
                 });
@@ -1153,8 +1221,8 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WriteOffID"), 1L, 1);
 
-                    b.Property<int>("EmployeeID")
-                        .HasColumnType("int");
+                    b.Property<string>("EmployeeID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("WriteOff_Date")
                         .HasColumnType("datetime2");
@@ -1220,35 +1288,6 @@ namespace API.Migrations
                     b.ToTable("WriteOffItems");
                 });
 
-            modelBuilder.Entity("API.Model.Address", b =>
-                {
-                    b.HasOne("API.Model.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerID");
-
-                    b.HasOne("API.Model.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeID");
-
-                    b.HasOne("API.Model.Province", "Province")
-                        .WithMany()
-                        .HasForeignKey("ProvinceID");
-
-                    b.HasOne("API.Model.SuperUser", "SuperUser")
-                        .WithMany()
-                        .HasForeignKey("SuperUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Province");
-
-                    b.Navigation("SuperUser");
-                });
-
             modelBuilder.Entity("API.Model.Booking", b =>
                 {
                     b.HasOne("API.Model.Customer", "Customer")
@@ -1281,14 +1320,10 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.Customer", b =>
                 {
                     b.HasOne("API.Model.User", "User")
-                        .WithOne()
-                        .HasForeignKey("API.Model.Customer", "UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("API.Model.User", null)
-                        .WithOne("Customer")
-                        .HasForeignKey("API.Model.Customer", "UserID1");
 
                     b.Navigation("User");
                 });
@@ -1298,12 +1333,12 @@ namespace API.Migrations
                     b.HasOne("API.Model.SuperUser", "SuperUser")
                         .WithMany("Employees")
                         .HasForeignKey("SuperUserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API.Model.User", "User")
-                        .WithOne("Employee")
-                        .HasForeignKey("API.Model.Employee", "UserID")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1314,52 +1349,33 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.Event", b =>
                 {
-                    b.HasOne("API.Model.EarlyBird", "EarlyBird")
-                        .WithMany()
-                        .HasForeignKey("EarlyBirdID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("API.Model.Employee", null)
                         .WithMany("Events")
-                        .HasForeignKey("EmployeeID");
+                        .HasForeignKey("EmployeeId");
 
-                    b.HasOne("API.Model.EventPrice", "EventPrice")
-                        .WithOne("Event")
-                        .HasForeignKey("API.Model.Event", "EventPriceID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("API.Model.EventType", "EventType")
+                    b.HasOne("API.Model.EventType", null)
                         .WithMany("Events")
-                        .HasForeignKey("EventTypeID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("EarlyBird");
-
-                    b.Navigation("EventPrice");
-
-                    b.Navigation("EventType");
+                        .HasForeignKey("EventTypeID");
                 });
 
             modelBuilder.Entity("API.Model.EventLocation", b =>
                 {
-                    b.HasOne("API.Model.Address", "Address")
-                        .WithOne("EventLocation")
-                        .HasForeignKey("API.Model.EventLocation", "AddressID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("API.Model.Event", "Event")
                         .WithMany()
                         .HasForeignKey("EventID");
 
                     b.HasOne("API.Model.SuperUser", null)
                         .WithMany("EventLocations")
-                        .HasForeignKey("SuperUserID");
+                        .HasForeignKey("SuperUserId");
 
-                    b.Navigation("Address");
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("API.Model.EventPrice", b =>
+                {
+                    b.HasOne("API.Model.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventID");
 
                     b.Navigation("Event");
                 });
@@ -1389,8 +1405,7 @@ namespace API.Migrations
                     b.HasOne("API.Model.Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("API.Model.OrderStatus", "OrderStatus")
                         .WithMany("Orders")
@@ -1504,10 +1519,8 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.SuperUser", b =>
                 {
                     b.HasOne("API.Model.User", "User")
-                        .WithOne("SuperUser")
-                        .HasForeignKey("API.Model.SuperUser", "UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("UserID");
 
                     b.Navigation("User");
                 });
@@ -1534,23 +1547,12 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.SupplierPayment", b =>
                 {
                     b.HasOne("API.Model.SupplierOrder", "SupplierOrder")
-                        .WithOne("SupplierPayment")
-                        .HasForeignKey("API.Model.SupplierPayment", "SupplierOrderID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("SupplierOrder");
-                });
-
-            modelBuilder.Entity("API.Model.SystemPrivilege", b =>
-                {
-                    b.HasOne("API.Model.User", "User")
-                        .WithMany("SystemPrivileges")
-                        .HasForeignKey("UserID")
+                        .WithMany()
+                        .HasForeignKey("SupplierOrderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("SupplierOrder");
                 });
 
             modelBuilder.Entity("API.Model.Ticket", b =>
@@ -1568,7 +1570,7 @@ namespace API.Migrations
                 {
                     b.HasOne("API.Model.Employee", null)
                         .WithMany("Wines")
-                        .HasForeignKey("EmployeeID");
+                        .HasForeignKey("EmployeeId");
 
                     b.HasOne("API.Model.Varietal", "Varietal")
                         .WithMany("Wines")
@@ -1592,8 +1594,7 @@ namespace API.Migrations
                     b.HasOne("API.Model.Customer", "Customer")
                         .WithOne("Wishlist")
                         .HasForeignKey("API.Model.Wishlist", "CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Customer");
                 });
@@ -1622,8 +1623,7 @@ namespace API.Migrations
                     b.HasOne("API.Model.Employee", "Employee")
                         .WithMany("WriteOffs")
                         .HasForeignKey("EmployeeID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Employee");
                 });
@@ -1651,11 +1651,6 @@ namespace API.Migrations
                     b.Navigation("WriteOff");
 
                     b.Navigation("WriteOff_Reason");
-                });
-
-            modelBuilder.Entity("API.Model.Address", b =>
-                {
-                    b.Navigation("EventLocation");
                 });
 
             modelBuilder.Entity("API.Model.Booking", b =>
@@ -1688,11 +1683,6 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.Event", b =>
                 {
                     b.Navigation("Bookings");
-                });
-
-            modelBuilder.Entity("API.Model.EventPrice", b =>
-                {
-                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("API.Model.EventType", b =>
@@ -1754,22 +1744,6 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.Supplier", b =>
                 {
                     b.Navigation("SupplierOrders");
-                });
-
-            modelBuilder.Entity("API.Model.SupplierOrder", b =>
-                {
-                    b.Navigation("SupplierPayment");
-                });
-
-            modelBuilder.Entity("API.Model.User", b =>
-                {
-                    b.Navigation("Customer");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("SuperUser");
-
-                    b.Navigation("SystemPrivileges");
                 });
 
             modelBuilder.Entity("API.Model.Varietal", b =>

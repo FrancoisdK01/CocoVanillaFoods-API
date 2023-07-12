@@ -1,14 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace API.Model
 {
-    public class SuperUser
+    public class SuperUser : IdentityUser
     {
-        [Key]
-        [Required]
-        public int SuperUserID { get; set; }
+        //[Key]
+        //[Required]
+        //public string SuperUserID { get; set; }
 
         [MaxLength(50)]
         [Required]
@@ -18,30 +21,27 @@ namespace API.Model
         [Required]
         public string Last_Name { get; set; }
 
-        [MaxLength(50)]
-        [Required]
-        public string Email { get; set; }
+        //[MaxLength(50)]
+        //[Required]
+        //public string Email { get; set; }
 
-        // [MinLength(10)] - REMEMBER TO ADD
-        [MaxLength(10)]
-        [Required]
-        public string Phone_Number { get; set; }
+        //[MaxLength(10)]
+        //[Required]
+        //public string Phone_Number { get; set; }
 
-        // [MinLength(13)] - REMEMBER TO ADD
-        [MaxLength(13)]
         [Required]
+        [RegularExpression("^[0-9]{13}$", ErrorMessage = "ID number must be a 13-digit number")]
         public string ID_Number { get; set; }
 
         [Required]
         public DateTime Hire_Date { get; set; }
 
-        public int UserID { get; set; }
-        [JsonIgnore]
-        public User User { get; set; }
+        [ForeignKey("Id")]
+        public string UserID { get; set; }
 
-        //public int AddressID { get; set; }
-        //[JsonIgnore]
-        //public Address Address { get; set; }
+        [JsonIgnore]
+        public virtual User User { get; set; }
+
         [JsonIgnore]
         public ICollection<Employee> Employees { get; set; }
         [JsonIgnore]
