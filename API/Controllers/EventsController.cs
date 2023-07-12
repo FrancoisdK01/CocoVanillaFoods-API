@@ -76,13 +76,18 @@ namespace API.Controllers
         // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
+        public async Task<ActionResult<Event>> PostEvent([FromForm] Event @event)
         {
+        //    @event.EventPrice = await _context.EventPrices.FindAsync(@event.EventPriceID);
+        //    @event.EarlyBird = await _context.EarlyBird.FindAsync(@event.EarlyBirdID);
+        //    @event.EventType = await _context.EventTypes.FindAsync(@event.EventTypeID);
+
             _context.Events.Add(@event);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetEvent", new { id = @event.EventID }, @event);
         }
+
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]

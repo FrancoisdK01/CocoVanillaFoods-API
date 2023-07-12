@@ -8,7 +8,7 @@ namespace API.Model
     {
         public int EarlyBirdID { get; set; }
 
-        public double Percentage { get; set; }
+        public int Percentage { get; set; }
 
         [Range(0, 999)]
         public int Limit { get; set; }

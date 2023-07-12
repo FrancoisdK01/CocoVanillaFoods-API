@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.Model
 {
     public class Ticket
     {
+        internal readonly object Booking;
+
         [Key]
         public int TicketID { get; set; }
 
@@ -14,11 +17,9 @@ namespace API.Model
 
         public DateTime ExpiredDate { get; set; }
 
-        [MaxLength(255)]
         public string QRCode { get; set; }
 
-        [ForeignKey("BookingID")]
-        public int BookingId { get; set; }
-        public Booking Booking { get; set; }
+        //public int? BookingId { get; set; }
+
     }
 }
