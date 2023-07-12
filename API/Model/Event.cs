@@ -25,27 +25,10 @@ namespace API.Model
 
         public int EventPrice { get; set; }
 
-
-        //public int? EventPriceID { get; set; }
-
-        //public int? EarlyBirdID { get; set; }
-
-        //public int? EventTypeID { get; set; }
-
-        //public virtual EventPrice EventPrice { get; set; }
-
-        //public virtual EarlyBird EarlyBird { get; set; }
-
-        //public virtual EventType EventType { get; set; }
-
-
-
-        
+        [Required]
+        public string ImagePath { get; set; }
 
         [JsonIgnore]
         public List<Booking> Bookings { get; set; }
-
-
-
     }
 }

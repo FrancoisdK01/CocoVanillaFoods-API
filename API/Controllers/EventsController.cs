@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
 
 namespace API.Controllers
 {
@@ -15,10 +17,46 @@ namespace API.Controllers
     public class EventsController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly string _bucketName;
+        private readonly IWebHostEnvironment _environment;
 
-        public EventsController(MyDbContext context)
+
+        public EventsController(IConfiguration configuration, IWebHostEnvironment environment, MyDbContext context)
         {
+            _configuration = configuration;
+            _environment = environment;
+            _bucketName = _configuration["GoogleCloudStorageBucketName"];
             _context = context;
+        }
+
+        private async Task<string> UploadFileToGoogleCloudStorage(string fileName, Stream fileStream)
+        {
+            try
+            {
+                var credential = GoogleCredential.FromFile(_configuration["GCPAuthStorageAuthFile"]);
+                var storageClient = StorageClient.Create(credential);
+                var bucket = storageClient.GetBucket(_bucketName);
+                var objectName = $"images/{fileName}";
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                    memoryStream.Position = 0;
+
+                    storageClient.UploadObject(bucket.Name, objectName, null, memoryStream);
+                }
+
+                var filePath = $"https://storage.googleapis.com/{_bucketName}/{objectName}";
+
+                return filePath;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
         }
 
         // GET: api/Events
@@ -43,49 +81,69 @@ namespace API.Controllers
         }
 
         // PUT: api/Events/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEvent(int id, Event @event)
+        public async Task<IActionResult> PutEvent(int id, [FromForm] EventFormViewModel eventForm)
         {
-            if (id != @event.EventID)
+            var filePath = await UploadFileToGoogleCloudStorage(eventForm.File.FileName, eventForm.File.OpenReadStream());
+
+            if (string.IsNullOrEmpty(filePath))
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload the file to Google Cloud Storage.");
             }
 
-            _context.Entry(@event).State = EntityState.Modified;
+            var eventItem = await _context.Events.FindAsync(id);
 
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            eventItem.EventName = eventForm.EventName;
+            eventItem.EventDate = eventForm.EventDate;
+            eventItem.Tickets_Available = eventForm.Tickets_Available;
+            eventItem.Description = eventForm.Description;
+            eventItem.EventPrice = eventForm.EventPrice;
+            eventItem.ImagePath = filePath;
+
+            _context.Entry(eventItem).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EventExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
         }
 
         // POST: api/Events
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent([FromForm] Event @event)
+        public async Task<ActionResult<Event>> PostEvent([FromForm] EventFormViewModel eventForm)
         {
-        //    @event.EventPrice = await _context.EventPrices.FindAsync(@event.EventPriceID);
-        //    @event.EarlyBird = await _context.EarlyBird.FindAsync(@event.EarlyBirdID);
-        //    @event.EventType = await _context.EventTypes.FindAsync(@event.EventTypeID);
+            var fileName = $"{Guid.NewGuid()}_{eventForm.File.FileName}";
+            var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.File.OpenReadStream());
 
-            _context.Events.Add(@event);
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload the file to Google Cloud Storage.");
+            }
+
+            var eventItem = new Event
+            {
+                EventName = eventForm.EventName,
+                EventDate = eventForm.EventDate,
+                Tickets_Available = eventForm.Tickets_Available,
+                Description = eventForm.Description,
+                EventPrice = eventForm.EventPrice,
+                ImagePath = filePath,
+            };
+
+            _context.Events.Add(eventItem);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEvent", new { id = @event.EventID }, @event);
+            return CreatedAtAction("GetEvent", new { id = eventItem.EventID }, eventItem);
         }
 
 
