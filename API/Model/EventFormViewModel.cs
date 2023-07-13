@@ -13,6 +13,6 @@
 
         public int EventPrice { get; set; }
 
-        public IFormFile File { get; set; }
+        public IFormFile ImagePath { get; set; }
     }
 }

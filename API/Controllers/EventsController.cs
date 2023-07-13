@@ -84,7 +84,7 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, [FromForm] EventFormViewModel eventForm)
         {
-            var filePath = await UploadFileToGoogleCloudStorage(eventForm.File.FileName, eventForm.File.OpenReadStream());
+            var filePath = await UploadFileToGoogleCloudStorage(eventForm.ImagePath.FileName, eventForm.ImagePath.OpenReadStream());
 
             if (string.IsNullOrEmpty(filePath))
             {
@@ -122,13 +122,15 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Event>> PostEvent([FromForm] EventFormViewModel eventForm)
         {
-            var fileName = $"{Guid.NewGuid()}_{eventForm.File.FileName}";
-            var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.File.OpenReadStream());
+
+            var fileName = $"{Guid.NewGuid()}_{eventForm.ImagePath.FileName}";
+            var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.ImagePath.OpenReadStream());
 
             if (string.IsNullOrEmpty(filePath))
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload the file to Google Cloud Storage.");
             }
+
 
             var eventItem = new Event
             {
