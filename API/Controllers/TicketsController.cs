@@ -84,16 +84,22 @@ namespace API.Controllers
 
             // Generate a QR code
             var qrCode = GenerateQRCode($"http://yourwebsite.com/api/Tickets/{ticket.TicketID}");
+
             ticket.QRCode = qrCode;
             await _context.SaveChangesAsync();
 
-            // Send the email
-            await SendEmail("mclarenmarco998@gmail.com", qrCode);
-            await SendEmail("u20444550@tuks.co.za", qrCode);
-           
+            // Get the customer associated with the ticket
+            var customer = await _context.Customers.FindAsync(ticket.CustomerID);
+
+            if (customer != null)
+            {
+                // Send the email to the customer
+                await SendEmail(customer.Email, qrCode);
+            }
 
             return CreatedAtAction("GetTicket", new { id = ticket.TicketID }, ticket);
         }
+
 
         // DELETE: api/Tickets/5
         [HttpDelete("{id}")]
@@ -124,6 +130,7 @@ namespace API.Controllers
 
             using var bitmap = qrCode.GetGraphic(20);
             using var stream = new MemoryStream();
+
             bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
             return Convert.ToBase64String(stream.ToArray());

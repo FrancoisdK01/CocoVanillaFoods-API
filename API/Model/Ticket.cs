@@ -19,6 +19,9 @@ namespace API.Model
 
         public string QRCode { get; set; }
 
+        public string CustomerID { get; set; }
+        public Customer Customer { get; set; }
+
         //public int? BookingId { get; set; }
 
     }
