@@ -19,7 +19,8 @@ namespace API.Identity
                 {
                     DisplayName = "MarindaBloem",
                     Email = "marinda.bloem@promenade.com",
-                    UserName = "Marinda"
+                    UserName = "Marinda",
+                    TwoFactorEnabled = false
                 };
 
                 var createUserResult = await userManager.CreateAsync(user, "P@ssword1");

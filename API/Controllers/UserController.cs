@@ -3,12 +3,10 @@ using API.Model;
 using API.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NuGet.Packaging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,12 +21,15 @@ namespace API.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _config;
         private readonly MyDbContext _context;
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, MyDbContext context) 
+        private readonly IEmailService _emailService;
+
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, MyDbContext context, IEmailService emailService) 
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = configuration;
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpPost]
@@ -39,20 +40,32 @@ namespace API.Controllers
 
             if (user != null && await _userManager.CheckPasswordAsync(user, lvm.password))
             {
-                try
+                if (await _userManager.GetTwoFactorEnabledAsync(user))
                 {
-                    return GenerateJWTToken(user);
+                    // Generate and send the 2FA code via email
+                    var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
+                    Send2FACodeByEmail(user, code);
+
+                    return Ok("Two-factor authentication code has been sent to your email.");
                 }
-                catch (Exception)
+                else
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error. Please contact support.");
+                    try
+                    {
+                        return GenerateJWTToken(user);
+                    }
+                    catch (Exception)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error. Please contact support.");
+                    }
                 }
             }
             else
             {
-                return NotFound("Does not exist");
+                return NotFound("User not found or invalid credentials.");
             }
         }
+
 
 
         [HttpPost]
@@ -66,9 +79,10 @@ namespace API.Controllers
             {
                 user = new User
                 {
-                    UserName = rvm.Email,
+                    UserName = rvm.DisplayName,
                     Email = rvm.Email,
                     DisplayName = rvm.DisplayName,
+                    TwoFactorEnabled = rvm.EnableTwoFactorAuth
                 };
 
                 var customer = new Customer
@@ -85,7 +99,14 @@ namespace API.Controllers
                     Date_of_last_update = DateTime.Now
                 };
                 var result = await _userManager.CreateAsync(user, rvm.Password);
-                
+
+                if (rvm.EnableTwoFactorAuth)
+                {
+                    // Generate 2FA code and send it via email
+                    var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
+                    Send2FACodeByEmail(user, code);
+                }
+
                 if (result.Succeeded)
                 {
                     _context.Users.Add(user);
@@ -115,12 +136,15 @@ namespace API.Controllers
                 }
                 else
                 {
-                    var reverserUser = await _userManager.FindByEmailAsync(user.Email);
-                    var reverseCustomer = await _context.Customers.FindAsync(user.Email);
+                    var reverseUser = await _userManager.FindByEmailAsync(user.Email);
+                    var reverseCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == user.Email);
 
-                    _context.Customers.Remove(reverseCustomer);
-                    _context.SaveChanges();
-                    await _userManager.DeleteAsync(reverserUser);
+                    if (reverseUser != null && reverseCustomer != null)
+                    {
+                        _context.Customers.Remove(reverseCustomer);
+                        await _context.SaveChangesAsync();
+                        await _userManager.DeleteAsync(reverseUser);
+                    }
 
                     return StatusCode(StatusCodes.Status500InternalServerError, "Creating the user account failed, please contact support");
                 }
@@ -169,6 +193,61 @@ namespace API.Controllers
                 userEmail = user.Email
             });
         }
+
+        //2FA code Generator
+        private void Send2FACodeByEmail(User user, string code)
+        {
+            // Generate the email message with the code
+            var evm = new EmailViewModel
+            {
+                To = user.Email,
+                Subject = "2-Factor Authentication code",
+                Body = $@"
+                                        <h5>Below you will find your 2-Factor authentication code, please use this code to access your account</h5>
+                                        
+                                        <ul>
+                                            <li>Code: {code}</li>
+                                        </ul>
+
+                                        <p>Kind regards,</p>
+                                        <p>The Promenade Team</p>
+                                        "
+            };
+
+            _emailService.SendEmail(evm);
+        }
+
+        [HttpPost]
+        [Route("VerifyCode")]
+        public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user != null)
+            {
+                var isCodeValid = await _userManager.VerifyTwoFactorTokenAsync(user, "email", model.Code);
+                if (isCodeValid)
+                {
+                    try
+                    {
+                        var token = GenerateJWTToken(user);
+                        return Ok(token);
+                    }
+                    catch (Exception)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error. Please contact support.");
+                    }
+                }
+                else
+                {
+                    return BadRequest("Invalid verification code.");
+                }
+            }
+            else
+            {
+                return NotFound("User not found.");
+            }
+        }
+
 
         [HttpPut("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -289,9 +368,7 @@ namespace API.Controllers
             return Ok();
         }
 
-
-
-
+        
         // AUTH CHECKING
         //Test Authentication
         [HttpGet]
@@ -330,5 +407,43 @@ namespace API.Controllers
         {
             return "Super secret text for Employees only";
         }
+
+
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // User with the provided email does not exist
+                return NotFound();
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Generate the password reset link using the token and the frontend URL
+            var callbackUrl = Url.Action("UpdateLoginDetails", "User", new { email = user.Email, token }, protocol: Request.Scheme);
+
+            var evm = new EmailViewModel
+            {
+                To = user.Email,
+                Subject = "Reset Password",
+                Body = $@"
+                    <h5>Reset Password</h5>
+                    <p>Please click the link below to reset your password:</p>
+                    <a href=""{callbackUrl}"">{callbackUrl}</a>
+                    <p>If you did not request a password reset, please ignore this email.</p>
+                    <p>Kind regards,</p>
+                    <p>The Promenade Team</p>
+                "
+            };
+
+            _emailService.SendEmail(evm);
+
+            return Ok();
+        }
+
+
     }
 }
