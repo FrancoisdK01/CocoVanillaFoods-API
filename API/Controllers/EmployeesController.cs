@@ -133,7 +133,7 @@ namespace API.Controllers
             {
                 var superuserID = superUser.Id;
 
-                var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName };
+                var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName , TwoFactorEnabled = true};
                 _context.Users.Add(user);
                 var userSavedChanges = await _context.SaveChangesAsync();
 

@@ -14,6 +14,8 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddDataProtection();
             // ... other services
             services.AddDirectoryBrowser();
         }

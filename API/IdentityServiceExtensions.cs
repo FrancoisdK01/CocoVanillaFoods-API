@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace API
 {
@@ -20,8 +21,8 @@ namespace API
                 opt.UseSqlServer(config.GetConnectionString("IdentityConnection"));
             });
 
-            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>().AddSignInManager<SignInManager<User>>().AddDefaultTokenProviders();
-
+            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>().AddSignInManager<SignInManager<User>>().AddDefaultTokenProviders().AddTokenProvider<EmailTokenProvider<User>>("email");
+            services.AddScoped<IEmailService, EmailService>();
             //services.AddIdentityCore<User>(opt =>
             //{
             //}).AddRoles<IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>().AddSignInManager<SignInManager<User>>().AddDefaultTokenProviders();
