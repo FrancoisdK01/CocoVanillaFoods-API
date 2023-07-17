@@ -140,6 +140,7 @@ namespace API.Controllers
                 Description = eventForm.Description,
                 EventPrice = eventForm.EventPrice,
                 ImagePath = filePath,
+                EarlyBirdID = eventForm.EarlyBirdID
             };
 
             _context.Events.Add(eventItem);
@@ -159,10 +160,38 @@ namespace API.Controllers
                 return NotFound();
             }
 
+            // Delete the image from Google Cloud Storage
+            if (!string.IsNullOrEmpty(@event.ImagePath))
+            {
+                await DeleteImageFromGoogleCloudStorage(@event.ImagePath);
+            }
+
             _context.Events.Remove(@event);
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private async Task DeleteImageFromGoogleCloudStorage(string filePath)
+        {
+            try
+            {
+                var credential = GoogleCredential.FromFile(_configuration["GCPAuthStorageAuthFile"]);
+                var storageClient = StorageClient.Create(credential);
+                var bucket = storageClient.GetBucket(_bucketName);
+
+                // Extract the object name from the file path
+                var uri = new Uri(filePath);
+                var objectName = uri.PathAndQuery.TrimStart('/');
+
+                // Delete the object from Google Cloud Storage
+                storageClient.DeleteObject(bucket.Name, objectName);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private bool EventExists(int id)

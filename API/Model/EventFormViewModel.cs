@@ -14,5 +14,7 @@
         public int EventPrice { get; set; }
 
         public IFormFile ImagePath { get; set; }
+
+        public int EarlyBirdID { get; set; }
     }
 }
