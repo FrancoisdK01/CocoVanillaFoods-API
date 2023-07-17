@@ -28,6 +28,10 @@ namespace API.Model
         [Required]
         public string ImagePath { get; set; }
 
+        public int EarlyBirdID { get; set; }
+        [ForeignKey("EarlyBirdID")]
+        public EarlyBird EarlyBird { get; set; }
+
         [JsonIgnore]
         public List<Booking> Bookings { get; set; }
     }

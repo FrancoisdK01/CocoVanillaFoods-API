@@ -12,5 +12,8 @@ namespace API.Model
 
         [Range(0, 999)]
         public int Limit { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Event> Events { get; set; }
     }
 }

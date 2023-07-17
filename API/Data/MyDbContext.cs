@@ -22,6 +22,21 @@ namespace API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<EarlyBird>(eb =>
+            {
+                eb.HasKey(e => e.EarlyBirdID);
+            });
+
+            modelBuilder.Entity<Event>(e =>
+            {
+                e.HasKey(e => e.EventID);
+                e.HasOne(e => e.EarlyBird)
+                    .WithMany(eb => eb.Events)
+                    .HasForeignKey(e => e.EarlyBirdID)
+                    .OnDelete(DeleteBehavior.Cascade); 
+            });
+
             modelBuilder.Entity<StockTake>()
             .HasMany<StockTake_Item>(s => s.StockTake_Items)
             .WithOne(si => si.StockTake)
