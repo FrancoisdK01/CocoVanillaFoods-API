@@ -34,7 +34,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public async Task<ActionResult<UserViewModel>> Login(LoginViewModel lvm)
+        public async Task<ActionResult<object>> Login(LoginViewModel lvm)
         {
             var user = await _userManager.FindByEmailAsync(lvm.email);
 
@@ -46,13 +46,13 @@ namespace API.Controllers
                     var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
                     Send2FACodeByEmail(user, code);
 
-                    return Ok("Two-factor authentication code has been sent to your email.");
+                    return Ok(new { message = "Two-factor authentication code has been sent to your email." });
                 }
                 else
                 {
                     try
                     {
-                        return GenerateJWTToken(user);
+                        return Ok(new { token = GenerateJWTToken(user) });
                     }
                     catch (Exception)
                     {
@@ -62,10 +62,9 @@ namespace API.Controllers
             }
             else
             {
-                return NotFound("User not found or invalid credentials.");
+                return NotFound(new { error = "User not found or invalid credentials." });
             }
         }
-
 
 
         [HttpPost]
@@ -215,6 +214,22 @@ namespace API.Controllers
             };
 
             _emailService.SendEmail(evm);
+        }
+
+        [HttpGet]
+        [Route("GetUserByEmail/{email}")]
+        public async Task<IActionResult> GetUserIdByEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound("The user you are searching for doesn't exist");
+            }
+            else
+            {
+                var userId = user.Id;
+                return Ok(new { userId });
+            }
         }
 
         [HttpPost]
