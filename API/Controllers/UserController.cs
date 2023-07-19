@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Protocol;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,7 +24,7 @@ namespace API.Controllers
         private readonly MyDbContext _context;
         private readonly IEmailService _emailService;
 
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, MyDbContext context, IEmailService emailService) 
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, MyDbContext context, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -46,15 +47,27 @@ namespace API.Controllers
                     var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
                     Send2FACodeByEmail(user, code);
 
-                    return Ok(new { message = "Two-factor authentication code has been sent to your email." });
+
+                    // Return a response indicating 2FA is enabled
+                    return Ok(new { message = "Two-factor authentication code has been sent to your email.", twoFactorEnabled = true });
+
+
                 }
                 else
                 {
-                    try
+                    var tokenResult = GenerateJWTToken(user);
+
+                    if (tokenResult != null)
                     {
-                        return Ok(new { token = GenerateJWTToken(user) });
+
+                        var tokenValue = tokenResult.Token;
+                        var userNameValue = tokenResult.UserName;
+                        var userEmailValue = tokenResult.UserEmail;
+
+                        return Ok(new { tokenValue, userNameValue, userEmailValue, twoFactorEnabled = false });
+
                     }
-                    catch (Exception)
+                    else
                     {
                         return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error. Please contact support.");
                     }
@@ -99,24 +112,24 @@ namespace API.Controllers
                 };
                 var result = await _userManager.CreateAsync(user, rvm.Password);
 
-                if (rvm.EnableTwoFactorAuth)
-                {
-                    // Generate 2FA code and send it via email
-                    var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
-                    Send2FACodeByEmail(user, code);
-                }
+                //if (rvm.EnableTwoFactorAuth)
+                //{
+                //    // Generate 2FA code and send it via email
+                //    var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
+                //    Send2FACodeByEmail(user, code);
+                //}
 
                 if (result.Succeeded)
                 {
                     _context.Users.Add(user);
                     var userSavedChanges = await _context.SaveChangesAsync();
 
-                    if(userSavedChanges > 0)
+                    if (userSavedChanges > 0)
                     {
                         _context.Customers.Add(customer);
                         var customerSavedChanges = await _context.SaveChangesAsync();
 
-                        if(customerSavedChanges > 0)
+                        if (customerSavedChanges > 0)
                         {
                             await _userManager.AddToRoleAsync(user, "Customer");
 
@@ -152,11 +165,11 @@ namespace API.Controllers
             {
                 return Forbid("Account already exists.");
             }
-            return Ok(user);
+            return Ok("Your account has been created!");
         }
 
         [HttpGet]
-        private ActionResult GenerateJWTToken(User user)
+        private TokenResult GenerateJWTToken(User user)
         {
             var roles = _userManager.GetRolesAsync(user).Result;
 
@@ -185,12 +198,7 @@ namespace API.Controllers
                 expires: DateTime.UtcNow.AddHours(24)
             );
 
-            return Created("", new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                userName = user.UserName,
-                userEmail = user.Email
-            });
+            return new TokenResult(new JwtSecurityTokenHandler().WriteToken(token), user.UserName, user.Email);
         }
 
         //2FA code Generator
@@ -244,8 +252,20 @@ namespace API.Controllers
                 {
                     try
                     {
-                        var token = GenerateJWTToken(user);
-                        return Ok(token);
+                        var tokenResult = GenerateJWTToken(user);
+
+                        if (tokenResult != null)
+                        {
+                            var tokenValue = tokenResult.Token;
+                            var userNameValue = tokenResult.UserName;
+                            var userEmailValue = tokenResult.UserEmail;
+
+                            return Ok(new { tokenValue, userNameValue, userEmailValue, twoFactorEnabled = false });
+                        }
+                        else
+                        {
+                            return BadRequest("Boo");
+                        }
                     }
                     catch (Exception)
                     {
@@ -274,7 +294,8 @@ namespace API.Controllers
             {
                 return NotFound();
             }
-            else {
+            else
+            {
                 if (!string.IsNullOrEmpty(model.NewEmail))
                 {
                     loggedInUser.Email = model.NewEmail;
@@ -304,7 +325,7 @@ namespace API.Controllers
         }
 
         // ASSIGN AND REMOVE ROLES
-       
+
         [HttpGet]
         [Route("GetAllUsers")]
         public async Task<ActionResult<IEnumerable<UserRolesViewModel>>> GetAllUsers()
@@ -383,7 +404,7 @@ namespace API.Controllers
             return Ok();
         }
 
-        
+
         // AUTH CHECKING
         //Test Authentication
         [HttpGet]
@@ -459,6 +480,20 @@ namespace API.Controllers
             return Ok();
         }
 
+        private class TokenResult
+        {
+            public string Token { get; }
+            public string UserName { get; }
+            public string UserEmail { get; }
 
+            public TokenResult(string token, string userName, string userEmail)
+            {
+                Token = token;
+                UserName = userName;
+                UserEmail = userEmail;
+            }
+        }
     }
+
+
 }
