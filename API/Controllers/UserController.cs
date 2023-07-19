@@ -47,8 +47,11 @@ namespace API.Controllers
                     var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
                     Send2FACodeByEmail(user, code);
 
+
                     // Return a response indicating 2FA is enabled
                     return Ok(new { message = "Two-factor authentication code has been sent to your email.", twoFactorEnabled = true });
+
+
                 }
                 else
                 {
@@ -56,11 +59,13 @@ namespace API.Controllers
 
                     if (tokenResult != null)
                     {
+
                         var tokenValue = tokenResult.Token;
                         var userNameValue = tokenResult.UserName;
                         var userEmailValue = tokenResult.UserEmail;
 
                         return Ok(new { tokenValue, userNameValue, userEmailValue, twoFactorEnabled = false });
+
                     }
                     else
                     {
@@ -73,7 +78,6 @@ namespace API.Controllers
                 return NotFound(new { error = "User not found or invalid credentials." });
             }
         }
-
 
 
         [HttpPost]
