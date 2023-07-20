@@ -55,6 +55,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 //DB Context
 builder.Services.AddIdentityServices(builder.Configuration);
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddDbContext<MyDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
 

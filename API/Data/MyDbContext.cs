@@ -290,6 +290,6 @@ namespace API.Data
         public DbSet<WriteOffItem> WriteOffItems { get; set; }
         public DbSet<WriteOff_Reason> WriteOffReasons { get; set; }
         public DbSet<SuperUser> SuperUser { get; set; }
-
+        public DbSet<EventPayments> EventsPayments { get; set; }
     }
 }

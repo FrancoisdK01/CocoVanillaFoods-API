@@ -16,7 +16,9 @@ namespace API
             services.AddControllers();
 
             services.AddDataProtection();
-            // ... other services
+
+            services.AddHttpClient();
+
             services.AddDirectoryBrowser();
         }
 
