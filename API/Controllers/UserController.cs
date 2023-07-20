@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Model;
 using API.ViewModels;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -85,7 +86,7 @@ namespace API.Controllers
         public async Task<ActionResult<UserViewModel>> Register(RegisterViewModel rvm)
         {
             var user = await _userManager.FindByEmailAsync(rvm.Email);
-            var cust = await _context.Customers.FindAsync(rvm.Email);
+            var cust = await _context.Customers.FirstOrDefaultAsync(x => x.Email == rvm.Email);
 
             if (user == null && cust == null)
             {
@@ -108,7 +109,8 @@ namespace API.Controllers
                     UserID = user.Id,
                     Title = rvm.Title,
                     Gender = rvm.Gender,
-                    Date_of_last_update = DateTime.Now
+                    Date_of_last_update = DateTime.Now,
+                    TwoFactorEnabled = rvm.EnableTwoFactorAuth
                 };
                 var result = await _userManager.CreateAsync(user, rvm.Password);
 
@@ -167,6 +169,31 @@ namespace API.Controllers
             }
             return Ok("Your account has been created!");
         }
+
+        [HttpPost]
+        [Route("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                // Perform logout actions
+
+                await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+                var token = new
+                {
+                    tokenValue = ""
+                };
+
+                return Ok(new { token });
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error. Please contact support.");
+            }
+        }
+
+
+
 
         [HttpGet]
         private TokenResult GenerateJWTToken(User user)
@@ -260,7 +287,7 @@ namespace API.Controllers
                             var userNameValue = tokenResult.UserName;
                             var userEmailValue = tokenResult.UserEmail;
 
-                            return Ok(new { tokenValue, userNameValue, userEmailValue, twoFactorEnabled = false });
+                            return Ok(new { tokenValue, userNameValue, userEmailValue, twoFactorEnabled = true });
                         }
                         else
                         {

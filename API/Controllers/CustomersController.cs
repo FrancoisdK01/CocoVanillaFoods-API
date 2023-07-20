@@ -32,17 +32,19 @@ namespace API.Controllers
         }
 
         // GET: api/Customers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(string id)
+        [HttpGet]
+        [Route("GetUser/{email}")]
+        public async Task<IActionResult> GetCustomer(string email)
         {
-            var customer = await _context.Customers.FindAsync(id);
-
-            if (customer == null)
+            var user = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
+            if (user == null)
             {
-                return NotFound();
+                return NotFound("The user you are searching for doesn't exist");
             }
-
-            return customer;
+            else
+            {
+                return Ok(new { user });
+            }
         }
 
         // PUT: api/Customers/5
