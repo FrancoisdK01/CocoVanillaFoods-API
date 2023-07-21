@@ -18,12 +18,14 @@ namespace API.Controllers
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
         private readonly MyDbContext _context;
+        private readonly ILogger<PaymentController> _logger;
 
-        public PaymentController(IHttpClientFactory clientFactory, IConfiguration configuration, MyDbContext context)
+        public PaymentController(IHttpClientFactory clientFactory, IConfiguration configuration, MyDbContext context, ILogger<PaymentController> logger)
         {
             _clientFactory = clientFactory;
             _configuration = configuration;
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost("CreatePayment", Name = "CreatePayment")]
@@ -33,9 +35,19 @@ namespace API.Controllers
         {
             var client = _clientFactory.CreateClient();
 
-            var url = "https://sandbox.payfast.co.za/eng/process";
+            // Change this line to use the live PayFast URL
+            var url = "https://www.payfast.co.za/eng/process";
 
-            payment.merchant_id = int.Parse(_configuration["PayFast:MerchantId"]);
+            if (int.TryParse(_configuration["PayFast:MerchantId"], out int merchantId))
+            {
+                payment.merchant_id = merchantId;
+            }
+            else
+            {
+                // Log an error
+                _logger.LogError($"MerchantId value '{_configuration["PayFast:MerchantId"]}' is not a valid integer.");
+            }
+
             payment.merchant_key = _configuration["PayFast:MerchantKey"];
 
             var passphrase = _configuration["PayFast:MerchantPassphrase"];
@@ -72,27 +84,18 @@ namespace API.Controllers
                 // Log the error and/or handle it appropriately
             }
 
-            if (payFastResponse != null)
+            if (response.IsSuccessStatusCode)
             {
-                // The response was successfully parsed as JSON
-                // Continue processing the response as before
-                var eventPayment = new EventPayments
-                {
-                    PaymentAmount = payment.amount,
-                    PaymentDate = DateTime.Now
-                };
-
-                _context.EventsPayments.Add(eventPayment);
-                await _context.SaveChangesAsync();
-
-                return Ok(payFastResponse);
+                // Instead of trying to read and process the response content, just return the URL.
+                //return Ok(url);
+                return Ok(payment);
             }
             else
             {
-                // The response couldn't be parsed as JSON
-                // Return an error response
+                // Handle the error...
                 return BadRequest(responseContent);
             }
+          
         }
 
         private string UrlEncode(string value)
