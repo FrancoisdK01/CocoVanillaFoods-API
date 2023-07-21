@@ -311,13 +311,16 @@ namespace API.Controllers
         }
 
 
-        [HttpPut("{id}")]
+        [HttpPut]
+        [Route("UpdateLoginDetails/{id}")]
+        [AllowAnonymous]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateLoginDetails(string id, LoginUpdateViewModel model)
         {
             var loggedInUser = await _userManager.FindByIdAsync(id);
+            var loggedInCust = await _context.Customers.FirstOrDefaultAsync(x => x.UserID == id);
 
-            if (loggedInUser == null)
+            if (loggedInUser == null && loggedInCust == null)
             {
                 return NotFound();
             }
@@ -327,6 +330,10 @@ namespace API.Controllers
                 {
                     loggedInUser.Email = model.NewEmail;
                     loggedInUser.UserName = model.UserName;
+                    loggedInCust.Email = model.NewEmail;
+                    loggedInCust.Date_of_last_update = DateTime.UtcNow;
+                    loggedInCust.UserName = model.UserName;
+                    loggedInUser.DisplayName = model.UserName;
                 }
 
                 // Update the password if provided
@@ -341,7 +348,8 @@ namespace API.Controllers
                 }
 
                 var updateResult = await _userManager.UpdateAsync(loggedInUser);
-
+                _context.Update(loggedInCust);
+                _context.SaveChanges();
                 if (!updateResult.Succeeded)
                 {
                     return BadRequest(updateResult.Errors);
