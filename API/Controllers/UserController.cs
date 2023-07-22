@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Protocol;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,6 +24,7 @@ namespace API.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _config;
         private readonly MyDbContext _context;
+        private static readonly Random random = new Random();
         private readonly IEmailService _emailService;
 
         public UserController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, MyDbContext context, IEmailService emailService)
@@ -211,7 +213,7 @@ namespace API.Controllers
             // Add the role claim(s) to the claims list
             foreach (var role in roles)
             {
-                claims.Add(new Claim("roles", role)); // Use a custom claim name, e.g., "roles"
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
@@ -485,33 +487,49 @@ namespace API.Controllers
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
+            var newPassword = GeneratePassword();
             if (user == null)
             {
                 // User with the provided email does not exist
                 return NotFound();
             }
-
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            // Generate the password reset link using the token and the frontend URL
-            var callbackUrl = Url.Action("UpdateLoginDetails", "User", new { email = user.Email, token }, protocol: Request.Scheme);
-
             var evm = new EmailViewModel
             {
                 To = user.Email,
                 Subject = "Reset Password",
                 Body = $@"
-                    <h5>Reset Password</h5>
-                    <p>Please click the link below to reset your password:</p>
-                    <a href=""{callbackUrl}"">{callbackUrl}</a>
+                    <h4>Reset Password</h4>
+                    <h6>You have requested to reset your password.</h6>
+                    <p>Please follow the following steps to update your login details:</p>
+                    <ol>
+                        <li>Find your login details below these steps</li>
+                        <li>Go to our website and login your account with the details provided</li>
+                        <li>If you wish to update your login details instead of keeping this password: Go to the account page</li>
+                        <li>Click on the Username and password tab in die sidebar</li>
+                        <li>Update your details and log into your account with your updated details</li>
+                    </ol>
+
+                    <p> You updated login details follow </p>
+                    <ul>
+                        <li>Email: {user.Email}</li>
+                        <li>Password: {newPassword}</li>
+                    </ul>
                     <p>If you did not request a password reset, please ignore this email.</p>
                     <p>Kind regards,</p>
                     <p>The Promenade Team</p>
                 "
             };
 
-            _emailService.SendEmail(evm);
-
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (result.Succeeded)
+            {
+                _emailService.SendEmail(evm);
+            }
+            else
+            {
+                return BadRequest("Failed to reset password");
+            }
             return Ok();
         }
 
@@ -528,7 +546,52 @@ namespace API.Controllers
                 UserEmail = userEmail;
             }
         }
+
+        public static string GeneratePassword()
+        {
+            string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string specialCharacters = "!@#$&*";
+            string digits = "0123456789";
+            string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+
+            char[] password = new char[12];
+
+            // Select one character from each requirement
+            password[0] = GetRandomCharacter(uppercaseLetters);
+            password[1] = GetRandomCharacter(specialCharacters);
+            password[2] = GetRandomCharacter(digits);
+            password[3] = GetRandomCharacter(lowercaseLetters);
+
+            // Fill the remaining characters
+            for (int i = 4; i < 12; i++)
+            {
+                {
+                    string allCharacters = uppercaseLetters + specialCharacters + digits + lowercaseLetters;
+                    password[i] = GetRandomCharacter(allCharacters);
+                }
+            }
+
+            // Shuffle the password characters
+            for (int i = 0; i < 12; i++)
+            {
+                {
+                    int randomIndex = random.Next(i, 12);
+                    char temp = password[randomIndex];
+                    password[randomIndex] = password[i];
+                    password[i] = temp;
+                }
+            }
+
+            return new string(password);
+        }
+
+
+        private static char GetRandomCharacter(string characterSet)
+        {
+            {
+                int randomIndex = random.Next(0, characterSet.Length);
+                return characterSet[randomIndex];
+            }
+        }
     }
-
-
 }
