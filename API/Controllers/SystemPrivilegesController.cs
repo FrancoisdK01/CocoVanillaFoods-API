@@ -12,13 +12,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using API.ViewModels;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Superuser")]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Superuser")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SystemPrivilegesController : ControllerBase
     {
         private readonly MyDbContext _context;
@@ -32,10 +32,12 @@ namespace API.Controllers
 
         // GET: api/SystemPrivileges
         [HttpGet]
+        [Route("GetSystemPrivileges")]
         public async Task<ActionResult<IEnumerable<SystemPrivilege>>> GetSystemPrivileges()
         {
             return await _context.SystemPrivileges.ToListAsync();
         }
+
 
         // GET: api/SystemPrivileges/5
         [HttpGet("{id}")]
@@ -74,7 +76,7 @@ namespace API.Controllers
 
             // Update the properties of the existingSystemPrivilege with the new values
             existingSystemPrivilege.Name = systemPrivilege.Name;
-            existingSystemPrivilege.Privilege_Description = systemPrivilege.Privilege_Description;
+            existingSystemPrivilege.Description = systemPrivilege.Description;
             // Update other properties as needed
 
             try
@@ -100,6 +102,7 @@ namespace API.Controllers
         // POST: api/SystemPrivileges
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Route("AddPrivilege")]
         public async Task<ActionResult<SystemPrivilege>> PostSystemPrivilege(SystemPrivilegeViewModel viewModel)
         {
             // Check if the role name already exists in SystemPrivileges
@@ -107,41 +110,56 @@ namespace API.Controllers
             {
                 return Conflict("Role name already exists in SystemPrivileges.");
             }
-
-            // Check if the role name already exists in AspNetRoles
-            if (await _roleManager.RoleExistsAsync(viewModel.Name))
+            else
             {
-                return Conflict("Role name already exists in AspNetRoles.");
+                // Check if the role name already exists in AspNetRoles
+                if (await _roleManager.RoleExistsAsync(viewModel.Name))
+                {
+                    return Conflict("Role name already exists in AspNetRoles.");
+                }
+                else
+                {
+                    var role = new IdentityRole { Name = viewModel.Name };
+
+                    // Add role to the AspNetRoles table
+                    var result = await _roleManager.CreateAsync(role);
+                    if (!result.Succeeded)
+                    {
+                        // Handle the error if role creation fails
+                        return StatusCode(500, "Failed to create role in AspNetRoles table.");
+                    }
+                    else
+                    {
+                        var privilege = new SystemPrivilege
+                        {
+                            Name = viewModel.Name,
+                            RoleId = role.Id,
+                            Description = viewModel.Description
+                        };
+
+                        _context.SystemPrivileges.Add(privilege);
+                        var savedChanges = await _context.SaveChangesAsync();
+                        if(savedChanges > 0)
+                        {
+                            return CreatedAtAction("GetSystemPrivilege", new { id = privilege.Id }, privilege);
+                        }
+                        else
+                        {
+                            await _roleManager.DeleteAsync(role);
+                            return BadRequest();
+                        }
+                    }
+                }
             }
+            
 
-            var role = new IdentityRole { Name = viewModel.Name};
+            
 
-            // Add role to the AspNetRoles table
-            var result = await _roleManager.CreateAsync(role);
-            if (!result.Succeeded)
-            {
-                // Handle the error if role creation fails
-                return StatusCode(500, "Failed to create role in AspNetRoles table.");
-            }
-
-            var privilege = new SystemPrivilege
-            {
-                Name = viewModel.Name,
-                RoleId = role.Id,
-                Privilege_Description = viewModel.Description
-            };
-
-            _context.SystemPrivileges.Add(privilege);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetSystemPrivilege", new { id = privilege.Id }, privilege);
+            
         }
 
-        // YOU ARE HERE
-
-
         // DELETE: api/SystemPrivileges/5
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteSystemPrivilege/{id}")]
         public async Task<IActionResult> DeleteSystemPrivilege(string id)
         {
             var systemPrivilege = await _context.SystemPrivileges.FindAsync(id);

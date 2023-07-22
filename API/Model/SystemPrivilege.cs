@@ -22,6 +22,6 @@ namespace API.Model
         //public string Privilege_Name { get; set; }
 
         [MaxLength(255)]
-        public string Privilege_Description { get; set; }
+        public string Description { get; set; }
     }
 }
