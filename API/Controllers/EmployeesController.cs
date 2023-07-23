@@ -29,6 +29,7 @@ namespace API.Controllers
 
         // GET: api/Employees
         [HttpGet]
+        [Route("GetEmployees")]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
             return await _context.Employees.ToListAsync();
@@ -115,6 +116,7 @@ namespace API.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Route("AddEmployee")]
         public async Task<ActionResult<Employee>> PostEmployee(EmployeeRegistrationViewModel viewModel)
         {
             RegisterViewModel registerModel = viewModel.RegisterModel;
@@ -205,7 +207,7 @@ namespace API.Controllers
         }
 
         // DELETE: api/Employees/5
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteEmployee/{id}")]
         public async Task<IActionResult> DeleteEmployee(string id)
         {
             var employee = await _context.Employees.FindAsync(id);

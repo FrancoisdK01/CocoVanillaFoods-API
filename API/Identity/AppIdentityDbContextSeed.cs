@@ -45,12 +45,30 @@ namespace API.Identity
                             UserName = "Marinda"
                         };
 
+                        var customer = new Customer
+                        {
+                            Id = user.Id,
+                            First_Name = "Marinda",
+                            Last_Name = "Bloem",
+                            Email = "marinda.bloem@promenade.com",
+                            PhoneNumber = "1234567890",
+                            ID_Number = "0123456789123",
+                            UserName = "Marinda",
+                            Date_Created = DateTime.Now,
+                            Date_of_last_update = DateTime.Now,
+                            UserID = user.Id,
+                            Gender = "Female",
+                            Title = "Mrs",
+                            TwoFactorEnabled = false,
+                        };
+
                         // Retrieve the user ID from the Identity database
                         var userIdentity = await identityDbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
                         if (userIdentity != null)
                         {
                             superuser.UserID = userIdentity.Id;
                             context.SuperUser.Add(superuser);
+                            context.Customers.Add(customer);
                             await context.SaveChangesAsync();
                         }
                     }
@@ -77,7 +95,7 @@ namespace API.Identity
                         var role = new SystemPrivilege
                         {
                             Name = roleName,
-                            Privilege_Description = descriptions[count]
+                            Description = descriptions[count]
                         };
 
                         var roleIdentity = await identityDbContext.Roles.FirstOrDefaultAsync(x => x.Name == role.Name);
