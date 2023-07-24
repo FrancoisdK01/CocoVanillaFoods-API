@@ -198,5 +198,43 @@ namespace API.Controllers
         {
             return _context.Events.Any(e => e.EventID == id);
         }
+
+        [HttpPost("purchase/{id}")]
+        public async Task<IActionResult> PurchaseTicket(int id)
+        {
+            var eventItem = await _context.Events.FindAsync(id);
+
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            if (eventItem.Tickets_Available <= 0)
+            {
+                return BadRequest(new { success = false, message = "No tickets available." });
+            }
+
+            // Subtract one from the available tickets and add one to the amount sold.
+            eventItem.Tickets_Available -= 1;
+            eventItem.Tickets_Sold += 1;
+
+            // Calculate the price. If the amount sold is less than or equal to the Early Bird limit, apply the discount.
+            var earlyBird = await _context.EarlyBird.FindAsync(eventItem.EarlyBirdID);
+            var price = eventItem.EventPrice;
+
+            if (earlyBird != null && eventItem.Tickets_Sold <= earlyBird.Limit)
+            {
+                price *= (1 - earlyBird.Percentage / 100);
+            }
+
+            // You would typically create an order or transaction record here and return the price to the client.
+
+            _context.Entry(eventItem).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, price = price });
+        }
+
     }
 }
