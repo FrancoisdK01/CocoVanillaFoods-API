@@ -291,5 +291,6 @@ namespace API.Data
         public DbSet<WriteOff_Reason> WriteOffReasons { get; set; }
         public DbSet<SuperUser> SuperUser { get; set; }
         public DbSet<EventPayments> EventsPayments { get; set; }
+        public DbSet<TicketPurchase> TicketPurchases { get; set;}
     }
 }

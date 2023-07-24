@@ -34,5 +34,6 @@ namespace API.Model
 
         [JsonIgnore]
         public List<Booking> Bookings { get; set; }
+
     }
 }
