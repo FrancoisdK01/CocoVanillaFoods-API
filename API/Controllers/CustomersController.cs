@@ -26,6 +26,7 @@ namespace API.Controllers
 
         // GET: api/Customers
         [HttpGet]
+        [Route("GetCustomers")]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
             return await _context.Customers.ToListAsync();
@@ -47,69 +48,8 @@ namespace API.Controllers
             }
         }
 
-        // PUT: api/Customers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(string id, Customer customer)
-        {
-            var existingCustomer = await _context.Customers.FindAsync(id);
-
-            if (existingCustomer == null)
-            {
-                return NotFound();
-            }
-
-            var existingUser = await _userManager.FindByIdAsync(existingCustomer.UserID);
-
-            // Update the properties of the existingSystemPrivilege with the new values
-            existingCustomer.Id = existingCustomer.Id;
-            existingCustomer.Date_Created = existingCustomer.Date_Created;
-            existingCustomer.Date_of_last_update = DateTime.Now;
-
-            existingCustomer.First_Name = customer.First_Name;
-            existingCustomer.Last_Name = customer.Last_Name;
-            existingCustomer.Email = customer.Email;
-            existingCustomer.PhoneNumber = customer.PhoneNumber;
-            existingCustomer.ID_Number = customer.ID_Number;
-            existingCustomer.Gender = customer.Gender;
-            existingCustomer.Title = customer.Title;
-
-            existingUser.UserName = customer.First_Name;
-            existingUser.Email = customer.Email;
-            existingUser.DisplayName = customer.First_Name;
-            //existingEmployee.Id = existingEmployee.Id;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CustomerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return Ok(existingCustomer);
-        }
-        //// POST: api/Customers
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
-        //{
-        //    _context.Customers.Add(customer);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetCustomer", new { id = customer.
-        //    }, customer);
-        //}
-
         // DELETE: api/Customers/5
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteCustomer/{id}")]
         public async Task<IActionResult> DeleteCustomer(string id)
         {
             var customer = await _context.Customers.FindAsync(id);
@@ -139,11 +79,6 @@ namespace API.Controllers
                 }
             }
             return Ok("User has been removed from the system");
-        }
-
-        private bool CustomerExists(string id)
-        {
-            return _context.Customers.Any(e => e.Id.Equals(id));
         }
     }
 }

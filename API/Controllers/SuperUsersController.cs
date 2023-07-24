@@ -33,6 +33,7 @@ namespace API.Controllers
 
         // GET: api/SuperUsers
         [HttpGet]
+        [Route("GetSuperusers")]
         public async Task<ActionResult<IEnumerable<SuperUser>>> GetSuperUser()
         {
             return await _context.SuperUser.ToListAsync();
@@ -95,6 +96,7 @@ namespace API.Controllers
         // POST: api/SuperUsers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Route("AddSuperuser")]
         public async Task<ActionResult<SuperUser>> PostSuperUser(SuperUserRegistrationViewModel viewModel)
         {
             RegisterViewModel registerModel = viewModel.RegisterModel;
@@ -137,7 +139,7 @@ namespace API.Controllers
         }
 
         // DELETE: api/SuperUsers/5
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteSuperuser/{id}")]
         public async Task<IActionResult> DeleteSuperUser(string id)
         {
             var superuser = await _context.SuperUser.FindAsync(id);
