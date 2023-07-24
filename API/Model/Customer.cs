@@ -48,5 +48,8 @@ namespace API.Model
         public List<Booking> Bookings { get; set; }
         [JsonIgnore]
         public List<EventReview> EventReviews { get; set; }
+
+        [JsonIgnore]
+        public Cart Cart { get; set; }
     }
 }
