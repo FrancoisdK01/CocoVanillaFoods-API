@@ -7,24 +7,12 @@ namespace API.Model
     {
         [Key]
         public int PaymentId { get; set; }
-
-        [Required]
-        public int EventId { get; set; }
-
-        [Required]
-        public string UserId { get; set; }
-
-        [Required]
-        public decimal PaymentAmount { get; set; }
-
-        [Required]
-        public DateTime PaymentDate { get; set; }
-
-        // Navigation properties
-        [ForeignKey("EventId")]
-        public Event Event { get; set; }
-
-        [ForeignKey("UserId")]
-        public User User { get; set; }
+        public int merchant_id { get; set; }
+        public string merchant_key { get; set; }
+        public int amount { get; set; }
+        public string item_name { get; set; }
+        public string signature { get; set; }
+        public string email_address { get; set; }
+        public string cell_number { get; set; }
     }
 }

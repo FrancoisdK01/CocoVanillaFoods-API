@@ -1,4 +1,6 @@
-﻿namespace API.Model
+﻿using System.Text.Json.Serialization;
+
+namespace API.Model
 {
     public class PayFastRequest
     {
