@@ -57,7 +57,27 @@ namespace API.Data
             // .HasForeignKey(w => w.EmployeeID)
             // .OnDelete(DeleteBehavior.Restrict);
 
-            
+
+            // Cart and CartItem relationship
+            modelBuilder.Entity<Cart>()
+                .HasMany(c => c.CartItems)
+                .WithOne(ci => ci.Cart)
+                .HasForeignKey(ci => ci.CartID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Cart>()
+               .HasOne(c => c.Customer)
+               .WithOne(cu => cu.Cart)
+                .HasForeignKey<Cart>(c => c.CustomerID);
+
+            // CartItem and Wine relationship
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.Wine)
+                .WithMany(w => w.CartItems)
+                .HasForeignKey(ci => ci.WineID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
 
             //Customer and Order
             modelBuilder.Entity<Order>()
@@ -292,5 +312,10 @@ namespace API.Data
         public DbSet<SuperUser> SuperUser { get; set; }
         public DbSet<EventPayments> EventsPayments { get; set; }
         public DbSet<TicketPurchase> TicketPurchases { get; set;}
+
+        //carts
+
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
     }
 }

@@ -54,5 +54,8 @@ namespace API.Model
         [JsonIgnore]
         public List<OrderItem> OrderItems { get; set; }
 
+        [JsonIgnore]
+        public List<CartItem> CartItems { get; set; }
+
     }
 }
