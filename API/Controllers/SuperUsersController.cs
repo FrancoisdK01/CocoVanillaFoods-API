@@ -24,11 +24,13 @@ namespace API.Controllers
     {
         private readonly MyDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public SuperUsersController(MyDbContext context, UserManager<User> userManager)
+        public SuperUsersController(MyDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         // GET: api/SuperUsers
@@ -173,6 +175,69 @@ namespace API.Controllers
         private bool SuperUserExists(string id)
         {
             return _context.SuperUser.Any(e => e.Id == id);
+        }
+
+        [HttpGet]
+        [Route("GetAllUsers")]
+        public async Task<ActionResult<IEnumerable<UserRolesViewModel>>> GetAllUsers()
+        {
+            var users = await _context.Users.ToListAsync();
+            var userRolesViewModels = new List<UserRolesViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                var userViewModel = new UserRolesViewModel
+                {
+                    UserEmail = user.Email,
+                    Privileges = roles.ToList()
+                };
+
+                userRolesViewModels.Add(userViewModel);
+            }
+
+            return userRolesViewModels;
+        }
+
+        [HttpPost]
+        [Route("UpdateUserRoles")]
+        public async Task<IActionResult> UpdateUserRoles(UserRolesViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.UserEmail);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Get all roles from the database
+            var allRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
+
+            // Determine roles to be added and removed
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var rolesToAdd = model.Privileges.Intersect(allRoles).Except(userRoles);
+            var rolesToRemove = userRoles.Except(model.Privileges);
+
+            // Add roles to the user
+            foreach (var roleToAdd in rolesToAdd)
+            {
+                await _userManager.AddToRoleAsync(user, roleToAdd);
+            }
+
+            // Remove roles from the user
+            foreach (var roleToRemove in rolesToRemove)
+            {
+                await _userManager.RemoveFromRoleAsync(user, roleToRemove);
+            }
+            return Ok();
+        }
+
+        [HttpGet("GetAllRoles")]
+        public async Task<IEnumerable<string>> GetAllRoles()
+        {
+            var allRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
+            return allRoles;
         }
     }
 }
