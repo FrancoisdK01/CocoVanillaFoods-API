@@ -36,7 +36,7 @@ namespace API.Controllers
             var client = _clientFactory.CreateClient();
 
             // Change this line to use the live PayFast URL
-            var url = "https://www.payfast.co.za/eng/process";
+            var url = "https://sandbox.payfast.co.za/eng/process";
 
             if (int.TryParse(_configuration["PayFast:MerchantId"], out int merchantId))
             {
@@ -57,6 +57,7 @@ namespace API.Controllers
                 .OrderBy(p => p.Name)
                 .Select(p => $"{p.Name}={UrlEncode(p.GetValue(payment).ToString())}");
 
+            // Now the return_url and notify_url are included in the raw data for the MD5 hash:
             var rawData = string.Join("&", propertyValues) + $"&passphrase={passphrase}";
 
             using (var md5 = MD5.Create())
@@ -102,7 +103,66 @@ namespace API.Controllers
         {
             return WebUtility.UrlEncode(value)?.Replace("%20", "+");
         }
+
+        [HttpPost("HandlePaymentResult")]
+        public async Task<IActionResult> HandlePaymentResult([FromBody] PayFastRequest payment)
+        {
+            if (payment == null)
+            {
+                return BadRequest();
+            }
+
+            // Get your passphrase from configuration
+            var passphrase = _configuration["PayFast:MerchantPassphrase"];
+
+            // Generate a signature from the incoming payment data
+            var propertyValues = payment.GetType().GetProperties()
+                .Where(p => p.GetValue(payment) != null && p.Name != "signature")
+                .OrderBy(p => p.Name)
+                .Select(p => $"{p.Name}={UrlEncode(p.GetValue(payment).ToString())}");
+
+            var rawData = string.Join("&", propertyValues) + $"&passphrase={passphrase}";
+
+            using (var md5 = MD5.Create())
+            {
+                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+                var generatedSignature = BitConverter.ToString(hash).Replace("-", "").ToLower();
+
+                // Compare the generated signature with the one in the request
+                if (payment.signature != generatedSignature)
+                {
+                    // Log an error, the signatures do not match
+                    _logger.LogError("Payment signature verification failed.");
+                    return BadRequest("Payment signature verification failed.");
+                }
+            }
+
+            // If the signatures match, continue with saving the payment to the database
+            var eventPayment = MapToEventPayment(payment);
+            _context.EventsPayments.Add(eventPayment);
+            await _context.SaveChangesAsync();
+
+            // After saving the payment to the database, return a successful response
+            return Ok();
+        }
+
+        private EventPayments MapToEventPayment(PayFastRequest payment)
+        {
+            return new EventPayments
+            {
+                merchant_id = payment.merchant_id,
+                merchant_key = payment.merchant_key,
+                amount = payment.amount,
+                item_name = payment.item_name,
+                signature = payment.signature,
+                email_address = payment.email_address,
+                cell_number = payment.cell_number,
+            };
+        }
+
     }
+
+
 
 }
 

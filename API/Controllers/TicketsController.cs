@@ -75,30 +75,30 @@ namespace API.Controllers
             return NoContent();
         }
 
-        // POST: api/Tickets
-        [HttpPost]
-        public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
-        {
-            _context.Tickets.Add(ticket);
-            await _context.SaveChangesAsync();
+        //// POST: api/Tickets
+        //[HttpPost]
+        //public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
+        //{
+        //    _context.Tickets.Add(ticket);
+        //    await _context.SaveChangesAsync();
 
-            // Generate a QR code
-            var qrCode = GenerateQRCode($"http://yourwebsite.com/api/Tickets/{ticket.TicketID}");
+        //    // Generate a QR code
+        //    var qrCode = GenerateQRCode($"http://yourwebsite.com/api/Tickets/{ticket.TicketID}");
 
-            ticket.QRCode = qrCode;
-            await _context.SaveChangesAsync();
+        //    ticket.QRCode = qrCode;
+        //    await _context.SaveChangesAsync();
 
-            // Get the customer associated with the ticket
-            var customer = await _context.Customers.FindAsync(ticket.CustomerID);
+        //    // Get the customer associated with the ticket
+        //    var customer = await _context.Customers.FindAsync(ticket.CustomerID);
 
-            if (customer != null)
-            {
-                // Send the email to the customer
-                await SendEmail(customer.Email, qrCode);
-            }
+        //    if (customer != null)
+        //    {
+        //        // Send the email to the customer
+        //        await SendEmail(customer.Email, qrCode);
+        //    }
 
-            return CreatedAtAction("GetTicket", new { id = ticket.TicketID }, ticket);
-        }
+        //    return CreatedAtAction("GetTicket", new { id = ticket.TicketID }, ticket);
+        //}
 
 
         // DELETE: api/Tickets/5
