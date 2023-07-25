@@ -3,16 +3,12 @@
     public class TicketPurchase
     {
         public int Id { get; set; }
-
-        // Updated foreign key property name
-        public int EventID { get; set; }
-        public Event Event { get; set; }
-
-        public string UserId { get; set; }
-        public User User { get; set; }
-
+        public string UserEmail { get; set; }
+        public int EventId { get; set; }
+        public DateTime EventDate { get; set; }
         public DateTime PurchaseDate { get; set; }
-        public decimal PricePaid { get; set; }
-        public bool EarlyBirdDiscountApplied { get; set; }
+        public decimal TicketPrice { get; set; }
+        public string EventName { get; set; }  // New field
+        public string Description { get; set; }
     }
 }
