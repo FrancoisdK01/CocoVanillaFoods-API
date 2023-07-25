@@ -200,7 +200,7 @@ namespace API.Controllers
             return userRolesViewModels;
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("UpdateUserRoles")]
         public async Task<IActionResult> UpdateUserRoles(UserRolesViewModel model)
         {
