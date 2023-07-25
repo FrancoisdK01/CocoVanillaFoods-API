@@ -25,14 +25,14 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SupplierOrder>>> GetSupplierOrders()
         {
-            return await _context.SupplierOrders.ToListAsync();
+            return await _context.SupplierOrders.Include(so => so.Supplier).ToListAsync();
         }
 
         // GET: api/SupplierOrders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<SupplierOrder>> GetSupplierOrder(int id)
         {
-            var supplierOrder = await _context.SupplierOrders.FindAsync(id);
+            var supplierOrder = await _context.SupplierOrders.Include(so => so.Supplier).FirstOrDefaultAsync(so => so.SupplierOrderID == id);
 
             if (supplierOrder == null)
             {
@@ -75,14 +75,16 @@ namespace API.Controllers
 
         // POST: api/SupplierOrders
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/SupplierOrders
         [HttpPost]
-        public async Task<ActionResult<SupplierOrder>> PostSupplierOrder(SupplierOrder supplierOrder)
+        public async Task<ActionResult<SupplierOrder>> PostSupplierOrder([Bind("SupplierOrderID,Quantity_Ordered,DateOrdered,SupplierID,Ordered,Paid,Received")] SupplierOrder supplierOrder)
         {
             _context.SupplierOrders.Add(supplierOrder);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSupplierOrder", new { id = supplierOrder.SupplierOrderID }, supplierOrder);
         }
+
 
         // DELETE: api/SupplierOrders/5
         [HttpDelete("{id}")]

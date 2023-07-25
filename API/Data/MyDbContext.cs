@@ -37,11 +37,7 @@ namespace API.Data
                     .OnDelete(DeleteBehavior.Cascade); 
             });
 
-            modelBuilder.Entity<StockTake>()
-            .HasMany<StockTake_Item>(s => s.StockTake_Items)
-            .WithOne(si => si.StockTake)
-            .HasForeignKey(si => si.StockTakeID)
-            .OnDelete(DeleteBehavior.Restrict);
+           
 
             //Wine and Inventory
             modelBuilder.Entity<Inventory>()
@@ -100,11 +96,7 @@ namespace API.Data
             .HasForeignKey(s => s.InventoryID)
             .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Wine>()
-            .HasMany(s => s.SupplierOrders)
-            .WithOne(w => w.Wine)
-            .HasForeignKey(w => w.WineID)
-            .OnDelete(DeleteBehavior.Restrict);
+          
 
             modelBuilder.Entity<SupplierOrder>()
             .HasOne<Supplier>(so => so.Supplier)
@@ -292,7 +284,7 @@ namespace API.Data
         public DbSet<RefundResponse> RefundResponses { get; set; }
         public DbSet<RefundType> RefundTypes { get; set; }
         public DbSet<ShippingDetails> ShippingDetails { get; set; }
-        public DbSet<StockTake> StockTakes { get; set; }
+     
         public DbSet<StockTake_Item> StockTakeItems { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
