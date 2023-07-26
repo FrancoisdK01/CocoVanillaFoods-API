@@ -1,108 +1,112 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using API.Data;
+using API.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using API.Data;
-using API.Model;
+using System.Linq;
+using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class WishlistsController : ControllerBase
+    [Route("api/[controller]")]
+    public class WishlistController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public WishlistsController(MyDbContext context)
+        public WishlistController(MyDbContext context, UserManager<User> usermanager)
         {
             _context = context;
+            _userManager = usermanager;
         }
 
-        // GET: api/Wishlists
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Wishlist>>> GetWishlists()
+        [HttpGet("{email}")]
+        public async Task<ActionResult<Wishlist>> GetWishlist(string email)
         {
-            return await _context.Wishlists.ToListAsync();
-        }
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
 
-        // GET: api/Wishlists/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Wishlist>> GetWishlist(int id)
-        {
-            var wishlist = await _context.Wishlists.FindAsync(id);
+            if (customer == null)
+            {
+                return BadRequest("Customer not found.");
+            }
+
+            var wishlist = await _context.Wishlists.Include(w => w.WishlistItems)
+                                                   .ThenInclude(wi => wi.Wine)
+                                                   .FirstOrDefaultAsync(w => w.CustomerID == customer.Id);
 
             if (wishlist == null)
             {
-                return NotFound();
+                return NotFound("Wishlist not found.");
             }
 
             return wishlist;
         }
 
-        // PUT: api/Wishlists/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWishlist(int id, Wishlist wishlist)
+        [HttpPost("{email}")]
+        public async Task<ActionResult<Wishlist>> AddToWishlist(string email, [FromBody] WishlistItem wishlistItem)
         {
-            if (id != wishlist.WishlistID)
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+
+            if (customer == null)
             {
-                return BadRequest();
+                return BadRequest("Customer not found.");
             }
 
-            _context.Entry(wishlist).State = EntityState.Modified;
+            var wine = await _context.Wines.FindAsync(wishlistItem.WineID);
 
-            try
+            if (wine == null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WishlistExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("Wine not found.");
             }
 
-            return NoContent();
-        }
+            var wishlist = await _context.Wishlists.Include(w => w.WishlistItems).ThenInclude(wi => wi.Wine).FirstOrDefaultAsync(w => w.CustomerID == customer.Id);
 
-        // POST: api/Wishlists
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Wishlist>> PostWishlist(Wishlist wishlist)
-        {
-            _context.Wishlists.Add(wishlist);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetWishlist", new { id = wishlist.WishlistID }, wishlist);
-        }
-
-        // DELETE: api/Wishlists/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWishlist(int id)
-        {
-            var wishlist = await _context.Wishlists.FindAsync(id);
+            // If no wishlist for the user exists, create a new one
             if (wishlist == null)
             {
-                return NotFound();
+                wishlist = new Wishlist { CustomerID = customer.Id, WishlistItems = new List<WishlistItem>() };
+                await _context.Wishlists.AddAsync(wishlist);
             }
 
-            _context.Wishlists.Remove(wishlist);
+            var existingWishlistItem = wishlist.WishlistItems.FirstOrDefault(wi => wi.WineID == wishlistItem.WineID);
+
+            // In wishlist, we are not considering the quantity of an item. Hence, no increment logic.
+            if (existingWishlistItem == null)
+            {
+                // Add a new wishlist item to the wishlist
+                var newWishlistItem = new WishlistItem { WineID = wishlistItem.WineID, WishlistID = wishlist.WishlistID };
+                wishlist.WishlistItems.Add(newWishlistItem);
+
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetWishlist), new { email = email }, wishlist);
+        }
+
+        [HttpDelete("{email}/{wishlistItemId}")]
+        public async Task<IActionResult> RemoveFromWishlist(string email, int wishlistItemId)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+
+            if (customer == null)
+            {
+                return BadRequest("Customer not found.");
+            }
+
+            var wishlistItem = await _context.WishlistItems.Include(wi => wi.Wishlist).FirstOrDefaultAsync(wi => wi.WishlistItemID == wishlistItemId && wi.Wishlist.CustomerID == customer.Id);
+
+            if (wishlistItem == null)
+            {
+                return NotFound("Wishlist item not found.");
+            }
+
+            _context.WishlistItems.Remove(wishlistItem);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool WishlistExists(int id)
-        {
-            return _context.Wishlists.Any(e => e.WishlistID == id);
         }
     }
 }

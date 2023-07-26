@@ -1,19 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using API.Model;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace API.Model
+public class Wishlist
 {
-    public class Wishlist
-    {
-        [Key]
-        public int WishlistID { get; set; }
+    public int WishlistID { get; set; }
+    public string CustomerID { get; set; }
+    public ICollection<WishlistItem> WishlistItems { get; set; }
 
-        [ForeignKey("CustomerID")]
-        public string CustomerID { get; set; }
-        public Customer Customer { get; set; }
-
-        [JsonIgnore]
-        public List<WishlistItem> WishlistItems { get; set; }
-    }
+    [JsonIgnore]
+    public Customer Customer { get; set; }
 }
