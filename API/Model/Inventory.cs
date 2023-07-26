@@ -13,9 +13,17 @@ namespace API.Model
 
         public int QuantityOnHand { get; set; }
 
-        [ForeignKey("WineID")]
-        public int? WineID { get; set; }
-        public Wine Wine { get; set; }
+        public string WineName { get; set; }
+
+        public string WineVarietal { get; set; }
+
+        public string WineType { get; set; }
+
+        public double winePrice { get; set; }
+
+        //[ForeignKey("WineID")]
+        //public int? WineID { get; set; }
+        //public Wine Wine { get; set; }
 
         [JsonIgnore]
         public List<StockTake_Item> StockTake_Items { get; set; }

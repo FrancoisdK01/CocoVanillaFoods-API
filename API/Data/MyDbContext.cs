@@ -40,11 +40,11 @@ namespace API.Data
            
 
             //Wine and Inventory
-            modelBuilder.Entity<Inventory>()
-            .HasOne<Wine>(i => i.Wine)
-            .WithMany(w => w.Inventories)
-            .HasForeignKey(i => i.WineID)
-            .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<Inventory>()
+            //.HasOne<Wine>(i => i.Wine)
+            //.WithMany(w => w.Inventories)
+            //.HasForeignKey(i => i.WineID)
+            //.OnDelete(DeleteBehavior.Restrict);
 
             //Wine and Employee
             //modelBuilder.Entity<Wine>()
