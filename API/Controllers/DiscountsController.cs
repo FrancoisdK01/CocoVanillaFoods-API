@@ -106,5 +106,25 @@ namespace API.Controllers
         {
             return _context.Discounts.Any(e => e.DiscountID == id);
         }
+
+        [HttpPost("Validate")]
+        public async Task<ActionResult<Discount>> ValidateDiscountCode([FromBody] DiscountCodeDto discountCodeDto)
+        {
+
+            Console.WriteLine("Received discount code: " + discountCodeDto.Code);
+
+            string code = discountCodeDto.Code;
+
+            var discount = await _context.Discounts
+                .Where(d => d.DiscountCode == code)
+                .FirstOrDefaultAsync();
+
+            if (discount == null)
+            {
+                return NotFound("Invalid discount code");
+            }
+
+            return discount;
+        }
     }
 }
