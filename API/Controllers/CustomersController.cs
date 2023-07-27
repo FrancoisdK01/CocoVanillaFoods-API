@@ -136,6 +136,7 @@ namespace API.Controllers
                     try
                     {
                         _context.Customers.Remove(customer);
+                        _context.Users.Remove(user);
                         await _userManager.DeleteAsync(user);
                         await _context.SaveChangesAsync();
                     }
@@ -145,7 +146,7 @@ namespace API.Controllers
                     }
                 }
             }
-            return Ok("User has been removed from the system");
+            return Ok();
         }
     }
 }
