@@ -51,5 +51,7 @@ namespace API.Model
 
         [JsonIgnore]
         public Cart Cart { get; set; }
+
+        public virtual ICollection<WineOrder> WineOrders { get; set; }
     }
 }

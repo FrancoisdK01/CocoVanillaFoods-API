@@ -21,8 +21,7 @@ namespace API.Model
 
         public OrderPayment OrderPayment { get; set; }
 
-        [JsonIgnore]
-        public List<OrderItem> OrderItems { get; set; }
+
 
         [ForeignKey("OrderStatusID")]
         public int OrderStatusID { get; set; }
