@@ -23,14 +23,14 @@ namespace API.Controllers
 
         // GET: api/OrderItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderItem>>> GetOrderItems()
+        public async Task<ActionResult<IEnumerable<WineOrderItem>>> GetOrderItems()
         {
             return await _context.OrderItems.ToListAsync();
         }
 
         // GET: api/OrderItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderItem>> GetOrderItem(int id)
+        public async Task<ActionResult<WineOrderItem>> GetOrderItem(int id)
         {
             var orderItem = await _context.OrderItems.FindAsync(id);
 
@@ -45,9 +45,9 @@ namespace API.Controllers
         // PUT: api/OrderItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrderItem(int id, OrderItem orderItem)
+        public async Task<IActionResult> PutOrderItem(int id, WineOrderItem orderItem)
         {
-            if (id != orderItem.OrderItemID)
+            if (id != orderItem.WineOrderItemId)
             {
                 return BadRequest();
             }
@@ -76,12 +76,12 @@ namespace API.Controllers
         // POST: api/OrderItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<OrderItem>> PostOrderItem(OrderItem orderItem)
+        public async Task<ActionResult<WineOrderItem>> PostOrderItem(WineOrderItem orderItem)
         {
             _context.OrderItems.Add(orderItem);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrderItem", new { id = orderItem.OrderItemID }, orderItem);
+            return CreatedAtAction("GetOrderItem", new { id = orderItem.WineOrderItemId }, orderItem);
         }
 
         // DELETE: api/OrderItems/5
@@ -102,7 +102,7 @@ namespace API.Controllers
 
         private bool OrderItemExists(int id)
         {
-            return _context.OrderItems.Any(e => e.OrderItemID == id);
+            return _context.OrderItems.Any(e => e.WineOrderItemId == id);
         }
     }
 }

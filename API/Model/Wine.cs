@@ -51,11 +51,14 @@ namespace API.Model
         [JsonIgnore]
         public List<WishlistItem> WishlistItems { get; set; }
 
-        [JsonIgnore]
-        public List<OrderItem> OrderItems { get; set; }
+        //[JsonIgnore]
+        //public List<WineOrderItem> OrderItems { get; set; }
 
         [JsonIgnore]
         public List<CartItem> CartItems { get; set; }
+
+        public virtual ICollection<WineOrderItem> OrderItems { get; set; }
+
 
     }
 }

@@ -14,7 +14,7 @@ namespace API.Model
 
         [ForeignKey("OrderItemID")]
         public int OrderItemID { get; set; }
-        public OrderItem OrderItem { get; set; }
+        public WineOrderItem OrderItem { get; set; }
 
         [ForeignKey("RefundResponseID")]
         public int RefundResponseID { get; set; }

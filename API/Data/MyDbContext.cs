@@ -34,10 +34,10 @@ namespace API.Data
                 e.HasOne(e => e.EarlyBird)
                     .WithMany(eb => eb.Events)
                     .HasForeignKey(e => e.EarlyBirdID)
-                    .OnDelete(DeleteBehavior.Cascade); 
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
-           
+
 
             //Wine and Inventory
             //modelBuilder.Entity<Inventory>()
@@ -96,7 +96,7 @@ namespace API.Data
             .HasForeignKey(s => s.InventoryID)
             .OnDelete(DeleteBehavior.Restrict);
 
-          
+
 
             modelBuilder.Entity<SupplierOrder>()
             .HasOne<Supplier>(so => so.Supplier)
@@ -118,26 +118,26 @@ namespace API.Data
                 .HasForeignKey(w => w.VarietalID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //OrderItem and Order
-            modelBuilder.Entity<OrderItem>()
-             .HasOne(oi => oi.Order)
-             .WithMany(o => o.OrderItems)
-             .HasForeignKey(oi => oi.OrderID)
-             .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<WineOrderItem>()
+              .HasOne(oi => oi.WineOrder)
+                .WithMany(o => o.OrderItems)
+                .HasForeignKey(oi => oi.OrderId) // <- change here
+                 .OnDelete(DeleteBehavior.Cascade);
+
 
             //OrderItem and Wine
-            modelBuilder.Entity<OrderItem>()
+            modelBuilder.Entity<WineOrderItem>()
              .HasOne(oi => oi.Wine)
              .WithMany(w => w.OrderItems)
-             .HasForeignKey(oi => oi.WineID)
+             .HasForeignKey(oi => oi.WineId)
              .OnDelete(DeleteBehavior.Restrict);
 
             //OrderItem and Refund
-            modelBuilder.Entity<OrderItem>()
-            .HasMany(o => o.Refunds)
-            .WithOne(r => r.OrderItem)
-            .HasForeignKey(r => r.OrderItemID)
-            .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<WineOrderItem>()
+            //.HasMany(o => o.Refunds)
+            //.WithOne(r => r.OrderItem)
+            //.HasForeignKey(r => r.OrderItemID)
+            //.OnDelete(DeleteBehavior.Restrict);
 
             //Refund and RefundResponse
             modelBuilder.Entity<Refund>()
@@ -167,7 +167,7 @@ namespace API.Data
              .OnDelete(DeleteBehavior.Restrict);
 
             //WriteOffReason and WriteOffItem
-            
+
 
             //WriteOff and WriteOffItem
             modelBuilder.Entity<WriteOff>()
@@ -257,6 +257,8 @@ namespace API.Data
             modelBuilder.Entity<User>()
                 .HasKey(u => u.Id);
 
+
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -277,14 +279,14 @@ namespace API.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatus> OrderStatus { get; set; }
         public DbSet<Province> Provinces { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<WineOrderItem> OrderItems { get; set; }
         public DbSet<OrderPayment> OrderPayments { get; set; }
         public DbSet<Refund> Refunds { get; set; }
         public DbSet<RefundReason> RefundReasons { get; set; }
         public DbSet<RefundResponse> RefundResponses { get; set; }
         public DbSet<RefundType> RefundTypes { get; set; }
         public DbSet<ShippingDetails> ShippingDetails { get; set; }
-     
+
         public DbSet<StockTake_Item> StockTakeItems { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
@@ -303,11 +305,17 @@ namespace API.Data
         public DbSet<WriteOff_Reason> WriteOffReasons { get; set; }
         public DbSet<SuperUser> SuperUser { get; set; }
         public DbSet<EventPayments> EventsPayments { get; set; }
-        public DbSet<TicketPurchase> TicketPurchases { get; set;}
+        public DbSet<TicketPurchase> TicketPurchases { get; set; }
 
         //carts
 
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+
+        //orderHistory
+
+        public DbSet<WineOrder> WineOrders { get; set; }
+        public DbSet<WineOrderItem> WineOrderItems { get; set; }
+
     }
 }
