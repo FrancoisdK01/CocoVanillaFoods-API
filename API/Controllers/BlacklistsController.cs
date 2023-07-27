@@ -104,5 +104,16 @@ namespace API.Controllers
         {
             return _context.Blacklists.Any(e => e.BlacklistID == id);
         }
+
+        //Check if users are in Blacklist
+        [HttpGet("check/{email}")]
+        public async Task<ActionResult<bool>> CheckBlacklist(string email)
+        {
+            var blacklist = await _context.Blacklists
+                .Where(b => b.Email == email)
+                .FirstOrDefaultAsync();
+
+            return blacklist != null;
+        }
     }
 }
