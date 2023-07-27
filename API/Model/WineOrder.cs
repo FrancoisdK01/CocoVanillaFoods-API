@@ -9,7 +9,11 @@ public class WineOrder
 
     public DateTime OrderDate { get; set; }
 
-  
+    public int OrderTotal { get; set; }
+
+    public bool Received { get; set; }
+
+
 
     [JsonIgnore]
     public Customer Customer { get; set; }

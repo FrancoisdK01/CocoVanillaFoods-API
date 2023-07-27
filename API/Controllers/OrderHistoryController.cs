@@ -44,6 +44,8 @@ namespace API.Controllers
             // Create new order and map cart items to order items
             var order = new WineOrder
             {
+                Received = false,
+                OrderTotal = cart.CartTotal,
                 CustomerId = customer.Id,
                 OrderDate = DateTime.UtcNow,
                 OrderItems = cart.CartItems.Select(ci => new WineOrderItem { WineId = ci.WineID, Quantity = ci.Quantity }).ToList()
@@ -96,5 +98,64 @@ namespace API.Controllers
 
             return order;
         }
+
+        [HttpPut("UpdateOrder/{id}")]
+        public async Task<ActionResult> UpdateOrderStatus(int id)
+        {
+            var order = await _context.WineOrders.FindAsync(id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            order.Received = true;
+
+            _context.Entry(order).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!WineOrderExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        private bool WineOrderExists(int id)
+        {
+            return _context.WineOrders.Any(e => e.WineOrderId == id);
+        }
+
+
+        [HttpGet("AllOrders")]
+        public async Task<ActionResult<IEnumerable<WineOrder>>> GetAllOrders()
+        {
+            var allOrders = await _context.WineOrders.Include(o => o.OrderItems)
+                                                     .ThenInclude(oi => oi.Wine)
+                                                     .ToListAsync();
+
+            if (allOrders == null || allOrders.Count == 0)
+            {
+                return NotFound("No orders found for any client.");
+            }
+
+            return allOrders;
+        }
+
     }
+
+
+
+
 }
