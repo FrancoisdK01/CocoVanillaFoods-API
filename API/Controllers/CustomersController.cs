@@ -50,7 +50,7 @@ namespace API.Controllers
                 return Ok(new { user });
             }
         }
-    
+
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Customer")]
@@ -60,6 +60,7 @@ namespace API.Controllers
             var customerDetailsBeforeUpdate = await _context.Customers.FindAsync(id);
             var existingCustomer = await _context.Customers.FindAsync(id);
             var existingUser = await _userManager.FindByIdAsync(existingCustomer.UserID);
+            var existingUserInUserTable = await _context.Users.FindAsync(existingCustomer.UserID);
 
             if (existingCustomer == null)
             {
@@ -76,6 +77,10 @@ namespace API.Controllers
                 existingCustomer.ID_Number = customer.ID_Number;
                 existingCustomer.Title = customer.Title;
                 existingCustomer.Gender = customer.Gender;
+                existingCustomer.TwoFactorEnabled = customer.TwoFactorEnabled;
+
+                existingUser.TwoFactorEnabled = customer.TwoFactorEnabled;
+                existingUserInUserTable.TwoFactorEnabled = customer.TwoFactorEnabled;
 
                 var savedcustomerChanges = await _context.SaveChangesAsync();
                 if (savedcustomerChanges > 0)
@@ -90,6 +95,10 @@ namespace API.Controllers
                         existingCustomer.ID_Number = customerDetailsBeforeUpdate.ID_Number;
                         existingCustomer.Title = customerDetailsBeforeUpdate.Title;
                         existingCustomer.Gender = customerDetailsBeforeUpdate.Gender;
+                        existingCustomer.TwoFactorEnabled = customerDetailsBeforeUpdate.TwoFactorEnabled;
+
+                        existingUser.TwoFactorEnabled = customerDetailsBeforeUpdate.TwoFactorEnabled;
+                        existingUserInUserTable.TwoFactorEnabled = customerDetailsBeforeUpdate.TwoFactorEnabled;
 
                         await _context.SaveChangesAsync();
 
