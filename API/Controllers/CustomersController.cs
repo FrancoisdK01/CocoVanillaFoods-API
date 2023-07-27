@@ -80,6 +80,7 @@ namespace API.Controllers
                 existingCustomer.TwoFactorEnabled = customer.TwoFactorEnabled;
 
                 existingUser.TwoFactorEnabled = customer.TwoFactorEnabled;
+                await _userManager.SetTwoFactorEnabledAsync(existingUser, customer.TwoFactorEnabled);
                 existingUserInUserTable.TwoFactorEnabled = customer.TwoFactorEnabled;
 
                 var savedcustomerChanges = await _context.SaveChangesAsync();
@@ -98,6 +99,7 @@ namespace API.Controllers
                         existingCustomer.TwoFactorEnabled = customerDetailsBeforeUpdate.TwoFactorEnabled;
 
                         existingUser.TwoFactorEnabled = customerDetailsBeforeUpdate.TwoFactorEnabled;
+                        await _userManager.SetTwoFactorEnabledAsync(existingUser, customerDetailsBeforeUpdate.TwoFactorEnabled);
                         existingUserInUserTable.TwoFactorEnabled = customerDetailsBeforeUpdate.TwoFactorEnabled;
 
                         await _context.SaveChangesAsync();
