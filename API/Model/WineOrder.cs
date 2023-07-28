@@ -13,6 +13,7 @@ public class WineOrder
 
     public bool Received { get; set; }
 
+    public string OrderRefNum { get; set; }
 
 
     [JsonIgnore]
