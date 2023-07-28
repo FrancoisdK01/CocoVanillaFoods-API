@@ -153,7 +153,7 @@ namespace API.Controllers
             {
                 merchant_id = payment.merchant_id,
                 merchant_key = payment.merchant_key,
-                amount = payment.amount,
+                amount = (int)Math.Round(payment.amount),
                 item_name = payment.item_name,
                 signature = payment.signature,
                 email_address = payment.email_address,

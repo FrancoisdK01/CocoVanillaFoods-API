@@ -110,7 +110,6 @@ namespace API.Controllers
         [HttpPost("Validate")]
         public async Task<ActionResult<Discount>> ValidateDiscountCode([FromBody] DiscountCodeDto discountCodeDto)
         {
-
             Console.WriteLine("Received discount code: " + discountCodeDto.Code);
 
             string code = discountCodeDto.Code;
@@ -124,7 +123,12 @@ namespace API.Controllers
                 return NotFound("Invalid discount code");
             }
 
+            // Removing the discount after it's applied
+            _context.Discounts.Remove(discount);
+            await _context.SaveChangesAsync();
+
             return discount;
         }
+
     }
 }

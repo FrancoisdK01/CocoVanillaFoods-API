@@ -126,11 +126,11 @@ namespace API.Data
 
 
             //OrderItem and Wine
-            modelBuilder.Entity<WineOrderItem>()
-             .HasOne(oi => oi.Wine)
-             .WithMany(w => w.OrderItems)
-             .HasForeignKey(oi => oi.WineId)
-             .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<WineOrderItem>()
+            // .HasOne(oi => oi.Wine)
+            // .WithMany(w => w.OrderItems)
+            // .HasForeignKey(oi => oi.WineId)
+            // .OnDelete(DeleteBehavior.Restrict);
 
             //OrderItem and Refund
             //modelBuilder.Entity<WineOrderItem>()
