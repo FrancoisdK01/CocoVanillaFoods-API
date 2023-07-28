@@ -44,6 +44,7 @@ namespace API.Controllers
             // Create new order and map cart items to order items
             var order = new WineOrder
             {
+                OrderRefNum = GenerateOrderRefNum(),
                 Received = false,
                 OrderTotal = cart.CartTotal,
                 CustomerId = customer.Id,
@@ -152,6 +153,16 @@ namespace API.Controllers
 
             return allOrders;
         }
+
+        private string GenerateOrderRefNum()
+        {
+            var guid = Guid.NewGuid();
+            var str = Convert.ToBase64String(guid.ToByteArray());
+            str = str.Replace("=", "").Replace("+", "").Replace("/", "");
+            var stringRetrn = str.Substring(1, 7);
+            return stringRetrn.ToUpper;
+        }
+
 
     }
 
