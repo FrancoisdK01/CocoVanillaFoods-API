@@ -160,7 +160,7 @@ namespace API.Controllers
             var str = Convert.ToBase64String(guid.ToByteArray());
             str = str.Replace("=", "").Replace("+", "").Replace("/", "");
             var stringRetrn = str.Substring(1, 7);
-            return stringRetrn.ToUpper;
+            return stringRetrn.ToUpper();
         }
 
 
