@@ -146,10 +146,24 @@ namespace API.Controllers
                 {
                     try
                     {
-                        _context.Customers.Remove(customer);
-                        _context.Users.Remove(user);
-                        await _userManager.DeleteAsync(user);
-                        await _context.SaveChangesAsync();
+                        var cartDetails = await _context.Carts.Include(c => c.CartItems).ThenInclude(ci => ci.Wine).FirstOrDefaultAsync(c => c.CustomerID == id);
+                        var wineOrder = await _context.WineOrders.FirstOrDefaultAsync(x => x.CustomerId == id);
+                        if (cartDetails == null && wineOrder == null) {
+                            _context.Customers.Remove(customer);
+                            _context.Users.Remove(user);
+                            await _userManager.DeleteAsync(user);
+                            await _context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            cartDetails = new Cart { CustomerID = "" };
+                            wineOrder = new WineOrder { CustomerId = "" };
+                            _context.Customers.Remove(customer);
+                            _context.Users.Remove(user);
+                            await _userManager.DeleteAsync(user);
+                            await _context.SaveChangesAsync();
+                        }
+                        
                     }
                     catch (Exception ex)
                     {

@@ -39,7 +39,7 @@ namespace API.Identity
                             First_Name = "Marinda",
                             Last_Name = "Bloem",
                             Email = "marinda.bloem@promenade.com",
-                            PhoneNumber = "1234567890",
+                            PhoneNumber = "0123456789",
                             ID_Number = "0123456789123",
                             Hire_Date = DateTime.Now,
                             UserName = "Marinda"
@@ -51,7 +51,7 @@ namespace API.Identity
                             First_Name = "Marinda",
                             Last_Name = "Bloem",
                             Email = "marinda.bloem@promenade.com",
-                            PhoneNumber = "1234567890",
+                            PhoneNumber = "0123456789",
                             ID_Number = "0123456789123",
                             UserName = "Marinda",
                             Date_Created = DateTime.Now,
