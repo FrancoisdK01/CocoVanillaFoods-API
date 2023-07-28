@@ -6,7 +6,7 @@ namespace API.Model
     {
         public int merchant_id { get; set; }
         public string merchant_key { get; set; }
-        public int amount { get; set; }
+        public decimal amount { get; set; }
         public string item_name { get; set; }
         public string signature { get; set; }
         public string email_address { get; set; }
