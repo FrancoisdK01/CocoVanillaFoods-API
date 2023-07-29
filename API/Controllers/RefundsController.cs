@@ -21,88 +21,44 @@ namespace API.Controllers
             _context = context;
         }
 
-        // GET: api/Refunds
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Refund>>> GetRefunds()
+        [HttpPost("RequestRefund")]
+        public async Task<IActionResult> RequestRefund([FromBody] RefundRequestModel model)
         {
-            return await _context.Refunds.ToListAsync();
-        }
-
-        // GET: api/Refunds/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Refund>> GetRefund(int id)
-        {
-            var refund = await _context.Refunds.FindAsync(id);
-
-            if (refund == null)
-            {
-                return NotFound();
-            }
-
-            return refund;
-        }
-
-        // PUT: api/Refunds/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRefund(int id, Refund refund)
-        {
-            if (id != refund.RefundID)
+            if (model == null || !ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(refund).State = EntityState.Modified;
-
             try
             {
+                var refundRequest = new RefundRequest
+                {
+                    WineId = model.WineId,
+                    Email = model.Email,
+                    RequestedOn = DateTime.UtcNow,
+                    Cost = model.Cost,
+                    Description = model.Description // Added line
+                };
+
+                _context.RefundRequests.Add(refundRequest);
                 await _context.SaveChangesAsync();
+
+                // Possibly send a notification about the refund request here...
+
+                return Ok();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!RefundExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                // Log the exception...
+                return StatusCode(500, "Internal server error");
             }
-
-            return NoContent();
         }
 
-        // POST: api/Refunds
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Refund>> PostRefund(Refund refund)
+        // GET: api/Refunds
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<RefundRequest>>> GetRefundRequests()
         {
-            _context.Refunds.Add(refund);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRefund", new { id = refund.RefundID }, refund);
-        }
-
-        // DELETE: api/Refunds/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRefund(int id)
-        {
-            var refund = await _context.Refunds.FindAsync(id);
-            if (refund == null)
-            {
-                return NotFound();
-            }
-
-            _context.Refunds.Remove(refund);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool RefundExists(int id)
-        {
-            return _context.Refunds.Any(e => e.RefundID == id);
+            return await _context.RefundRequests.ToListAsync();
         }
     }
 }
