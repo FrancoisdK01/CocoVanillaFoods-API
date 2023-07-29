@@ -60,5 +60,30 @@ namespace API.Controllers
         {
             return await _context.RefundRequests.ToListAsync();
         }
+
+        [HttpGet("{email}")]
+        public async Task<ActionResult<IEnumerable<RefundRequest>>> GetUserRefundRequests(string email)
+        {
+            return await _context.RefundRequests.Where(r => r.Email == email).ToListAsync();
+        }
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] StatusUpdateModel model)
+        {
+            var refundRequest = await _context.RefundRequests.FindAsync(id);
+
+            if (refundRequest == null)
+            {
+                return NotFound();
+            }
+
+            refundRequest.Status = model.Status;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
     }
 }

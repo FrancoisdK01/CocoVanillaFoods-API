@@ -1,5 +1,12 @@
 ﻿namespace API.Model
 {
+    public enum RefundStatus
+    {
+        InProgress,
+        Approved,
+        NotApproved
+    }
+
     public class RefundRequest
     {
         public int Id { get; set; }
@@ -9,5 +16,6 @@
         public DateTime RequestedOn { get; set; }
         public decimal Cost { get; set; }
         public string Description { get; set; } // New field
+        public RefundStatus Status { get; set; }
     }
 }
