@@ -14,7 +14,5 @@ namespace API.Model
         [MaxLength(255)]
         public string Description { get; set; }
 
-        [JsonIgnore]
-        public List<Refund> Refunds { get; set; }
     }
 }

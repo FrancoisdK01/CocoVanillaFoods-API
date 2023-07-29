@@ -139,25 +139,6 @@ namespace API.Data
             //.HasForeignKey(r => r.OrderItemID)
             //.OnDelete(DeleteBehavior.Restrict);
 
-            //Refund and RefundResponse
-            modelBuilder.Entity<Refund>()
-            .HasOne(r => r.RefundResponse)
-            .WithMany(rr => rr.Refunds)
-            .HasForeignKey(r => r.RefundResponseID)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            //Refund and RefundReason
-            modelBuilder.Entity<Refund>()
-            .HasOne(r => r.RefundReason)
-            .WithMany(rr => rr.Refunds)
-            .HasForeignKey(r => r.RefundReasonID);
-
-            //RefundReason and RefundType
-            modelBuilder.Entity<RefundReason>()
-            .HasOne(rr => rr.RefundType)
-            .WithMany(rt => rt.RefundReasons)
-            .HasForeignKey(rr => rr.RefundTypeID)
-            .OnDelete(DeleteBehavior.Restrict);
 
             //Wine and WriteOffItem
             modelBuilder.Entity<Wine>()
@@ -281,8 +262,6 @@ namespace API.Data
         public DbSet<Province> Provinces { get; set; }
         public DbSet<WineOrderItem> OrderItems { get; set; }
         public DbSet<OrderPayment> OrderPayments { get; set; }
-        public DbSet<Refund> Refunds { get; set; }
-        public DbSet<RefundReason> RefundReasons { get; set; }
         public DbSet<RefundResponse> RefundResponses { get; set; }
         public DbSet<RefundType> RefundTypes { get; set; }
         public DbSet<ShippingDetails> ShippingDetails { get; set; }
@@ -316,6 +295,10 @@ namespace API.Data
 
         public DbSet<WineOrder> WineOrders { get; set; }
         public DbSet<WineOrderItem> WineOrderItems { get; set; }
+
+        //Refunds
+        public DbSet<RefundRequest> RefundRequests { get; set; }
+
 
     }
 }
