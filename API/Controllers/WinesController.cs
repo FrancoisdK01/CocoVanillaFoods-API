@@ -12,6 +12,9 @@ using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace API.Controllers
 {
@@ -64,6 +67,8 @@ namespace API.Controllers
 
         // GET: api/Wines
         [HttpGet]
+        [Authorize(Roles = "Admin, Superuser, Customer")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<Wine>>> GetWines()
         {
             var wines = await _context.Wines.ToListAsync();
@@ -73,6 +78,8 @@ namespace API.Controllers
 
         // GET: api/Wines/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin, Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Wine>> GetWine(int id)
         {
             var wine = await _context.Wines.FindAsync(id);
@@ -87,6 +94,8 @@ namespace API.Controllers
 
         // PUT: api/Wines/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin, Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PutWine(int id, [FromForm] Wine wine)
         {
             if (id != wine.WineID)
@@ -121,6 +130,8 @@ namespace API.Controllers
         // POST: api/Wines
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Admin, Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Wine>> PostWine([FromForm] WineFormViewModel wineForm)
         {
             var fileName = $"{Guid.NewGuid()}_{wineForm.File.FileName}";
@@ -153,6 +164,8 @@ namespace API.Controllers
 
         // DELETE: api/Wines/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin, Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteWine(int id)
         {
             var wine = await _context.Wines.FindAsync(id);
@@ -173,6 +186,8 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin, Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         private async Task DeleteImageFromGoogleCloudStorage(string filePath)
         {
             try
@@ -195,6 +210,8 @@ namespace API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         private bool WineExists(int id)
         {
             return _context.Wines.Any(e => e.WineID == id);
