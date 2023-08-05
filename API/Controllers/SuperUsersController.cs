@@ -60,7 +60,7 @@ namespace API.Controllers
 
         // PUT: api/SuperUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("UpdateSuperUser/{id}")]
         public async Task<IActionResult> PutSuperUser(string id, SuperUser superUser)
         {
             var existingSuperUser = await _context.SuperUser.FindAsync(id);
