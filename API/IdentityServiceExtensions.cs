@@ -1,5 +1,4 @@
 ﻿using API.Data;
-using API.Identity;
 using API.Model;
 using Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,12 +15,15 @@ namespace API
         public static IServiceCollection AddIdentityServices(this IServiceCollection services,
             IConfiguration config) 
         {
-            services.AddDbContext<AppIdentityDbContext>(opt =>
-            {
-                opt.UseSqlServer(config.GetConnectionString("IdentityConnection"));
-            });
 
-            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>().AddSignInManager<SignInManager<User>>().AddDefaultTokenProviders().AddTokenProvider<EmailTokenProvider<User>>("email");
+            services.AddDbContext<MyDbContext>(opt => opt.UseSqlServer(config.GetConnectionString("MyConnection")));
+
+            services.AddIdentity<User, IdentityRole>().
+                AddEntityFrameworkStores<MyDbContext>().
+                AddSignInManager<SignInManager<User>>().
+                AddDefaultTokenProviders().
+                AddTokenProvider<EmailTokenProvider<User>>("email");
+
             services.AddScoped<IEmailService, EmailService>();
             //services.AddIdentityCore<User>(opt =>
             //{

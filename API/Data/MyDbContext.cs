@@ -1,12 +1,13 @@
-﻿using API.Identity;
-using API.Model;
+﻿using API.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using System.Linq;
 
 namespace API.Data
 {
-    public class MyDbContext : DbContext
+    public class MyDbContext : IdentityDbContext<User, IdentityRole, string>
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
@@ -37,7 +38,7 @@ namespace API.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-
+            modelBuilder.Entity<SystemPrivilege>().HasKey(sp => sp.Id);
 
             //Wine and Inventory
             //modelBuilder.Entity<Inventory>()
@@ -272,7 +273,7 @@ namespace API.Data
         public DbSet<SupplierPayment> SupplierPayments { get; set; }
         public DbSet<SystemPrivilege> SystemPrivileges { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<User> Users { get; set; }
+        //public DbSet<User> Users { get; set; }
         public DbSet<VAT> VATs { get; set; }
         public DbSet<Varietal> Varietals { get; set; }
         public DbSet<Wine> Wines { get; set; }

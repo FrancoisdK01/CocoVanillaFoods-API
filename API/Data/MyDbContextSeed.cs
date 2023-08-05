@@ -1,17 +1,13 @@
-﻿using API.Data;
-using API.Model;
+﻿using API.Model;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
-namespace API.Identity
+namespace API.Data
 {
-    public class AppIdentityDbContextSeed
+    public class MyDbContextSeed
     {
-        private readonly MyDbContext _context;
 
-        public static async Task SeedUsersAsync(UserManager<User> userManager, MyDbContext context, AppIdentityDbContext identityDbContext)
+        public static async Task SeedUsersAsync(UserManager<User> userManager, MyDbContext context)
         {
             if (!userManager.Users.Any())
             {
@@ -63,7 +59,7 @@ namespace API.Identity
                         };
 
                         // Retrieve the user ID from the Identity database
-                        var userIdentity = await identityDbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+                        var userIdentity = await context.Users.FindAsync(user.Id);
                         if (userIdentity != null)
                         {
                             superuser.UserID = userIdentity.Id;
@@ -77,7 +73,7 @@ namespace API.Identity
         }
 
 
-        public static async Task SeedUserRolesAsync(IServiceProvider serviceProvider, MyDbContext context, AppIdentityDbContext identityDbContext)
+        public static async Task SeedUserRolesAsync(IServiceProvider serviceProvider, MyDbContext context)
         {
             try
             {
@@ -92,16 +88,19 @@ namespace API.Identity
                     if (!roleExists)
                     {
                         await roleManager.CreateAsync(new IdentityRole(roleName));
+
+                        var aspRole = roleManager.Roles.FirstOrDefault(r => r.Name == roleName);
+
                         var role = new SystemPrivilege
                         {
+                            Id = aspRole.Id,
                             Name = roleName,
                             Description = descriptions[count]
                         };
 
-                        var roleIdentity = await identityDbContext.Roles.FirstOrDefaultAsync(x => x.Name == role.Name);
+                        var roleIdentity = await context.Roles.FindAsync(aspRole.Id);
                         if (roleIdentity != null)
                         {
-                            role.RoleId = roleIdentity.Id;
                             context.SystemPrivileges.Add(role);
                             await context.SaveChangesAsync();
                         }
@@ -116,3 +115,4 @@ namespace API.Identity
         }
     }
 }
+

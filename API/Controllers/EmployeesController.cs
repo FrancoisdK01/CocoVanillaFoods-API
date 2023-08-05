@@ -77,9 +77,9 @@ namespace API.Controllers
                 existingEmployee.SuperUserID = existingEmployee.SuperUserID;
 
                 var savedEmployeeChanges = await _context.SaveChangesAsync();
-                if(savedEmployeeChanges > 0)
+                if (savedEmployeeChanges > 0)
                 {
-                    if(existingUser == null) 
+                    if (existingUser == null)
                     {
                         // Revert employee details to their original state
                         existingEmployee.Hire_Date = employeeDetailsBeforeUpdate.Hire_Date;
@@ -135,48 +135,43 @@ namespace API.Controllers
             {
                 var superuserID = superUser.Id;
 
-                var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName , TwoFactorEnabled = true};
-                _context.Users.Add(user);
-                var userSavedChanges = await _context.SaveChangesAsync();
+                var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName, TwoFactorEnabled = true };
+                var generatedPassword = GeneratePassword();
+                var result = await _userManager.CreateAsync(user, generatedPassword);
 
-                if (userSavedChanges > 0)
+                if (!result.Succeeded)
                 {
-                    var generatedPassword = GeneratePassword();
-                    var result = await _userManager.CreateAsync(user, generatedPassword);
+                    await _userManager.DeleteAsync(user);
 
-                    if (!result.Succeeded)
+                    return BadRequest(result.Errors);
+                }
+                else
+                {
+                    var employee = new Employee
                     {
-                        await _userManager.DeleteAsync(user);
+                        First_Name = employeeModel.FirstName,
+                        Last_Name = employeeModel.LastName,
+                        Email = registerModel.Email,
+                        PhoneNumber = employeeModel.PhoneNumber,
+                        ID_Number = employeeModel.IDNumber,
+                        Hire_Date = DateTime.Now,
+                        UserId = user.Id,
+                        SuperUserID = superuserID
+                    };
 
-                        return BadRequest(result.Errors);
-                    }
-                    else
+                    _context.Employees.Add(employee);
+                    var employeeSavedChanges = await _context.SaveChangesAsync();
+
+                    if (employeeSavedChanges > 0)
                     {
-                        var employee = new Employee
+                        await _userManager.AddToRoleAsync(user, "Employee");
+                        await _userManager.AddToRoleAsync(user, "Customer");
+
+                        var evm = new EmailViewModel
                         {
-                            First_Name = employeeModel.FirstName,
-                            Last_Name = employeeModel.LastName,
-                            Email = registerModel.Email,
-                            PhoneNumber = employeeModel.PhoneNumber,
-                            ID_Number = employeeModel.IDNumber,
-                            Hire_Date = DateTime.Now,
-                            UserId = user.Id,
-                            SuperUserID = superuserID
-                        };
-
-                        _context.Employees.Add(employee);
-                        var employeeSavedChanges = await _context.SaveChangesAsync();
-
-                        if (employeeSavedChanges > 0)
-                        {
-                            await _userManager.AddToRoleAsync(user, "Employee");
-                            await _userManager.AddToRoleAsync(user, "Customer");
-
-                            var evm = new EmailViewModel
-                            {
-                                To = registerModel.Email,
-                                Subject = "Welcome to the Promenade",
-                                Body = $@"
+                            To = registerModel.Email,
+                            Subject = "Welcome to the Promenade",
+                            Body = $@"
                                         <h1>Welcome to the team {registerModel.FirstName}</h1>
                                         <p>We are so happy to have you working for us.</p>
                                         <p>Please find your login details below and feel free to update your details once you have settled in with the system.</p>
@@ -187,21 +182,17 @@ namespace API.Controllers
                                         <p>We can't wait to see you in our offices.</p>
                                         <p>Kind regards,</p>
                                         <p>The Promenade Team</p>
-                                        "};
+                                        "
+                        };
 
-                            _emailService.SendEmail(evm);
+                        _emailService.SendEmail(evm);
 
-                            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
-                        }
-                        else
-                        {
-                            return BadRequest("Failed to add employee account to the database");
-                        }
+                        return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
                     }
-                }
-                else
-                {
-                    return BadRequest("Adding the user account failed");
+                    else
+                    {
+                        return BadRequest("Failed to add employee account to the database");
+                    }
                 }
             }
         }
