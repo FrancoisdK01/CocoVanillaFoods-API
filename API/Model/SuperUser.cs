@@ -9,10 +9,6 @@ namespace API.Model
 {
     public class SuperUser : IdentityUser
     {
-        //[Key]
-        //[Required]
-        //public string SuperUserID { get; set; }
-
         [MaxLength(50)]
         [Required]
         public string First_Name { get; set; }
@@ -20,14 +16,6 @@ namespace API.Model
         [MaxLength(50)]
         [Required]
         public string Last_Name { get; set; }
-
-        //[MaxLength(50)]
-        //[Required]
-        //public string Email { get; set; }
-
-        //[MaxLength(10)]
-        //[Required]
-        //public string Phone_Number { get; set; }
 
         [Required]
         [RegularExpression("^[0-9]{13}$", ErrorMessage = "ID number must be a 13-digit number")]

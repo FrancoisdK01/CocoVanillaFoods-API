@@ -125,51 +125,39 @@ namespace API.Controllers
 
                 if (result.Succeeded)
                 {
-                    _context.Users.Add(user);
-                    var userSavedChanges = await _context.SaveChangesAsync();
+                    _context.Customers.Add(customer);
+                    var customerSavedChanges = await _context.SaveChangesAsync();
 
-                    if (userSavedChanges > 0)
+                    if (customerSavedChanges > 0)
                     {
-                        _context.Customers.Add(customer);
-                        var customerSavedChanges = await _context.SaveChangesAsync();
+                        await _userManager.AddToRoleAsync(user, "Customer");
 
-                        if (customerSavedChanges > 0)
-                        {
-                            await _userManager.AddToRoleAsync(user, "Customer");
-
-                            return Ok("Your account has been created!");
-                        }
-                        else
-                        {
-                            var reverseAction = await _userManager.FindByEmailAsync(user.Email);
-                            await _userManager.DeleteAsync(reverseAction);
-                        }
+                        return Ok("Your account has been created!");
                     }
                     else
                     {
-                        return BadRequest("Failed to add customer details to the database");
+                        var reverseUser = await _userManager.FindByEmailAsync(user.Email);
+                        var reverseCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == user.Email);
+
+                        if (reverseUser != null && reverseCustomer != null)
+                        {
+                            _context.Customers.Remove(reverseCustomer);
+                            await _context.SaveChangesAsync();
+                            await _userManager.DeleteAsync(reverseUser);
+                        }
+
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Creating the user account failed, please contact support");
                     }
                 }
                 else
                 {
-                    var reverseUser = await _userManager.FindByEmailAsync(user.Email);
-                    var reverseCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == user.Email);
-
-                    if (reverseUser != null && reverseCustomer != null)
-                    {
-                        _context.Customers.Remove(reverseCustomer);
-                        await _context.SaveChangesAsync();
-                        await _userManager.DeleteAsync(reverseUser);
-                    }
-
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Creating the user account failed, please contact support");
+                    return BadRequest("Failed to add customer details to the database");
                 }
             }
             else
             {
                 return Forbid("Account already exists.");
             }
-            return Ok("Your account has been created!");
         }
 
         [HttpPost]

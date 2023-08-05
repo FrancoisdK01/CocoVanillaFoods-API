@@ -6,22 +6,17 @@ using System.Text.Json.Serialization;
 
 namespace API.Model
 {
-    public class SystemPrivilege : IdentityRole
+    public class SystemPrivilege
     {
-        //[Key]
-        //public int SystemPrivilegeID { get; set; }
-        //public string UserID { get; set; }
+        [Key]
+        public string Id { get; set; } // This property will act as the primary key
 
-        //[ForeignKey("UserID")]
-        //[JsonIgnore]
-        //public User User { get; set; }
-
-        public string RoleId { get; set; }
-
-        //[MaxLength(50)]
-        //public string Privilege_Name { get; set; }
+        [MaxLength(50)]
+        public string Name { get; set; }
 
         [MaxLength(255)]
         public string Description { get; set; }
+
     }
+
 }

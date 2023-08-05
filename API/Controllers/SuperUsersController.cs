@@ -24,13 +24,16 @@ namespace API.Controllers
     {
         private readonly MyDbContext _context;
         private readonly UserManager<User> _userManager;
+        private static Random random = new Random();
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailService _emailService;
 
-        public SuperUsersController(MyDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public SuperUsersController(MyDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _emailService = emailService;
         }
 
         // GET: api/SuperUsers
@@ -106,9 +109,8 @@ namespace API.Controllers
 
             // Create the user account
             var user = new User { UserName = registerModel.DisplayName, Email = registerModel.Email, DisplayName = registerModel.DisplayName };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            var result = await _userManager.CreateAsync(user, registerModel.Password);
+            var generatedPassword = GeneratePassword();
+            var result = await _userManager.CreateAsync(user, generatedPassword);
             if (!result.Succeeded)
             {
                 // Handle user account creation failure
@@ -128,16 +130,46 @@ namespace API.Controllers
             };
 
             _context.SuperUser.Add(superuser);
-            await _context.SaveChangesAsync();
+            var superUserSavedChanges = await _context.SaveChangesAsync();
 
-            if (_context.Entry(superuser).State == EntityState.Unchanged)
+            if(superUserSavedChanges > 0)
             {
-                // Changes have been saved
-                // Add roles to the user account
-                await _userManager.AddToRoleAsync(user, "Superuser");
-                await _userManager.AddToRoleAsync(user, "Customer");
+                if (_context.Entry(superuser).State == EntityState.Unchanged)
+                {
+                    // Changes have been saved
+                    // Add roles to the user account
+                    await _userManager.AddToRoleAsync(user, "Superuser");
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                }
+
+                var evm = new EmailViewModel
+                {
+                    To = registerModel.Email,
+                    Subject = "Welcome to the Promenade",
+                    Body = $@"
+                                        <h1>Welcome to the team {registerModel.FirstName}</h1>
+                                        <p>We are so happy to have you working for us.</p>
+                                        <p>Please find your login details below and feel free to update your details once you have settled in with the system.</p>
+                                        <ul>
+                                            <li>Email Address: {registerModel.Email}</li>
+                                            <li>Password: {generatedPassword}</li>
+                                        </ul>
+                                        <p>We can't wait to see you in our offices.</p>
+                                        <p>Kind regards,</p>
+                                        <p>The Promenade Team</p>
+                                        "
+                };
+
+                _emailService.SendEmail(evm);
+
+                return CreatedAtAction("GetSuperUser", new { id = superuser.Id }, superuser);
             }
-            return CreatedAtAction("GetSuperUser", new { id = superuser.Id }, superuser);
+            else
+            {
+                return BadRequest("Failed to add superuser");
+            }
+
+           
         }
 
         // DELETE: api/SuperUsers/5
@@ -238,6 +270,47 @@ namespace API.Controllers
         {
             var allRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
             return allRoles;
+        }
+
+
+        public static string GeneratePassword()
+        {
+            string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string specialCharacters = "!@#$&*";
+            string digits = "0123456789";
+            string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+
+            char[] password = new char[12];
+
+            // Select one character from each requirement
+            password[0] = GetRandomCharacter(uppercaseLetters);
+            password[1] = GetRandomCharacter(specialCharacters);
+            password[2] = GetRandomCharacter(digits);
+            password[3] = GetRandomCharacter(lowercaseLetters);
+
+            // Fill the remaining characters
+            for (int i = 4; i < 12; i++)
+            {
+                string allCharacters = uppercaseLetters + specialCharacters + digits + lowercaseLetters;
+                password[i] = GetRandomCharacter(allCharacters);
+            }
+
+            // Shuffle the password characters
+            for (int i = 0; i < 12; i++)
+            {
+                int randomIndex = random.Next(i, 12);
+                char temp = password[randomIndex];
+                password[randomIndex] = password[i];
+                password[i] = temp;
+            }
+
+            return new string(password);
+        }
+
+        private static char GetRandomCharacter(string characterSet)
+        {
+            int randomIndex = random.Next(0, characterSet.Length);
+            return characterSet[randomIndex];
         }
     }
 }

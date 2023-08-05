@@ -66,7 +66,7 @@ namespace API.Controllers
             }
 
             // Get the role from the AspNetRoles table
-            var role = await _roleManager.FindByIdAsync(existingSystemPrivilege.RoleId);
+            var role = await _roleManager.FindByIdAsync(existingSystemPrivilege.Id);
             if (role != null)
             {
                 // Update the role name with the new privilege name
@@ -132,8 +132,8 @@ namespace API.Controllers
                     {
                         var privilege = new SystemPrivilege
                         {
+                            Id = role.Id,
                             Name = viewModel.Name,
-                            RoleId = role.Id,
                             Description = viewModel.Description
                         };
 
@@ -169,7 +169,7 @@ namespace API.Controllers
             }
 
             // Get the role from the AspNetRoles table
-            var role = await _roleManager.FindByIdAsync(systemPrivilege.RoleId);
+            var role = await _roleManager.FindByIdAsync(systemPrivilege.Id);
             if (role != null)
             {
                 // Remove the role from the AspNetRoles table

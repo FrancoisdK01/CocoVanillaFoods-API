@@ -1,7 +1,6 @@
 global using API.Services.EmailService;
 using API;
 using API.Data;
-using API.Identity;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -81,15 +80,15 @@ app.MapControllers();
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 var context = services.GetRequiredService<MyDbContext>();
-var identityContext = services.GetRequiredService<AppIdentityDbContext>();
+//var identityContext = services.GetRequiredService<AppIdentityDbContext>();
 var userManager = services.GetRequiredService<UserManager<User>>();
 var logger = services.GetRequiredService<ILogger<Program>>();
 try
 {
     await context.Database.MigrateAsync();
-    await identityContext.Database.MigrateAsync();
-    await AppIdentityDbContextSeed.SeedUserRolesAsync(services, context, identityContext);
-    await AppIdentityDbContextSeed.SeedUsersAsync(userManager, context, identityContext);
+    //await identityContext.Database.MigrateAsync();
+    await MyDbContextSeed.SeedUserRolesAsync(services, context);
+    await MyDbContextSeed.SeedUsersAsync(userManager, context);
 }
 catch (Exception ex)
 {
