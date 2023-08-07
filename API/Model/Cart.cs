@@ -7,13 +7,20 @@ public class Cart
     public string CustomerID { get; set; }
     public ICollection<CartItem> CartItems { get; set; }
 
-    public int CartTotal
+    public double DiscountedCart { get; set; }
+
+    public double CartTotal
     {
         get
         {
+            if (DiscountedCart != 0)
+            {
+                return DiscountedCart;
+            }
             return (int)(CartItems != null ? CartItems.Sum(item => item.Quantity * item.Wine.WinePrice) : 0);
         }
     }
+
 
     [JsonIgnore]
     public Customer Customer { get; set; }
