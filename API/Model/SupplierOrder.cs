@@ -22,6 +22,8 @@ namespace API.Model
 
         public int WinePrice { get; set; }
 
+        public double OrderTotal { get; set; }
+
 
         [ForeignKey("SupplierID")]
         public int SupplierID { get; set; }
