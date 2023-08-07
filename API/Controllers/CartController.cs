@@ -160,5 +160,26 @@ namespace API.Controllers
 
             return Ok(total);
         }
+        // In your CartController class:
+
+        [HttpPut("{email}/applyDiscount")]
+        public async Task<IActionResult> ApplyDiscount(string email, [FromBody] double newTotal)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
+            var cart = await _context.Carts.FirstOrDefaultAsync(c => c.CustomerID == customer.Id);
+
+            if (cart == null)
+            {
+                return NotFound("Cart not found.");
+            }
+
+            cart.DiscountedCart = newTotal;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
     }
 }

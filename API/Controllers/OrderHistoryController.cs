@@ -46,11 +46,13 @@ namespace API.Controllers
             {
                 OrderRefNum = GenerateOrderRefNum(),
                 Received = false,
-                OrderTotal = cart.CartTotal,
+
+                OrderTotal = (int)(cart.DiscountedCart != 0 ? cart.DiscountedCart : cart.CartTotal),
                 CustomerId = customer.Id,
                 OrderDate = DateTime.UtcNow,
                 OrderItems = cart.CartItems.Select(ci => new WineOrderItem { WineId = ci.WineID, Quantity = ci.Quantity }).ToList()
             };
+
 
             await _context.WineOrders.AddAsync(order);
 

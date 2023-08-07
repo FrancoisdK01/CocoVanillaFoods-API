@@ -134,6 +134,11 @@ namespace API.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Wine>> PostWine([FromForm] WineFormViewModel wineForm)
         {
+            if (wineForm.File == null)
+            {
+                return BadRequest("File not found");
+            }
+
             var fileName = $"{Guid.NewGuid()}_{wineForm.File.FileName}";
             var filePath = await UploadFileToGoogleCloudStorage(fileName, wineForm.File.OpenReadStream());
 
