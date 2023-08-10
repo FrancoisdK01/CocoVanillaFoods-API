@@ -170,6 +170,15 @@ namespace API.Controllers
                 return NotFound();
             }
 
+            // Find all ticket purchases related to this event
+            var ticketPurchases = _context.TicketPurchases.Where(tp => tp.EventId == id);
+
+            // Set the EventDeleted property to true for all ticket purchases related to this event
+            foreach (var ticketPurchase in ticketPurchases)
+            {
+                ticketPurchase.EventDeleted = true;
+            }
+
             // Delete the image from Google Cloud Storage
             if (!string.IsNullOrEmpty(@event.ImagePath))
             {
@@ -181,6 +190,8 @@ namespace API.Controllers
 
             return NoContent();
         }
+
+
 
         private async Task DeleteImageFromGoogleCloudStorage(string filePath)
         {

@@ -10,5 +10,7 @@
         public decimal TicketPrice { get; set; }
         public string EventName { get; set; }  // New field
         public string Description { get; set; }
+
+        public bool EventDeleted { get; set; }
     }
 }
