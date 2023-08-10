@@ -36,8 +36,15 @@ namespace API.Controllers
             _context = dbContext;
         }
 
-        private async Task<string> UploadFileToGoogleCloudStorage(string fileName, Stream fileStream)
+        private async Task<string> UploadFileToGoogleCloudStorage(string fileName, Stream fileStream, string previousFilePath = null)
         {
+
+            // Delete the previous image if there is one
+            if (!string.IsNullOrEmpty(previousFilePath))
+            {
+                await DeleteImageFromGoogleCloudStorage(previousFilePath);
+            }
+
             try
             {
                 var credential = GoogleCredential.FromFile(_configuration["GCPAuthStorageAuthFile"]);
@@ -107,17 +114,45 @@ namespace API.Controllers
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin, Superuser")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> PutWine(int id, [FromForm] Wine wine)
+        public async Task<IActionResult> PutWine(int id, [FromForm] WineFormViewModel wineForm)
         {
-            if (id != wine.WineID)
+            if (id != wineForm.WineID)
             {
                 return BadRequest();
             }
 
-            wine.WineType = await _context.WineTypes.FindAsync(wine.WineTypeID);
-            wine.Varietal = await _context.Varietals.FindAsync(wine.VarietalID);
+            // Get the current wine from the database
+            var wineToUpdate = await _context.Wines.FindAsync(id);
+            if (wineToUpdate == null)
+            {
+                return NotFound();
+            }
 
-            _context.Entry(wine).State = EntityState.Modified;
+            // If a file is included, process and update the image
+            if (wineForm.File != null)
+            {
+                var fileName = $"{Guid.NewGuid()}_{wineForm.File.FileName}";
+                var filePath = await UploadFileToGoogleCloudStorage(fileName, wineForm.File.OpenReadStream(), wineToUpdate.FilePath);
+
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload the file to Google Cloud Storage.");
+                }
+
+                wineToUpdate.FilePath = filePath;
+            }
+
+            // Map other properties from the form to the wine object
+            wineToUpdate.Name = wineForm.Name;
+            wineToUpdate.Description = wineForm.Description;
+            wineToUpdate.Vintage = wineForm.Vintage;
+            wineToUpdate.RestockLimit = wineForm.RestockLimit;
+            wineToUpdate.WineTastingNote = wineForm.WineTastingNote;
+            wineToUpdate.WinePrice = wineForm.WinePrice;
+            wineToUpdate.WineTypeID = wineForm.WineTypeID;
+            wineToUpdate.VarietalID = wineForm.VarietalID;
+
+            _context.Entry(wineToUpdate).State = EntityState.Modified;
 
             try
             {
@@ -214,14 +249,18 @@ namespace API.Controllers
 
                 // Extract the object name from the file path
                 var uri = new Uri(filePath);
-                var objectName = uri.PathAndQuery.TrimStart('/');
+                var objectNameParts = uri.LocalPath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries).Skip(1);
+                var finalObjectName = string.Join("/", objectNameParts);
+
+                Console.WriteLine("Deleting object: " + finalObjectName); // Log the object name
 
                 // Delete the object from Google Cloud Storage
-                storageClient.DeleteObject(bucket.Name, objectName);
+                await storageClient.DeleteObjectAsync(bucket.Name, finalObjectName); // Use the correct object name
             }
             catch (Exception ex)
             {
                 // Log the exception here
+                Console.WriteLine("An error occurred while deleting the image from Google Cloud Storage:");
                 Console.WriteLine(ex.ToString());
             }
         }
