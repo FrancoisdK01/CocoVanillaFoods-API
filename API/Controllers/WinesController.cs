@@ -76,9 +76,20 @@ namespace API.Controllers
             return wines;
         }
 
+
+        [HttpGet]
+        [Route("CustomerWines")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<Wine>>> GetWinesForCustomers()
+        {
+            var wines = await _context.Wines.ToListAsync();
+
+            return wines;
+        }
+
         // GET: api/Wines/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin, Superuser")]
+        [Authorize(Roles = "Admin, Superuser, Customer")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Wine>> GetWine(int id)
         {

@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace API.Controllers
 {
@@ -23,6 +26,8 @@ namespace API.Controllers
         }
 
         [HttpGet("{email}")]
+        [Authorize(Roles = "Customer")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Wishlist>> GetWishlist(string email)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
