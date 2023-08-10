@@ -1,5 +1,6 @@
 ﻿using API.Model;
 using Microsoft.AspNetCore.Identity;
+using System.IO;
 using System.Linq;
 
 namespace API.Data
@@ -69,6 +70,23 @@ namespace API.Data
                         }
                     }
                 }
+                var wineTypes = new List<string> { "Rooi", "Wit" };
+                var wineTypesDescriptions = new List<string> { "Dis rooi", "Dis wit" };
+                var wineVarietal = new List<string> { "Chenin Blanc", "Pinotage" };
+                var wineVarietalDescriptions = new List<string> { "Dis n chenin blanc", "Dis n pinotage" };
+
+                for (int i = 0; i < wineTypes.Count; i++)
+                {
+                    var addedWineType = new WineType { Name = wineTypes[i], Description = wineTypesDescriptions[i] };
+                    context.WineTypes.Add(addedWineType);
+                }
+
+                for (int i = 0; i < wineVarietal.Count; i++)
+                {
+                    var addedVarietal = new Varietal { Name = wineVarietal[i], Description = wineVarietalDescriptions[i] };
+                    context.Varietals.Add(addedVarietal);
+                }
+                await context.SaveChangesAsync();
             }
         }
 
