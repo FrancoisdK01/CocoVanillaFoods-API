@@ -54,6 +54,28 @@ namespace API.Controllers
 
             return ticketPurchases;
         }
+        [HttpDelete("CheckAndDelete/{id}")]
+        public async Task<IActionResult> CheckAndDeletePurchasedTicket(int id)
+        {
+            var ticketPurchase = await _context.TicketPurchases.FindAsync(id);
+
+            if (ticketPurchase == null)
+            {
+                return NotFound();
+            }
+
+            if (ticketPurchase.EventDeleted)
+            {
+                _context.TicketPurchases.Remove(ticketPurchase);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+
+            return BadRequest(new { message = "The ticket purchase cannot be deleted as the event has not been deleted." });
+        }
+
+
 
     }
 }
