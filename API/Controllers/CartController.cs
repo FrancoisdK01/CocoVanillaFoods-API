@@ -180,6 +180,33 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{email}/clear")]
+        public async Task<IActionResult> ClearCart(string email)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
+            if (customer == null)
+            {
+                return BadRequest("Customer not found.");
+            }
+
+            var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.CustomerID == customer.Id);
+            if (cart == null)
+            {
+                return NotFound("Cart not found.");
+            }
+
+            // Instead of removing the cart, we will clear its contents and reset its values
+            _context.CartItems.RemoveRange(cart.CartItems); // Remove all cart items associated with the cart
+            cart.CartItems.Clear(); // Clear the cart items from the cart object as well
+            cart.DiscountedCart = 0; // Reset the discounted cart value
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
+
 
     }
 }
