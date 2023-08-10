@@ -21,7 +21,7 @@ namespace API.Model
 
         public OrderPayment OrderPayment { get; set; }
 
-
+        public Boolean isRefunded { get; set; }
 
         [ForeignKey("OrderStatusID")]
         public int OrderStatusID { get; set; }

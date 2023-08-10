@@ -15,7 +15,7 @@ public class WineOrder
 
     public string OrderRefNum { get; set; }
 
-
+    public Boolean isRefunded { get; set; }
     [JsonIgnore]
     public Customer Customer { get; set; }
 

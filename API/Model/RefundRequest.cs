@@ -17,5 +17,7 @@
         public decimal Cost { get; set; }
         public string Description { get; set; } // New field
         public RefundStatus Status { get; set; }
+
+        public Boolean isRefunded { get; set; }
     }
 }
