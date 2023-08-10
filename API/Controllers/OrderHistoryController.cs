@@ -49,7 +49,7 @@ namespace API.Controllers
 
                 OrderTotal = (int)(cart.DiscountedCart != 0 ? cart.DiscountedCart : cart.CartTotal),
                 CustomerId = customer.Id,
-                OrderDate = DateTime.UtcNow,
+                OrderDate = DateTime.Now,
                 OrderItems = cart.CartItems.Select(ci => new WineOrderItem { WineId = ci.WineID, Quantity = ci.Quantity }).ToList()
             };
 

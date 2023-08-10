@@ -24,9 +24,18 @@ namespace API.Controllers
         [HttpPost("RequestRefund")]
         public async Task<IActionResult> RequestRefund([FromBody] RefundRequestModel model)
         {
+
+            var wineOrderToUpdate = await _context.WineOrders.FirstOrDefaultAsync(o => o.Customer.Email == model.Email);
+
             if (model == null || !ModelState.IsValid)
             {
                 return BadRequest();
+            }
+
+            TimeSpan difference = DateTime.UtcNow - wineOrderToUpdate.OrderDate;
+            if (difference.TotalDays > 7)
+            {
+                return BadRequest("Can't request refund after 7 days of purchase.");
             }
 
             try
@@ -37,8 +46,13 @@ namespace API.Controllers
                     Email = model.Email,
                     RequestedOn = DateTime.UtcNow,
                     Cost = model.Cost,
-                    Description = model.Description // Added line
+                    Description = model.Description,
+                    isRefunded = true
                 };
+                if(wineOrderToUpdate != null)
+                {
+                    wineOrderToUpdate.isRefunded = true;
+                }
 
                 _context.RefundRequests.Add(refundRequest);
                 await _context.SaveChangesAsync();
