@@ -141,9 +141,17 @@ namespace API.Controllers
                 Tickets_Available = eventForm.Tickets_Available,
                 Description = eventForm.Description,
                 EventPrice = eventForm.EventPrice,
-                ImagePath = filePath,
-                EarlyBirdID = eventForm.EarlyBirdID
+                ImagePath = filePath
             };
+
+            if (eventForm.EarlyBirdID == 0)
+            {
+                eventItem.EarlyBirdID = null;
+            }
+            else
+            {
+                eventItem.EarlyBirdID = eventForm?.EarlyBirdID;
+            }
 
             _context.Events.Add(eventItem);
             await _context.SaveChangesAsync();
