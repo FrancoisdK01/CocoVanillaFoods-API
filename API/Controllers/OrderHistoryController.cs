@@ -8,6 +8,7 @@ using System;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using API.ViewModels;
 
 namespace API.Controllers
 {
@@ -17,11 +18,13 @@ namespace API.Controllers
     {
         private readonly MyDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
 
-        public OrderHistoryController(MyDbContext context, UserManager<User> userManager)
+        public OrderHistoryController(MyDbContext context, UserManager<User> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         [HttpPost("{email}")]
@@ -45,7 +48,7 @@ namespace API.Controllers
             var order = new WineOrder
             {
                 OrderRefNum = GenerateOrderRefNum(),
-                Received = false,
+                OrderStatus = 0,
 
                 OrderTotal = (int)(cart.DiscountedCart != 0 ? cart.DiscountedCart : cart.CartTotal),
                 CustomerId = customer.Id,
@@ -106,18 +109,66 @@ namespace API.Controllers
         public async Task<ActionResult> UpdateOrderStatus(int id)
         {
             var order = await _context.WineOrders.FindAsync(id);
+            var customer = await _context.Customers.FindAsync(order.CustomerId);
 
+            var evm = new EmailViewModel();
             if (order == null)
             {
                 return NotFound();
             }
 
-            order.Received = true;
+            if(order.OrderStatus == 0)
+            {
+                order.OrderStatus = 1;  // Set status to "Received"
+                evm = new EmailViewModel
+                {
+                    To = order.Customer.Email,
+                    Subject = "Your order is at Promenade",
+                    Body = $@"
+                              <h1>Order Confirmation: Ready for Collection</h1>
+                              <p>Dear {customer.First_Name},</p>
+                              <p>We are pleased to inform you that your order has been processed and is now ready for collection.</p>
+                              <p>Please ensure you have your order reference number with you when you arrive for a seamless collection process.</p>
+                              <ul>
+                                <li>Order Reference: {order.OrderRefNum}</li>
+                              </ul>
+                              <p>Our team has ensured that your order is packed with care, awaiting your collection. Should you have any questions, or require any further assistance, please do not hesitate to contact our customer service team.</p>
+                              <p>Thank you for choosing us.</p>
+                              <p>Warm regards,</p>
+                              <p>The Promenade Team</p>
+                      "
+                };
+            }
+            else if(order.OrderStatus == 1)
+            {
+                order.OrderStatus = 2;
+                order.CollectedDate = DateTime.Now;
+
+                evm = new EmailViewModel
+                {
+                    To = order.Customer.Email,
+                    Subject = "Your order is at Promenade",
+                    Body = $@"
+                              <h1>Order Collection Confirmation</h1>
+                              <p>Dear {customer.First_Name},</p>
+                              <p>We are writing to confirm that your order has been successfully collected.</p>
+                              <p>We strive for utmost precision and quality in our products and services. If, for any reason, you find any issues with your order, please be informed that you have a period of 7 days from the date of collection to request a refund.</p>
+                              <ul>
+                                <li>Order Reference: {order.OrderRefNum}</li>
+                              </ul>
+                              <p>To initiate a refund, kindly visit the 'Orders' page within your account and follow the prompt to request a refund. Our customer service team will assist you throughout the process.</p>
+                              <p>We value your trust in our brand and are committed to ensuring your satisfaction.</p>
+                              <p>Warm regards,</p>
+                              <p>The Promenade Team</p>
+                      "
+                };
+            }
 
             _context.Entry(order).State = EntityState.Modified;
 
             try
             {
+                _emailService.SendEmail(evm);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -134,6 +185,7 @@ namespace API.Controllers
 
             return NoContent();
         }
+
 
         private bool WineOrderExists(int id)
         {
