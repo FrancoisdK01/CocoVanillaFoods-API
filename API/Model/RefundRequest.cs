@@ -1,4 +1,6 @@
-﻿namespace API.Model
+﻿using System.Text.Json.Serialization;
+
+namespace API.Model
 {
     public enum RefundStatus
     {
@@ -17,7 +19,12 @@
         public decimal Cost { get; set; }
         public string Description { get; set; } // New field
         public RefundStatus Status { get; set; }
+        public string OrderRefNum { get; set; }
 
         public Boolean isRefunded { get; set; }
+
+        [JsonIgnore]
+        public WineOrder WineOrder { get; set; }
+
     }
 }
