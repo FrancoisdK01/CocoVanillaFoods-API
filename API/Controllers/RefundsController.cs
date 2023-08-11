@@ -25,7 +25,7 @@ namespace API.Controllers
         public async Task<IActionResult> RequestRefund([FromBody] RefundRequestModel model)
         {
 
-            var wineOrderToUpdate = await _context.WineOrders.FirstOrDefaultAsync(o => o.Customer.Email == model.Email);
+            var wineOrderToUpdate = await _context.WineOrders.FirstOrDefaultAsync(o => o.OrderRefNum == model.ReferenceNumber);
 
             if (model == null || !ModelState.IsValid)
             {
