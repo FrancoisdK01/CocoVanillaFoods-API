@@ -32,7 +32,7 @@ namespace API.Controllers
                 return BadRequest();
             }
 
-            TimeSpan difference = DateTime.UtcNow - wineOrderToUpdate.OrderDate;
+            TimeSpan difference = DateTime.UtcNow - wineOrderToUpdate.CollectedDate;
             if (difference.TotalDays > 7)
             {
                 return BadRequest("Can't request refund after 7 days of purchase.");
