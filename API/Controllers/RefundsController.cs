@@ -68,12 +68,28 @@ namespace API.Controllers
             }
         }
 
+
+
+
         // GET: api/Refunds
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RefundRequest>>> GetRefundRequests()
         {
-            return await _context.RefundRequests.ToListAsync();
+            var refundRequests = await _context.RefundRequests
+        .Include(r => r.WineOrder) // Include the related WineOrder object
+        .ToListAsync();
+
+            foreach (var request in refundRequests)
+            {
+                request.OrderRefNum = request.WineOrder?.OrderRefNum; // Set the OrderRefNum property
+            }
+
+            return refundRequests;
         }
+
+
+
+
 
         [HttpGet("{email}")]
         public async Task<ActionResult<IEnumerable<RefundRequest>>> GetUserRefundRequests(string email)
@@ -97,6 +113,7 @@ namespace API.Controllers
 
             return NoContent();
         }
+
 
 
     }

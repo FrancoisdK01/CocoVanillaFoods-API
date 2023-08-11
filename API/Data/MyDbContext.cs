@@ -228,6 +228,11 @@ namespace API.Data
             .HasForeignKey(r => r.CustomerID)
             .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<RefundRequest>()
+    .HasOne(rr => rr.WineOrder)
+    .WithMany(wo => wo.RefundRequests) // Assuming there's a collection of RefundRequests in WineOrder
+    .HasForeignKey(rr => rr.WineId);
+
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.SuperUser)
                 .WithMany(su => su.Employees)

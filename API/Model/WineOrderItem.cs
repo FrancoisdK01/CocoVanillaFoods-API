@@ -11,7 +11,6 @@ public class WineOrderItem
 
     public int Quantity { get; set; } = 1;
 
-    [JsonIgnore]
     public Wine Wine { get; set; }
 
     [JsonIgnore]
