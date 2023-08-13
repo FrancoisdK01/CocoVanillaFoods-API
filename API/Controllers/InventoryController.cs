@@ -97,7 +97,7 @@ namespace API.Controllers
                 StockLimit = inventory.StockLimit,
                 QuantityOnHand = inventory.QuantityOnHand,
                 WineID = wine.WineID,
-                WinePrice = inventory.WinePrice,
+                WinePrice = (decimal)wine.WinePrice,
                 VarietalID = inventory.VarietalID,
                 WineTypeID = inventory.WineTypeID,
             };
