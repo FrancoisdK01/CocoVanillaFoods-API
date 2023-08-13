@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20230813074059_database")]
-    partial class database
+    [Migration("20230813171937_init2")]
+    partial class init2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -355,6 +355,9 @@ namespace API.Migrations
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("EventDisplay")
+                        .HasColumnType("bit");
+
                     b.Property<string>("EventName")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -562,24 +565,25 @@ namespace API.Migrations
                     b.Property<int>("StockLimit")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WineID")
+                    b.Property<int>("VarietalID")
                         .HasColumnType("int");
 
-                    b.Property<string>("WineName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("WineID")
+                        .HasColumnType("int");
 
-                    b.Property<string>("WineType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("WinePrice")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("WineVarietal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("winePrice")
-                        .HasColumnType("float");
+                    b.Property<int>("WineTypeID")
+                        .HasColumnType("int");
 
                     b.HasKey("InventoryID");
 
+                    b.HasIndex("VarietalID");
+
                     b.HasIndex("WineID");
+
+                    b.HasIndex("WineTypeID");
 
                     b.ToTable("Inventories");
                 });
@@ -1211,6 +1215,9 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<bool>("DisplayWine")
+                        .HasColumnType("bit");
+
                     b.Property<string>("EmployeeId")
                         .HasColumnType("nvarchar(450)");
 
@@ -1327,12 +1334,18 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WriteOff_ReasonID"), 1L, 1);
 
+                    b.Property<int>("BottelsLost")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date_of_last_update")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("TimesUsed")
+                        .HasColumnType("int");
 
                     b.HasKey("WriteOff_ReasonID");
 
@@ -1619,9 +1632,9 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("API.Model.Event", "Event")
-                        .WithMany("Bookings")
+                        .WithMany()
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -1741,9 +1754,29 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.Inventory", b =>
                 {
-                    b.HasOne("API.Model.Wine", null)
+                    b.HasOne("API.Model.Varietal", "Varietal")
+                        .WithMany()
+                        .HasForeignKey("VarietalID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.Wine", "Wine")
                         .WithMany("Inventories")
-                        .HasForeignKey("WineID");
+                        .HasForeignKey("WineID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.WineType", "WineType")
+                        .WithMany()
+                        .HasForeignKey("WineTypeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Varietal");
+
+                    b.Navigation("Wine");
+
+                    b.Navigation("WineType");
                 });
 
             modelBuilder.Entity("API.Model.Order", b =>
@@ -2067,11 +2100,6 @@ namespace API.Migrations
                     b.Navigation("Wines");
 
                     b.Navigation("WriteOffs");
-                });
-
-            modelBuilder.Entity("API.Model.Event", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("API.Model.EventType", b =>

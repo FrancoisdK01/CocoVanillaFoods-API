@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace API.Migrations
 {
-    public partial class database : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -304,7 +304,9 @@ namespace API.Migrations
                     WriteOff_ReasonID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Date_of_last_update = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Date_of_last_update = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TimesUsed = table.Column<int>(type: "int", nullable: false),
+                    BottelsLost = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -731,6 +733,7 @@ namespace API.Migrations
                     EventPrice = table.Column<int>(type: "int", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EarlyBirdID = table.Column<int>(type: "int", nullable: true),
+                    EventDisplay = table.Column<bool>(type: "bit", nullable: false),
                     EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     EventTypeID = table.Column<int>(type: "int", nullable: true)
                 },
@@ -770,6 +773,7 @@ namespace API.Migrations
                     WineTypeID = table.Column<int>(type: "int", nullable: false),
                     VarietalID = table.Column<int>(type: "int", nullable: false),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DisplayWine = table.Column<bool>(type: "bit", nullable: false),
                     EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -838,7 +842,7 @@ namespace API.Migrations
                         column: x => x.EventId,
                         principalTable: "Events",
                         principalColumn: "EventID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
