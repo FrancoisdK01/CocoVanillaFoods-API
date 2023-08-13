@@ -54,6 +54,8 @@ namespace API.Model
         [JsonIgnore]
         public List<CartItem> CartItems { get; set; }
 
+        public Boolean DisplayWine { get; set; }
+
 
     }
 }
