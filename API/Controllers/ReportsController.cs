@@ -69,5 +69,16 @@ namespace API.Controllers
 
             return Ok(listOfEvents);
         }
+
+        [HttpGet]
+        [Route("getAllSupplierOrders")]
+        [Authorize(Roles = "Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetAllSupplierOrders()
+        {
+            var listOfSupplierOrders = await _context.SupplierOrders.ToListAsync();
+
+            return Ok(listOfSupplierOrders);
+        }
     }
 }
