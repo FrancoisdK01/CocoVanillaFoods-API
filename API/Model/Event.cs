@@ -32,8 +32,8 @@ namespace API.Model
         [ForeignKey("EarlyBirdID")]
         public EarlyBird EarlyBird { get; set; }
 
-        [JsonIgnore]
-        public List<Booking> Bookings { get; set; }
+        //[JsonIgnore]
+        //public List<Booking> Bookings { get; set; }
 
     }
 }

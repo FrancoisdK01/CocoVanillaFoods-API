@@ -47,5 +47,27 @@ namespace API.Controllers
 
             return Ok(listOfWriteOffs);
         }
+
+        [HttpGet]
+        [Route("getEventReport/{beginDate}/{endDate}")]
+        [Authorize(Roles = "Superuser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetEventsReport(DateTime beginDate, DateTime endDate)
+        {
+            // Ensure dates are in correct order (swap if necessary)
+            if (beginDate > endDate)
+            {
+                var temp = beginDate;
+                beginDate = endDate;
+                endDate = temp;
+            }
+
+            var listOfEvents = await _context.Events
+                                             .Include(e => e.EarlyBird)
+                                             .Where(e => e.EventDate >= beginDate && e.EventDate <= endDate)
+                                             .ToListAsync();
+
+            return Ok(listOfEvents);
+        }
     }
 }
