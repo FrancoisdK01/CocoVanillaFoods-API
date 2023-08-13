@@ -151,6 +151,7 @@ namespace API.Controllers
             wineToUpdate.WinePrice = wineForm.WinePrice;
             wineToUpdate.WineTypeID = wineForm.WineTypeID;
             wineToUpdate.VarietalID = wineForm.VarietalID;
+            wineToUpdate.DisplayWine = wineForm.DisplayWine;
 
             _context.Entry(wineToUpdate).State = EntityState.Modified;
 
@@ -201,6 +202,7 @@ namespace API.Controllers
                 RestockLimit = wineForm.RestockLimit,
                 WineTastingNote = wineForm.WineTastingNote,
                 WinePrice = wineForm.WinePrice,
+                DisplayWine = wineForm.DisplayWine,
                 WineTypeID = wineForm.WineTypeID,
                 VarietalID = wineForm.VarietalID,
                 FilePath = filePath,
