@@ -46,36 +46,38 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutInventory(int id, Inventory inventory)
         {
-            if (id != inventory.InventoryID)
+            var editInventory = _context.Inventories.FirstOrDefault(i => i.InventoryID == id);
+
+            if(editInventory == null)
+            {
+                return NotFound();
+            }
+
+            var newInventory = new Inventory
+            {
+                // Stays the same as previous thingies
+                InventoryID = editInventory.InventoryID,
+                VarietalID = editInventory.VarietalID,
+                WineID = editInventory.WineID,
+                WineTypeID = editInventory.WineTypeID,
+
+                // Updated values
+                QuantityOnHand = inventory.QuantityOnHand,
+                StockLimit = inventory.StockLimit,
+            };
+
+            _context.Inventories.Update(newInventory);
+
+            var result = await _context.SaveChangesAsync();
+
+            if(result > 0)
+            {
+                return Ok();
+            }
+            else
             {
                 return BadRequest();
-                // If the ID provided in the URL does not match the ID in the request body, return a 400 Bad Request response.
             }
-
-            _context.Entry(inventory).State = EntityState.Modified;
-            // Update the state of the inventory object to Modified to indicate it has been changed.
-
-            try
-            {
-                await _context.SaveChangesAsync();
-                // Save the changes to the database.
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!InventoryExists(id))
-                {
-                    return NotFound();
-                    // If the inventory item to be updated is not found, return a 404 Not Found response.
-                }
-                else
-                {
-                    throw;
-                    // If there's a concurrency issue while updating, rethrow the exception.
-                }
-            }
-
-            return NoContent();
-            // If the update is successful, return a 204 No Content response.
         }
 
         // POST: api/Inventory
@@ -83,14 +85,35 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Inventory>> PostInventory(Inventory inventory)
         {
-            _context.Inventories.Add(inventory);
-            // Add the new inventory item to the context.
+            var wine = _context.Wines.FirstOrDefault(w => w.WineID == inventory.WineID);
 
-            await _context.SaveChangesAsync();
-            // Save the changes to the database.
+            if(wine == null)
+            {
+                return NoContent();
+            }
 
-            return CreatedAtAction("GetInventory", new { id = inventory.InventoryID }, inventory);
-            // Return a 201 Created response with the newly created inventory item and its location.
+            var addInventory = new Inventory
+            {
+                StockLimit = inventory.StockLimit,
+                QuantityOnHand = inventory.QuantityOnHand,
+                WineID = wine.WineID,
+                WinePrice = inventory.WinePrice,
+                VarietalID = inventory.VarietalID,
+                WineTypeID = inventory.WineTypeID,
+            };
+
+            _context.Inventories.Add(addInventory);
+
+            var result = await _context.SaveChangesAsync();
+
+           if(result > 0)
+            {
+                return CreatedAtAction("GetInventory", new { id = inventory.InventoryID }, inventory);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE: api/Inventory/5

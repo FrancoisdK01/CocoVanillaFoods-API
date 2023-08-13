@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20230813095633_events")]
-    partial class events
+    [Migration("20230813124522_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1214,6 +1214,9 @@ namespace API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<bool>("DisplayWine")
+                        .HasColumnType("bit");
+
                     b.Property<string>("EmployeeId")
                         .HasColumnType("nvarchar(450)");
 
@@ -1330,12 +1333,18 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WriteOff_ReasonID"), 1L, 1);
 
+                    b.Property<int>("BottelsLost")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date_of_last_update")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("TimesUsed")
+                        .HasColumnType("int");
 
                     b.HasKey("WriteOff_ReasonID");
 
