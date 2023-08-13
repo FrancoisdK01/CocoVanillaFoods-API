@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.ViewModels;
+using System.Globalization;
 
 namespace API.Controllers
 {
@@ -217,6 +218,41 @@ namespace API.Controllers
             return stringRetrn.ToUpper();
         }
 
+        //Charts for reporting the sales
+        [HttpGet("SalesReport/{startDate}/{endDate}")]
+        public async Task<ActionResult<IEnumerable<WineOrder>>> GetSalesReport(string startDate, string endDate)
+        {
+            DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+            var orders = await _context.WineOrders
+                .Include(o => o.OrderItems)
+                .Where(o => o.OrderDate >= startDateTime && o.OrderDate <= endDateTime)
+                .ToListAsync();
+
+            if (orders == null || !orders.Any())
+            {
+                return NotFound("No orders found for the specified date range.");
+            }
+
+            return Ok(orders);
+        }
+
+
+        [HttpGet("AllSales")]
+        public async Task<ActionResult<IEnumerable<WineOrder>>> GetAllSales()
+        {
+            var orders = await _context.WineOrders
+                .Include(o => o.OrderItems)
+                .ToListAsync();
+
+            if (orders == null || !orders.Any())
+            {
+                return NotFound("No orders found.");
+            }
+
+            return Ok(orders);
+        }
 
     }
 
