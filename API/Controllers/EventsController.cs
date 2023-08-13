@@ -106,6 +106,8 @@ namespace API.Controllers
             eventItem.Description = eventForm.Description;
             eventItem.EventPrice = eventForm.EventPrice;
             eventItem.ImagePath = filePath;
+            
+            
 
             _context.Entry(eventItem).State = EntityState.Modified;
             try
@@ -141,7 +143,8 @@ namespace API.Controllers
                 Tickets_Available = eventForm.Tickets_Available,
                 Description = eventForm.Description,
                 EventPrice = eventForm.EventPrice,
-                ImagePath = filePath
+                ImagePath = filePath,
+                EventDisplay = true
             };
 
             if (eventForm.EarlyBirdID == 0)
@@ -258,5 +261,43 @@ namespace API.Controllers
         }
 
 
+        [HttpPut("display-toggle/{id}")]
+        public async Task<IActionResult> ToggleEventDisplay(int id)
+        {
+            var eventItem = await _context.Events.FindAsync(id);
+
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            // Toggle the EventDisplay attribute
+            eventItem.EventDisplay = !eventItem.EventDisplay;
+
+            _context.Entry(eventItem).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EventExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+
+
     }
+
+
 }
