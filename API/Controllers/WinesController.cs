@@ -131,6 +131,8 @@ namespace API.Controllers
             // If a file is included, process and update the image
             if (wineForm.File != null)
             {
+                await DeleteImageFromGoogleCloudStorage(wineForm.File.FileName);
+
                 var fileName = $"{Guid.NewGuid()}_{wineForm.File.FileName}";
                 var filePath = await UploadFileToGoogleCloudStorage(fileName, wineForm.File.OpenReadStream(), wineToUpdate.FilePath);
 
