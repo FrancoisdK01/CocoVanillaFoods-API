@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace API.Migrations
 {
-    public partial class initProm : Migration
+    public partial class database : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -164,25 +164,6 @@ namespace API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Provinces", x => x.ProvinceID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RefundRequests",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    WineId = table.Column<int>(type: "int", nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RequestedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RefundRequests", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -560,6 +541,7 @@ namespace API.Migrations
                     Order_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ShippingID = table.Column<int>(type: "int", nullable: false),
                     CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    isRefunded = table.Column<bool>(type: "bit", nullable: false),
                     OrderStatusID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -587,9 +569,11 @@ namespace API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CollectedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     OrderTotal = table.Column<int>(type: "int", nullable: false),
-                    Received = table.Column<bool>(type: "bit", nullable: false),
-                    OrderRefNum = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    OrderStatus = table.Column<int>(type: "int", nullable: false),
+                    OrderRefNum = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    isRefunded = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -703,6 +687,33 @@ namespace API.Migrations
                         column: x => x.OrderID,
                         principalTable: "Orders",
                         principalColumn: "OrderID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefundRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WineId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RequestedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    OrderRefNum = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    isRefunded = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefundRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefundRequests_WineOrders_WineId",
+                        column: x => x.WineId,
+                        principalTable: "WineOrders",
+                        principalColumn: "WineOrderId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -1282,6 +1293,11 @@ namespace API.Migrations
                 name: "IX_Orders_OrderStatusID",
                 table: "Orders",
                 column: "OrderStatusID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefundRequests_WineId",
+                table: "RefundRequests",
+                column: "WineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShippingDetails_OrderID",

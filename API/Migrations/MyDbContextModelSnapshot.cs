@@ -602,6 +602,9 @@ namespace API.Migrations
                     b.Property<int>("ShippingID")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isRefunded")
+                        .HasColumnType("bit");
+
                     b.HasKey("OrderID");
 
                     b.HasIndex("CustomerID");
@@ -695,6 +698,9 @@ namespace API.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
+                    b.Property<string>("OrderRefNum")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("RequestedOn")
                         .HasColumnType("datetime2");
 
@@ -704,7 +710,12 @@ namespace API.Migrations
                     b.Property<int>("WineId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isRefunded")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WineId");
 
                     b.ToTable("RefundRequests");
                 });
@@ -1524,6 +1535,9 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WineOrderId"), 1L, 1);
 
+                    b.Property<DateTime>("CollectedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CustomerId")
                         .HasColumnType("nvarchar(450)");
 
@@ -1533,10 +1547,13 @@ namespace API.Migrations
                     b.Property<string>("OrderRefNum")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrderStatus")
+                        .HasColumnType("int");
+
                     b.Property<int>("OrderTotal")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Received")
+                    b.Property<bool>("isRefunded")
                         .HasColumnType("bit");
 
                     b.HasKey("WineOrderId");
@@ -1754,6 +1771,17 @@ namespace API.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("API.Model.RefundRequest", b =>
+                {
+                    b.HasOne("WineOrder", "WineOrder")
+                        .WithMany("RefundRequests")
+                        .HasForeignKey("WineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WineOrder");
                 });
 
             modelBuilder.Entity("API.Model.ShippingDetails", b =>
@@ -2119,6 +2147,8 @@ namespace API.Migrations
             modelBuilder.Entity("WineOrder", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("RefundRequests");
                 });
 
             modelBuilder.Entity("Wishlist", b =>
