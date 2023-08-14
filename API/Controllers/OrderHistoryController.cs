@@ -219,24 +219,24 @@ namespace API.Controllers
         }
 
         //Charts for reporting the sales
-        [HttpGet("SalesReport/{startDate}/{endDate}")]
-        public async Task<ActionResult<IEnumerable<WineOrder>>> GetSalesReport(string startDate, string endDate)
-        {
-            DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        //[HttpGet("SalesReport/{startDate}/{endDate}")]
+        //public async Task<ActionResult<IEnumerable<WineOrder>>> GetSalesReport(string startDate, string endDate)
+        //{
+        //    DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        //    DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-            var orders = await _context.WineOrders
-                .Include(o => o.OrderItems)
-                .Where(o => o.OrderDate >= startDateTime && o.OrderDate <= endDateTime)
-                .ToListAsync();
+        //    var orders = await _context.WineOrders
+        //        .Include(o => o.OrderItems)
+        //        .Where(o => o.OrderDate >= startDateTime && o.OrderDate <= endDateTime)
+        //        .ToListAsync();
 
-            if (orders == null || !orders.Any())
-            {
-                return NotFound("No orders found for the specified date range.");
-            }
+        //    if (orders == null || !orders.Any())
+        //    {
+        //        return NotFound("No orders found for the specified date range.");
+        //    }
 
-            return Ok(orders);
-        }
+        //    return Ok(orders);
+        //}
 
 
         [HttpGet("AllSales")]
@@ -254,8 +254,34 @@ namespace API.Controllers
             return Ok(orders);
         }
 
+        /////////////////////////////Marco kode om die sales chart te display/////////////////////////////////////
+        [HttpGet("SalesReport")]
+        public async Task<ActionResult<IEnumerable<WineOrder>>> GetSalesReport(string? startDate, string? endDate)
+        {
+            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
+            {
+                return await GetAllSales();
+            }
+
+            DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddHours(23).AddMinutes(59).AddSeconds(59);
+
+            var orders = await _context.WineOrders
+                        .Include(o => o.OrderItems)
+                        .Where(o => o.OrderDate >= startDateTime && o.OrderDate <= endDateTime)
+                        .ToListAsync();
+
+
+            if (orders == null || !orders.Any())
+            {
+                return NotFound("No orders found for the specified date range.");
+            }
+
+            return Ok(orders);
+        }
     }
 
+    
 
 
 
