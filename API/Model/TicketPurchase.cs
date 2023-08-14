@@ -12,5 +12,9 @@
         public string Description { get; set; }
 
         public bool EventDeleted { get; set; }
+        public bool IsScanned { get; set; }
+        public DateTime? ScannedAt { get; set; }
+        public string ScanningToken { get; set; }  // Unique token for each ticket
+
     }
 }
