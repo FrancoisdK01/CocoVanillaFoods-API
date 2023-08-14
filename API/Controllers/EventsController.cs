@@ -86,41 +86,65 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, [FromForm] EventFormViewModel eventForm)
         {
-            var filePath = await UploadFileToGoogleCloudStorage(eventForm.ImagePath.FileName, eventForm.ImagePath.OpenReadStream());
-
-            if (string.IsNullOrEmpty(filePath))
+            // Ensure ID matches
+            if (id != eventForm.EventID)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload the file to Google Cloud Storage.");
+                return BadRequest();
             }
 
+            // Get the current event from the database
             var eventItem = await _context.Events.FindAsync(id);
-
             if (eventItem == null)
             {
                 return NotFound();
             }
 
+            // If a file is included, process and update the image
+            if (eventForm.ImagePath != null)
+            {
+                // You might want to delete the existing image here similar to the wine method
+                await DeleteImageFromGoogleCloudStorage(eventItem.ImagePath);
+
+                var fileName = $"{Guid.NewGuid()}_{eventForm.ImagePath.FileName}";
+                var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.ImagePath.OpenReadStream());
+
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload the file to Google Cloud Storage.");
+                }
+
+                eventItem.ImagePath = filePath;
+            }
+
+            // Map other properties from the form to the event object
             eventItem.EventName = eventForm.EventName;
             eventItem.EventDate = eventForm.EventDate;
             eventItem.Tickets_Available = eventForm.Tickets_Available;
             eventItem.Description = eventForm.Description;
             eventItem.EventPrice = eventForm.EventPrice;
-            eventItem.ImagePath = filePath;
-            
-            
+            eventItem.DisplayEvent = eventForm.DisplayEvent;
 
             _context.Entry(eventItem).State = EntityState.Modified;
+
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw;
+                if (!EventExists(id)) // You may want to implement the EventExists method similar to the WineExists method
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
 
             return NoContent();
         }
+
 
         // POST: api/Events
         [HttpPost]
@@ -144,7 +168,7 @@ namespace API.Controllers
                 Description = eventForm.Description,
                 EventPrice = eventForm.EventPrice,
                 ImagePath = filePath,
-                EventDisplay = true
+                DisplayEvent = true
             };
 
             if (eventForm.EarlyBirdID == 0)
@@ -272,7 +296,7 @@ namespace API.Controllers
             }
 
             // Toggle the EventDisplay attribute
-            eventItem.EventDisplay = !eventItem.EventDisplay;
+            eventItem.DisplayEvent = !eventItem.DisplayEvent;
 
             _context.Entry(eventItem).State = EntityState.Modified;
 
