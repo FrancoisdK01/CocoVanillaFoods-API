@@ -37,7 +37,7 @@ namespace API.Data
                             Last_Name = "Bloem",
                             Email = "marinda.bloem@promenade.com",
                             PhoneNumber = "0123456789",
-                            ID_Number = "0123456789123",
+                            ID_Number = "7001030203088",
                             Hire_Date = DateTime.Now,
                             UserName = "Marinda"
                         };
@@ -49,7 +49,7 @@ namespace API.Data
                             Last_Name = "Bloem",
                             Email = "marinda.bloem@promenade.com",
                             PhoneNumber = "0123456789",
-                            ID_Number = "0123456789123",
+                            ID_Number = "7001030203088",
                             UserName = "Marinda",
                             Date_Created = DateTime.Now,
                             Date_of_last_update = DateTime.Now,

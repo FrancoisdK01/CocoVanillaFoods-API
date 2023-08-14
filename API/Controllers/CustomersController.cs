@@ -173,5 +173,59 @@ namespace API.Controllers
             }
             return Ok();
         }
+
+        //////////////////////////Marco se code om die age groups in charts te display ////////////////////////////////////////
+        [HttpGet]
+        [Route("AgeDistribution")]
+        public async Task<ActionResult<Dictionary<string, int>>> GetAgeDistribution()
+        {
+            var users = await _context.Customers.ToListAsync();
+
+            var ageGroups = new Dictionary<string, int>
+    {
+        {"18-21", 0}, {"21-30", 0}, {"31-40", 0}, {"41-50", 0}, {"51-60", 0}, {"61-70", 0}, {"71-80", 0}, {"81-90", 0}, {"91-100", 0}
+    };
+
+            foreach (var user in users)
+            {
+                // Extract birth year from ID number
+                int birthYear;
+                string yy = user.ID_Number.Substring(0, 2);
+                string century;
+
+                if (int.Parse(yy) <= DateTime.Now.Year % 100)
+                {
+                    century = "20";
+                }
+                else
+                {
+                    century = "19";
+                }
+
+                if (int.TryParse(century + yy, out birthYear))
+                {
+                    var age = DateTime.Now.Year - birthYear;
+
+                    // Classify the user into an age group
+                    string group = "";
+                    if (age >= 18 && age <= 21) group = "18-21";
+                    else if (age > 21 && age <= 30) group = "21-30";
+                    else if (age > 31 && age <= 40) group = "31-40";
+                    else if (age > 41 && age <= 50) group = "41-50";
+                    else if (age > 51 && age <= 60) group = "51-60";
+                    else if (age > 61 && age <= 70) group = "61-70";
+                    else if (age > 71 && age <= 80) group = "71-80";
+                    else if (age > 81 && age <= 90) group = "81-90";
+                    else if (age > 91 && age <= 100) group = "91-100";
+
+
+                    if (ageGroups.ContainsKey(group))
+                        ageGroups[group]++;
+                }
+            }
+
+            return Ok(ageGroups);
+        }
+
     }
 }

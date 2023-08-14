@@ -501,5 +501,19 @@ namespace API.Controllers
                 return characterSet[randomIndex];
             }
         }
+
+        //////////////////////////Marco se code om die gender chart inligting te kry vir Charts ////////////////////////////////////////
+        [HttpGet]
+        [Route("GetGenderDistribution")]
+        public IActionResult GetGenderDistribution()
+        {
+            var genderDistribution = _context.Customers.GroupBy(c => c.Gender)
+                                                      .Select(g => new { Gender = g.Key, Count = g.Count() })
+                                                      .ToList();
+
+            return Ok(genderDistribution);
+        }
+
+
     }
 }
