@@ -131,7 +131,12 @@ namespace API.Controllers
             }
 
             ticket.IsScanned = true;
-            ticket.ScannedAt = DateTime.UtcNow;
+
+            DateTime utcNow = DateTime.UtcNow;
+            TimeZoneInfo saTimeZone = TimeZoneInfo.FindSystemTimeZoneById("South Africa Standard Time");
+            DateTime localTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, saTimeZone);
+
+            ticket.ScannedAt = localTime;
 
             _context.TicketPurchases.Update(ticket);
             await _context.SaveChangesAsync();
