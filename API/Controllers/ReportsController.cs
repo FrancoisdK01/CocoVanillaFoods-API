@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Model;
+using API.ViewModels.ViewModelsForReports;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +37,6 @@ namespace API.Controllers
 
 
             var listOfWriteOffs = await _context.RefundRequests
-                                             .Include(w => w.WineOrder).Include(wo => wo.WineOrder)
                                              .Where(r => r.RequestedOn >= beginDate && r.RequestedOn <= endDate)
                                              .ToListAsync();
 
@@ -63,7 +63,7 @@ namespace API.Controllers
             }
 
             var listOfEvents = await _context.Events
-                                             .Include(e => e.EarlyBird)
+                                             .Include(e => e.EarlyBird) // Why, you don't use it in your report???????
                                              .Where(e => e.EventDate >= beginDate && e.EventDate <= endDate)
                                              .ToListAsync();
 
@@ -76,9 +76,24 @@ namespace API.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetAllSupplierOrders()
         {
+            DateTime currentDate = DateTime.Now;
+
+            // Fetch the latest VAT percentage before (or on) the current date
+            var activeVAT = await _context.VATs
+                                .Where(v => v.Date <= currentDate)  // Filtering by date
+                                .OrderByDescending(v => v.Date)  // Ordering in descending order to get the latest VAT
+                                .FirstOrDefaultAsync();
+
             var listOfSupplierOrders = await _context.SupplierOrders.ToListAsync();
 
-            return Ok(listOfSupplierOrders);
+            var fullListOfSupplierDetails = new SupplierOrdersVAT
+            {
+                SupplierOrders = listOfSupplierOrders,
+                VATs = activeVAT
+            };
+
+            return Ok(fullListOfSupplierDetails);
         }
+
     }
 }
