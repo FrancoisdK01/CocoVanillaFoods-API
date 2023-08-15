@@ -27,6 +27,7 @@ namespace API.Controllers
         {
             _context.TicketPurchases.Add(ticket);
             await _context.SaveChangesAsync();
+            ticket.ScanningToken = Guid.NewGuid().ToString();
 
             // Generate a QR code
             var qrCode = GenerateQRCode($"http://localhost:4200/Tickets/Scan/{ticket.ScanningToken}");
@@ -34,16 +35,18 @@ namespace API.Controllers
             //ticket.QRCode = qrCode;
             await _context.SaveChangesAsync();
 
+            var eventDetails = await _context.Events.FirstOrDefaultAsync(e => e.EventID == ticket.EventId);
+
             // Get the customer associated with the ticket
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == ticket.UserEmail);
 
             if (customer != null)
             {
                 // Send the email to the customer
-                await SendEmail(customer.Email, qrCode, customer);
+                await SendEmail(customer.Email, qrCode, customer, eventDetails);
             }
 
-            ticket.ScanningToken = Guid.NewGuid().ToString();
+
 
 
             return CreatedAtAction("GetTicket", new { id = ticket.UserEmail }, ticket);
@@ -145,7 +148,7 @@ namespace API.Controllers
         }
 
 
-        private async Task SendEmail(string email, string qrCode, Customer customer)
+        private async Task SendEmail(string email, string qrCode, Customer customer, Event eventDetails)
         {
             var emailServer = "smtp.gmail.com";
             var emailPort = 587;
@@ -165,9 +168,10 @@ namespace API.Controllers
             string greeting = $"Dear {customer.Title} {customer.First_Name} {customer.Last_Name},";
 
             // Constructing the personalized message body
-            string messageBodyText = $"{greeting}\r\n\r\nThank you for your purchase! Please find attached your QR code for the event. Keep it safe and present it at the entrance. We look forward to seeing you!\r\n\r\nWarm regards,\r\nThe Promenade Team";
+            string messageBodyText = $"{greeting}\r\n\r\nThank you for your purchase for the event {eventDetails.EventName} on {eventDetails.EventDate}. Please find attached your QR code. Keep it safe and present it at the entrance. We look forward to seeing you!\r\n\r\nWarm regards,\r\nThe Promenade Team";
 
-            string messageBodyHtml = $"<p>{greeting}</p><p>Thank you for your purchase! Please find below your QR code for the event. Keep it safe and present it at the entrance. We look forward to seeing you!</p><img src=\"data:image/png;base64,{qrCode}\" /><p>Warm regards,<br/>The Promenade Team</p>";
+            string messageBodyHtml = $"<p>{greeting}</p><p>Thank you for your purchase for the event <strong>{eventDetails.EventName}</strong> on {eventDetails.EventDate}. Please find below your QR code. Keep it safe and present it at the entrance. We look forward to seeing you!</p><img src=\"data:image/png;base64,{qrCode}\" /><p>Warm regards,<br/>The Promenade Team</p>";
+
 
             body.Add(new TextPart("plain")
             {
