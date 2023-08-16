@@ -206,7 +206,6 @@ namespace API.Controllers
             await client.DisconnectAsync(true);
         }
 
-        ///////////////////////////////////Marco code om die ticket sales in n chart te display///////////////////////////////////////
         [HttpGet("TicketSalesReport")]
         public async Task<ActionResult<IEnumerable<object>>> GetTicketSalesReport(string? startDate, string? endDate)
         {
@@ -240,8 +239,7 @@ namespace API.Controllers
                                         .ToList();
 
             return Ok(result);
-        }
-
+        }            
 
     }
 }
