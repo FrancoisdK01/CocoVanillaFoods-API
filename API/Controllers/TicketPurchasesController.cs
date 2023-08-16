@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using QRCoder;
+using System.Globalization;
 using static QRCoder.PayloadGenerator;
 
 namespace API.Controllers
@@ -196,7 +197,41 @@ namespace API.Controllers
             await client.DisconnectAsync(true);
         }
 
+        /////Marco se kode om die charts reg te display//////////////////
+        [HttpGet("TicketSalesReport")]
+        public async Task<ActionResult<IEnumerable<object>>> GetTicketSalesReport(string? startDate, string? endDate)
+        {
+            Console.WriteLine($"Received start date: {startDate}, end date: {endDate}"); // Debugging line
 
+            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
+            {
+                return NotFound("Start date and end date are required.");
+            }
+
+            DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddHours(23).AddMinutes(59).AddSeconds(59);
+
+            var ticketPurchases = await _context.TicketPurchases
+                                .Where(tp => tp.PurchaseDate >= startDateTime && tp.PurchaseDate <= endDateTime)
+                                .ToListAsync();
+
+            if (ticketPurchases == null || !ticketPurchases.Any())
+            {
+                return NotFound("No ticket purchases found for the specified date range.");
+            }
+
+            // Optionally, you can transform the data as needed to match what you want on the client
+            var result = ticketPurchases.GroupBy(tp => tp.PurchaseDate.Date)
+                                        .Select(group => new
+                                        {
+                                            PurchaseDate = group.Key,
+                                            TotalAmount = group.Sum(tp => tp.TicketPrice)
+                                        })
+                                        .OrderBy(item => item.PurchaseDate)
+                                        .ToList();
+
+            return Ok(result);
+        }
 
     }
 }
