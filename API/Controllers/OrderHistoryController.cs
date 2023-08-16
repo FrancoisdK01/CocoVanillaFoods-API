@@ -256,28 +256,39 @@ namespace API.Controllers
 
         /////////////////////////////Marco kode om die sales chart te display/////////////////////////////////////
         [HttpGet("SalesReport")]
-        public async Task<ActionResult<IEnumerable<WineOrder>>> GetSalesReport(string? startDate, string? endDate)
+        public async Task<ActionResult<IEnumerable<object>>> GetSalesReport(string? startDate, string? endDate)
         {
             if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
             {
-                return await GetAllSales();
+                // Return an empty array with a 200 OK status
+                return Ok(new List<object>());
             }
 
             DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddHours(23).AddMinutes(59).AddSeconds(59);
 
             var orders = await _context.WineOrders
-                        .Include(o => o.OrderItems)
-                        .Where(o => o.OrderDate >= startDateTime && o.OrderDate <= endDateTime)
-                        .ToListAsync();
-
+                            .Include(o => o.OrderItems)
+                            .Where(o => o.OrderDate >= startDateTime && o.OrderDate <= endDateTime)
+                            .ToListAsync();
 
             if (orders == null || !orders.Any())
             {
-                return NotFound("No orders found for the specified date range.");
+                // Return an empty array with a 200 OK status
+                return Ok(new List<object>());
             }
 
-            return Ok(orders);
+            // Group orders by OrderDate and sum the total for each day
+            var result = orders.GroupBy(o => o.OrderDate.Date)
+                               .Select(group => new
+                               {
+                                   OrderDate = group.Key,
+                                   TotalAmount = group.Sum(o => o.OrderTotal)
+                               })
+                               .OrderBy(item => item.OrderDate)
+                               .ToList();
+
+            return Ok(result);
         }
     }
 
