@@ -213,7 +213,8 @@ namespace API.Controllers
 
             if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
             {
-                return NotFound("Start date and end date are required.");
+                // Return an empty array with a 200 OK status
+                return Ok(new List<object>());
             }
 
             DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -225,7 +226,8 @@ namespace API.Controllers
 
             if (ticketPurchases == null || !ticketPurchases.Any())
             {
-                return NotFound("No ticket purchases found for the specified date range.");
+                // Return an empty array with a 200 OK status
+                return Ok(new List<object>());
             }
 
             // Optionally, you can transform the data as needed to match what you want on the client
@@ -240,6 +242,7 @@ namespace API.Controllers
 
             return Ok(result);
         }
+
 
 
     }
