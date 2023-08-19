@@ -262,7 +262,34 @@ namespace API.Controllers
             {
                 await _userManager.RemoveFromRoleAsync(user, roleToRemove);
             }
-            return Ok();
+
+            var evm = new EmailViewModel
+            {
+                To = model.UserEmail,
+                Subject = "Account Update Notification from the Promenade",
+                Body = $@"
+                        <h1>Hello {user.DisplayName},</h1>
+                        <p>We hope this message finds you well. We wanted to notify you that your account details at the Promenade have been updated successfully.</p>
+                        <p>For security reasons and to ensure the integrity of your account, we require you to log in again to see the changes and continue using our system.</p>
+                        
+                        <p>If you did not request this change or believe this is an error, please contact our support immediately.</p>
+                        <p>Thank you for your understanding and continued trust in us.</p>
+                        <p>Kind regards,</p>
+                        <p>The Promenade Team</p>
+                    "
+            };
+
+
+            try
+            {
+                _emailService.SendEmail(evm);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+            
         }
 
         [HttpGet("GetAllRoles")]
