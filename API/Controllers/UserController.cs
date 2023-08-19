@@ -118,7 +118,8 @@ namespace API.Controllers
 
                 //if (rvm.EnableTwoFactorAuth)
                 //{
-                //    // Generate 2FA code and send it via email
+                // 3
+                // Generate 2FA code and send it via email
                 //    var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
                 //    Send2FACodeByEmail(user, code);
                 //}
