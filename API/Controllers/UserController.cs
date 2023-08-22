@@ -209,7 +209,7 @@ namespace API.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expiration = DateTime.UtcNow.AddMinutes(30); // EDIT HERE IF YOU WANT ACCESS FOR LONGER
+            var expiration = DateTime.UtcNow.AddMinutes(30); // KEEP THIS 30, SYSTEM WORKS DYNAMICALLY
             var token = new JwtSecurityToken(
                 _config["Tokens:Issuer"],
                 _config["Tokens:Audience"],
@@ -228,7 +228,7 @@ namespace API.Controllers
             var evm = new EmailViewModel
             {
                 To = user.Email,
-                Subject = "2-Factor Authentication code",
+                Subject = "2-Factor Authentication code: " + code,
                 Body = $@"
                                         <h5>Below you will find your 2-Factor authentication code, please use this code to access your account</h5>
                                         
