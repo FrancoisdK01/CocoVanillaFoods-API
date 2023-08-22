@@ -59,15 +59,16 @@ namespace API.Controllers
                 else
                 {
                     var tokenResult = GenerateJWTToken(user);
-
+                    
                     if (tokenResult != null)
                     {
 
                         var tokenValue = tokenResult.Token;
                         var userNameValue = tokenResult.UserName;
                         var userEmailValue = tokenResult.UserEmail;
+                        var expirationTime = tokenResult.Expiration;
 
-                        return Ok(new { tokenValue, userNameValue, userEmailValue, twoFactorEnabled = false });
+                        return Ok(new { tokenValue, userNameValue, userEmailValue, expirationTime, twoFactorEnabled = false });
 
                     }
                     else
@@ -208,15 +209,16 @@ namespace API.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            var expiration = DateTime.UtcNow.AddMinutes(30); // EDIT HERE IF YOU WANT ACCESS FOR LONGER
             var token = new JwtSecurityToken(
                 _config["Tokens:Issuer"],
                 _config["Tokens:Audience"],
                 claims,
                 signingCredentials: credentials,
-                expires: DateTime.UtcNow.AddHours(24)
+                expires: expiration
             );
 
-            return new TokenResult(new JwtSecurityTokenHandler().WriteToken(token), user.UserName, user.Email);
+            return new TokenResult(new JwtSecurityTokenHandler().WriteToken(token), user.UserName, user.Email, expiration);
         }
 
         //2FA code Generator
@@ -448,11 +450,14 @@ namespace API.Controllers
             public string UserName { get; }
             public string UserEmail { get; }
 
-            public TokenResult(string token, string userName, string userEmail)
+            public DateTime Expiration { get; }
+
+            public TokenResult(string token, string userName, string userEmail, DateTime expiration)
             {
                 Token = token;
                 UserName = userName;
                 UserEmail = userEmail;
+                Expiration = expiration;
             }
         }
 

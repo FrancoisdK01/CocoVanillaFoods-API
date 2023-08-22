@@ -37,7 +37,10 @@ namespace API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Tokens:Key"])),
                     ValidIssuer = config["Tokens:Issuer"],
                     ValidAudience = config["Tokens:Audience"],
-                    ValidateIssuer = true
+                    ValidateIssuer = true,
+                    RequireExpirationTime = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromMinutes(0)
                 };
             });
             services.AddAuthorization();
