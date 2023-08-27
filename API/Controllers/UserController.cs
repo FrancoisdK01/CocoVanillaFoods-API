@@ -117,14 +117,6 @@ namespace API.Controllers
                 };
                 var result = await _userManager.CreateAsync(user, rvm.Password);
 
-                //if (rvm.EnableTwoFactorAuth)
-                //{
-                // 3
-                // Generate 2FA code and send it via email
-                //    var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
-                //    Send2FACodeByEmail(user, code);
-                //}
-
                 if (result.Succeeded)
                 {
                     _context.Customers.Add(customer);
@@ -163,7 +155,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Route("Logout")]
+        [Route("Logout")]   
         public async Task<IActionResult> Logout()
         {
             try
@@ -209,7 +201,7 @@ namespace API.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expiration = DateTime.UtcNow.AddMinutes(30); // KEEP THIS 30, SYSTEM WORKS DYNAMICALLY
+            var expiration = DateTime.UtcNow.AddHours(24); // KEEP THIS 30, SYSTEM WORKS DYNAMICALLY
             var token = new JwtSecurityToken(
                 _config["Tokens:Issuer"],
                 _config["Tokens:Audience"],
@@ -279,12 +271,13 @@ namespace API.Controllers
                             var tokenValue = tokenResult.Token;
                             var userNameValue = tokenResult.UserName;
                             var userEmailValue = tokenResult.UserEmail;
+                            var expirationTime = tokenResult.Expiration;
 
-                            return Ok(new { tokenValue, userNameValue, userEmailValue, twoFactorEnabled = true });
+                            return Ok(new { tokenValue, userNameValue, userEmailValue, expirationTime, twoFactorEnabled = true });
                         }
                         else
                         {
-                            return BadRequest("Boo");
+                            return BadRequest("Token failed to generate");
                         }
                     }
                     catch (Exception)
