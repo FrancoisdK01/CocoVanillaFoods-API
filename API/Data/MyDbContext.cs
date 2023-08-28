@@ -35,7 +35,7 @@ namespace API.Data
                 e.HasOne(e => e.EarlyBird)
                     .WithMany(eb => eb.Events)
                     .HasForeignKey(e => e.EarlyBirdID)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<SystemPrivilege>().HasKey(sp => sp.Id);
