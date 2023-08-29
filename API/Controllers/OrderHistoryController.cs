@@ -49,7 +49,7 @@ namespace API.Controllers
             var order = new WineOrder
             {
                 OrderRefNum = GenerateOrderRefNum(),
-                OrderStatus = 0,
+                OrderStatusId = (int)OrderStatusEnum.ClientOrderPlaced,  // or another appropriate value
 
                 OrderTotal = (int)(cart.DiscountedCart != 0 ? cart.DiscountedCart : cart.CartTotal),
                 CustomerId = customer.Id,
@@ -106,88 +106,6 @@ namespace API.Controllers
             return order;
         }
 
-        [HttpPut("UpdateOrder/{id}")]
-        public async Task<ActionResult> UpdateOrderStatus(int id)
-        {
-            var order = await _context.WineOrders.FindAsync(id);
-            var customer = await _context.Customers.FindAsync(order.CustomerId);
-
-            var evm = new EmailViewModel();
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            if(order.OrderStatus == 0)
-            {
-                order.OrderStatus = 1;  // Set status to "Received"
-                evm = new EmailViewModel
-                {
-                    To = order.Customer.Email,
-                    Subject = "Your order is at Promenade",
-                    Body = $@"
-                              <h1>Order Confirmation: Ready for Collection</h1>
-                              <p>Dear {customer.First_Name},</p>
-                              <p>We are pleased to inform you that your order has been processed and is now ready for collection.</p>
-                              <p>Please ensure you have your order reference number with you when you arrive for a seamless collection process.</p>
-                              <ul>
-                                <li>Order Reference: {order.OrderRefNum}</li>
-                              </ul>
-                              <p>Our team has ensured that your order is packed with care, awaiting your collection. Should you have any questions, or require any further assistance, please do not hesitate to contact our customer service team.</p>
-                              <p>Thank you for choosing us.</p>
-                              <p>Warm regards,</p>
-                              <p>The Promenade Team</p>
-                      "
-                };
-            }
-            else if(order.OrderStatus == 1)
-            {
-                order.OrderStatus = 2;
-                order.CollectedDate = DateTime.Now;
-
-                evm = new EmailViewModel
-                {
-                    To = order.Customer.Email,
-                    Subject = "Your order is at Promenade",
-                    Body = $@"
-                              <h1>Order Collection Confirmation</h1>
-                              <p>Dear {customer.First_Name},</p>
-                              <p>We are writing to confirm that your order has been successfully collected.</p>
-                              <p>We strive for utmost precision and quality in our products and services. If, for any reason, you find any issues with your order, please be informed that you have a period of 7 days from the date of collection to request a refund.</p>
-                              <ul>
-                                <li>Order Reference: {order.OrderRefNum}</li>
-                              </ul>
-                              <p>To initiate a refund, kindly visit the 'Orders' page within your account and follow the prompt to request a refund. Our customer service team will assist you throughout the process.</p>
-                              <p>We value your trust in our brand and are committed to ensuring your satisfaction.</p>
-                              <p>Warm regards,</p>
-                              <p>The Promenade Team</p>
-                      "
-                };
-            }
-
-            _context.Entry(order).State = EntityState.Modified;
-
-            try
-            {
-                _emailService.SendEmail(evm);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WineOrderExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-
         private bool WineOrderExists(int id)
         {
             return _context.WineOrders.Any(e => e.WineOrderId == id);
@@ -199,6 +117,8 @@ namespace API.Controllers
         {
             var allOrders = await _context.WineOrders.Include(o => o.OrderItems)
                                                      .ThenInclude(oi => oi.Wine)
+                                                     .Where(o => o.OrderStatusId != 4)
+                                                     .OrderBy(o => o.OrderDate)// Exclude orders with OrderStatusId = 4
                                                      .ToListAsync();
 
             if (allOrders == null || allOrders.Count == 0)
@@ -209,6 +129,7 @@ namespace API.Controllers
             return allOrders;
         }
 
+
         private string GenerateOrderRefNum()
         {
             var guid = Guid.NewGuid();
@@ -217,27 +138,6 @@ namespace API.Controllers
             var stringRetrn = str.Substring(1, 7);
             return stringRetrn.ToUpper();
         }
-
-        //Charts for reporting the sales
-        //[HttpGet("SalesReport/{startDate}/{endDate}")]
-        //public async Task<ActionResult<IEnumerable<WineOrder>>> GetSalesReport(string startDate, string endDate)
-        //{
-        //    DateTime startDateTime = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        //    DateTime endDateTime = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-
-        //    var orders = await _context.WineOrders
-        //        .Include(o => o.OrderItems)
-        //        .Where(o => o.OrderDate >= startDateTime && o.OrderDate <= endDateTime)
-        //        .ToListAsync();
-
-        //    if (orders == null || !orders.Any())
-        //    {
-        //        return NotFound("No orders found for the specified date range.");
-        //    }
-
-        //    return Ok(orders);
-        //}
-
 
         [HttpGet("AllSales")]
         public async Task<ActionResult<IEnumerable<WineOrder>>> GetAllSales()
@@ -290,10 +190,126 @@ namespace API.Controllers
 
             return Ok(result);
         }
+
+        [HttpPut("UpdateOrder/{id}")]
+        public async Task<ActionResult> UpdateOrderStatus(int id, [FromQuery] int newStatus)
+        {
+            {
+                var order = await _context.WineOrders.FindAsync(id);
+                int status = newStatus;
+
+                if (status == 0)
+                {
+                    return NotFound("Status");
+                }
+
+                if (order == null)
+                {
+                    return NotFound();
+                }
+
+                var customer = await _context.Customers.FindAsync(order.CustomerId);
+                if (customer == null)
+                {
+                    return NotFound("Customer not found.");
+                }
+
+                EmailViewModel evm = null;
+
+                if (newStatus == 2)
+                {
+                    order.OrderStatusId = 2; // Set status to "SupplierOrderPlaced"
+                    evm = new EmailViewModel
+                    {
+                        To = customer.Email,
+                        Subject = "Your order has been placed",
+                        Body = $@"
+                  <h1>Order Placed Confirmation</h1>
+                  <p>Dear {customer.First_Name},</p>
+                  <p>We are writing to confirm that your order has been successfully placed.</p>
+                  <ul>
+                    <li>Order Reference: {order.OrderRefNum}</li>
+                  </ul>
+                  <p>To initiate a refund, kindly visit the 'Orders' page within your account and follow the prompt to request a refund. Our customer service team will assist you throughout the process.</p>
+                  <p>We value your trust in our brand and are committed to ensuring your satisfaction.</p>
+                  <p>Warm regards,</p>
+                  <p>The Promenade Team</p>
+                  "
+                    };
+                }
+                else if (newStatus == 3)
+                {
+                    order.OrderStatusId = 3;
+                    order.CollectedDate = DateTime.Now;
+                    evm = new EmailViewModel
+                    {
+                        To = customer.Email,
+                        Subject = "Your order is at Promenade",
+                        Body = $@"
+                  <h1>Order Confirmation: Ready for Collection</h1>
+                  <p>Dear {customer.First_Name},</p>
+                  <p>We are pleased to inform you that your order has been processed and is now ready for collection.</p>
+                  <p>Please ensure you have your order reference number with you when you arrive for a seamless collection process.</p>
+                  <ul>
+                    <li>Order Reference: {order.OrderRefNum}</li>
+                  </ul>
+                  <p>Our team has ensured that your order is packed with care, awaiting your collection at the venue. 
+                        Should you have any questions, or require any further assistance, please do not hesitate to contact our customer service team.</p>
+                  <p>Thank you for choosing us.</p>
+                  <p>Warm regards,</p>
+                  <p>The Promenade Team</p>
+                  "
+                    };
+                }
+                else if (newStatus == 4)  // Assuming 4 corresponds to "Collected"
+                {
+                    order.OrderStatusId = 4; // Set status to "Collected"
+                    evm = new EmailViewModel
+                    {
+                        To = customer.Email,
+                        Subject = "Your order has been Collected",
+                        Body = $@"
+                  <h1>Order Collected</h1>
+                  <p>Dear {customer.First_Name},</p>
+                  <p>We are pleased to inform you that your order has been successfully collected.</p>
+                  <p>Thank you for choosing us.</p>
+                  <p>Warm regards,</p>
+                  <p>The Promenade Team</p>
+                  "
+                    };
+                }
+
+                if (evm != null)
+                {
+                    _emailService.SendEmail(evm);
+                }
+
+                _context.Entry(order).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!WineOrderExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();
+            }
+
+        }
+
+
+
+
+
     }
-
-    
-
-
-
 }
