@@ -76,26 +76,26 @@ namespace API.Data
 
 
 
-            //Customer and Order
-            modelBuilder.Entity<Order>()
-            .HasOne(o => o.Customer)
-            .WithMany(c => c.Orders)
-            .HasForeignKey(o => o.CustomerID)
-            .OnDelete(DeleteBehavior.Restrict);
+            ////Customer and Order
+            //modelBuilder.Entity<Order>()
+            //.HasOne(o => o.Customer)
+            //.WithMany(c => c.Orders)
+            //.HasForeignKey(o => o.CustomerID)
+            //.OnDelete(DeleteBehavior.Restrict);
 
-            //Order and OrderStatus
-            modelBuilder.Entity<Order>()
-             .HasOne(o => o.OrderStatus)
-             .WithMany(os => os.Orders)
-             .HasForeignKey(o => o.OrderStatusID)
-             .OnDelete(DeleteBehavior.Restrict);
+            ////Order and OrderStatus
+            //modelBuilder.Entity<Order>()
+            // .HasOne(o => o.OrderStatus)
+            // .WithMany(os => os.Orders)
+            // .HasForeignKey(o => o.OrderStatusID)
+            // .OnDelete(DeleteBehavior.Restrict);
 
-            //Inventory and stockTake_Item
-            modelBuilder.Entity<Inventory>()
-            .HasMany<StockTake_Item>(i => i.StockTake_Items)
-            .WithOne(s => s.Inventory)
-            .HasForeignKey(s => s.InventoryID)
-            .OnDelete(DeleteBehavior.Restrict);
+            ////Inventory and stockTake_Item
+            //modelBuilder.Entity<Inventory>()
+            //.HasMany<StockTake_Item>(i => i.StockTake_Items)
+            //.WithOne(s => s.Inventory)
+            //.HasForeignKey(s => s.InventoryID)
+            //.OnDelete(DeleteBehavior.Restrict);
 
 
 
@@ -141,21 +141,21 @@ namespace API.Data
             //.OnDelete(DeleteBehavior.Restrict);
 
 
-            //Wine and WriteOffItem
-            modelBuilder.Entity<Wine>()
-             .HasMany(w => w.WriteOffItems)
-             .WithOne(wi => wi.Wine)
-             .HasForeignKey(wi => wi.WineID)
-             .OnDelete(DeleteBehavior.Restrict);
+            ////Wine and WriteOffItem
+            //modelBuilder.Entity<Wine>()
+            // .HasMany(w => w.WriteOffItems)
+            // .WithOne(wi => wi.Wine)
+            // .HasForeignKey(wi => wi.WineID)
+            // .OnDelete(DeleteBehavior.Restrict);
 
             //WriteOffReason and WriteOffItem
 
 
-            //WriteOff and WriteOffItem
-            modelBuilder.Entity<WriteOff>()
-            .HasMany(w => w.WriteOffItems)
-            .WithOne(wi => wi.WriteOff)
-            .HasForeignKey(wi => wi.WriteOffID);
+            ////WriteOff and WriteOffItem
+            //modelBuilder.Entity<WriteOff>()
+            //.HasMany(w => w.WriteOffItems)
+            //.WithOne(wi => wi.WriteOff)
+            //.HasForeignKey(wi => wi.WriteOffID);
 
             //WishlistItem and Wine
             modelBuilder.Entity<WishlistItem>()
@@ -178,19 +178,19 @@ namespace API.Data
             .HasForeignKey<Wishlist>(wl => wl.CustomerID)
             .OnDelete(DeleteBehavior.Cascade);
 
-            //Order and ShippingDetails
-            modelBuilder.Entity<Order>()
-            .HasOne(o => o.ShippingDetails)
-            .WithOne(sd => sd.Order)
-            .HasForeignKey<ShippingDetails>(sd => sd.OrderID)
-            .OnDelete(DeleteBehavior.Cascade);
+            ////Order and ShippingDetails
+            //modelBuilder.Entity<Order>()
+            //.HasOne(o => o.ShippingDetails)
+            //.WithOne(sd => sd.Order)
+            //.HasForeignKey<ShippingDetails>(sd => sd.OrderID)
+            //.OnDelete(DeleteBehavior.Cascade);
 
-            //Order and OrderPayment
-            modelBuilder.Entity<Order>()
-             .HasOne(o => o.OrderPayment)
-             .WithOne(op => op.Order)
-             .HasForeignKey<OrderPayment>(op => op.OrderID)
-             .OnDelete(DeleteBehavior.Restrict);
+            ////Order and OrderPayment
+            //modelBuilder.Entity<Order>()
+            // .HasOne(o => o.OrderPayment)
+            // .WithOne(op => op.Order)
+            // .HasForeignKey<OrderPayment>(op => op.OrderID)
+            // .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<WriteOff>()
                 .HasOne(w => w.Employee)
@@ -210,23 +210,23 @@ namespace API.Data
             //.HasForeignKey(t => t.BookingId)
             //.OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Booking>()
-            .HasOne(b => b.BookingPayment)
-            .WithOne(p => p.Booking)
-            .HasForeignKey<BookingPayment>(p => p.BookingId)
-            .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<Booking>()
+            //.HasOne(b => b.BookingPayment)
+            //.WithOne(p => p.Booking)
+            //.HasForeignKey<BookingPayment>(p => p.BookingId)
+            //.OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Booking>()
-            .HasOne(b => b.Customer)
-            .WithMany(c => c.Bookings)
-            .HasForeignKey(b => b.CustomerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<Booking>()
+            //.HasOne(b => b.Customer)
+            //.WithMany(c => c.Bookings)
+            //.HasForeignKey(b => b.CustomerId)
+            //.OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<EventReview>()
-            .HasOne(r => r.Customer)
-            .WithMany(c => c.EventReviews)
-            .HasForeignKey(r => r.CustomerID)
-            .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<EventReview>()
+            //.HasOne(r => r.Customer)
+            //.WithMany(c => c.EventReviews)
+            //.HasForeignKey(r => r.CustomerID)
+            //.OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<RefundRequest>()
     .HasOne(rr => rr.WineOrder)
@@ -250,34 +250,34 @@ namespace API.Data
         }
 
         public DbSet<Blacklist> Blacklists { get; set; }
-        public DbSet<Booking> Bookings { get; set; }
-        public DbSet<BookingPayment> BookingPayments { get; set; }
+        //public DbSet<Booking> Bookings { get; set; }
+        //public DbSet<BookingPayment> BookingPayments { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Event> Events { get; set; }
-        public DbSet<EventLocation> EventLocations { get; set; }
+        //public DbSet<EventLocation> EventLocations { get; set; }
         public DbSet<EventPrice> EventPrices { get; set; }
         public DbSet<EventType> EventTypes { get; set; }
-        public DbSet<EventReview> EventReviews { get; set; }
+        //public DbSet<EventReview> EventReviews { get; set; }
         public DbSet<EarlyBird> EarlyBird { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderStatus> OrderStatus { get; set; }
-        public DbSet<Province> Provinces { get; set; }
+        //public DbSet<Order> Orders { get; set; }
+        //public DbSet<OrderStatus> OrderStatus { get; set; }
+        //public DbSet<Province> Provinces { get; set; }
         public DbSet<WineOrderItem> OrderItems { get; set; }
-        public DbSet<OrderPayment> OrderPayments { get; set; }
+        //public DbSet<OrderPayment> OrderPayments { get; set; }
         public DbSet<RefundResponse> RefundResponses { get; set; }
-        public DbSet<RefundType> RefundTypes { get; set; }
+        //public DbSet<RefundType> RefundTypes { get; set; }
         public DbSet<ShippingDetails> ShippingDetails { get; set; }
 
-        public DbSet<StockTake_Item> StockTakeItems { get; set; }
+        //public DbSet<StockTake_Item> StockTakeItems { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
-        public DbSet<SupplierPayment> SupplierPayments { get; set; }
+        //public DbSet<SupplierPayment> SupplierPayments { get; set; }
         public DbSet<SystemPrivilege> SystemPrivileges { get; set; }
-        public DbSet<Ticket> Tickets { get; set; }
+        //public DbSet<Ticket> Tickets { get; set; }
         //public DbSet<User> Users { get; set; }
         public DbSet<VAT> VATs { get; set; }
         public DbSet<Varietal> Varietals { get; set; }
@@ -286,7 +286,7 @@ namespace API.Data
         public DbSet<WishlistItem> WishlistItems { get; set; }
         public DbSet<WineType> WineTypes { get; set; }
         public DbSet<WriteOff> WriteOffs { get; set; }
-        public DbSet<WriteOffItem> WriteOffItems { get; set; }
+        //public DbSet<WriteOffItem> WriteOffItems { get; set; }
         public DbSet<WriteOff_Reason> WriteOffReasons { get; set; }
         public DbSet<SuperUser> SuperUser { get; set; }
         public DbSet<EventPayments> EventsPayments { get; set; }

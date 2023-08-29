@@ -31,8 +31,8 @@ namespace API.Model
         [JsonIgnore]
         public List<SupplierOrder> SupplierOrders { get; set; }
 
-        [JsonIgnore]
-        public List<WriteOffItem> WriteOffItems { get; set; }
+        //[JsonIgnore]
+        //public List<WriteOffItem> WriteOffItems { get; set; }
 
         [JsonIgnore]
         public List<WishlistItem> WishlistItems { get; set; }

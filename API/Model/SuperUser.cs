@@ -32,7 +32,7 @@ namespace API.Model
 
         [JsonIgnore]
         public ICollection<Employee> Employees { get; set; }
-        [JsonIgnore]
-        public ICollection<EventLocation> EventLocations { get; set; }
+        //[JsonIgnore]
+        //public ICollection<EventLocation> EventLocations { get; set; }
     }
 }

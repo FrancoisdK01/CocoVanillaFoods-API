@@ -15,6 +15,6 @@ namespace API.Model
 
         [ForeignKey("OrderID")]
         public int OrderID { get; set; }
-        public Order Order { get; set; }
+        //public Order Order { get; set; }
     }
 }

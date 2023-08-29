@@ -42,12 +42,12 @@ namespace API.Model
 
         [JsonIgnore]
         public Wishlist Wishlist { get; set; }
-        [JsonIgnore]
-        public List<Order> Orders { get; set; }
-        [JsonIgnore]
-        public List<Booking> Bookings { get; set; }
-        [JsonIgnore]
-        public List<EventReview> EventReviews { get; set; }
+        //[JsonIgnore]
+        //public List<Order> Orders { get; set; }
+        //[JsonIgnore]
+        //public List<Booking> Bookings { get; set; }
+        //[JsonIgnore]
+        //public List<EventReview> EventReviews { get; set; }
 
         [JsonIgnore]
         public Cart Cart { get; set; }

@@ -28,8 +28,8 @@ namespace API.Model
 
         public decimal WinePrice { get; set; } // Change the data type to decimal for the price.
 
-        [JsonIgnore]
-        public List<StockTake_Item> StockTake_Items { get; set; }
+        //[JsonIgnore]
+        //public List<StockTake_Item> StockTake_Items { get; set; }
 
 
 
