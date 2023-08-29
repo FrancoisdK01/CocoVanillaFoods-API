@@ -5,37 +5,23 @@ using System.Text.Json.Serialization;
 
 namespace API.Model
 {
-    public class Event
+    public class Event : ShopItem
     {
 
         [Key]
         public int EventID { get; set; }
 
         [MaxLength(255)]
-        public string EventName { get; set; }
-
-        public DateTime EventDate { get; set; }
-
-        public int Tickets_Available { get; set; }
-
-        public int Tickets_Sold { get; set; }
-
-        [MaxLength(255)]
         public string Description { get; set; }
 
-        public int EventPrice { get; set; }
-
-        [Required]
-        public string ImagePath { get; set; }
+        public DateTime EventDate { get; set; }
+        public int Tickets_Available { get; set; }
+        public int Tickets_Sold { get; set; }
 
         public int? EarlyBirdID { get; set; }
         [ForeignKey("EarlyBirdID")]
         public EarlyBird EarlyBird { get; set; }
-
-        public bool DisplayEvent { get; set; }
-
-        //[JsonIgnore]
-        //public List<Booking> Bookings { get; set; }
+        // Other specific properties
 
     }
 }

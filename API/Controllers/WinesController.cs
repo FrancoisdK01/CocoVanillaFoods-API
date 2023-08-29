@@ -146,14 +146,14 @@ namespace API.Controllers
 
             // Map other properties from the form to the wine object
             wineToUpdate.Name = wineForm.Name;
-            wineToUpdate.Description = wineForm.Description;
+            //wineToUpdate.Description = wineForm.Description;
             wineToUpdate.Vintage = wineForm.Vintage;
-            wineToUpdate.RestockLimit = wineForm.RestockLimit;
+            //wineToUpdate.RestockLimit = wineForm.RestockLimit;
             wineToUpdate.WineTastingNote = wineForm.WineTastingNote;
-            wineToUpdate.WinePrice = wineForm.WinePrice;
+            wineToUpdate.Price = wineForm.Price;
             wineToUpdate.WineTypeID = wineForm.WineTypeID;
             wineToUpdate.VarietalID = wineForm.VarietalID;
-            wineToUpdate.DisplayWine = wineForm.DisplayWine;
+            wineToUpdate.DisplayItem = wineForm.DisplayItem;
 
             _context.Entry(wineToUpdate).State = EntityState.Modified;
 
@@ -183,10 +183,6 @@ namespace API.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Wine>> PostWine([FromForm] WineFormViewModel wineForm)
         {
-            if (wineForm.File == null)
-            {
-                return BadRequest("File not found");
-            }
 
             var fileName = $"{Guid.NewGuid()}_{wineForm.File.FileName}";
             var filePath = await UploadFileToGoogleCloudStorage(fileName, wineForm.File.OpenReadStream());
@@ -199,12 +195,12 @@ namespace API.Controllers
             var wine = new Wine
             {
                 Name = wineForm.Name,
-                Description = wineForm.Description,
+                //Description = wineForm.Description,
                 Vintage = wineForm.Vintage,
-                RestockLimit = wineForm.RestockLimit,
+                //RestockLimit = wineForm.RestockLimit,
                 WineTastingNote = wineForm.WineTastingNote,
-                WinePrice = wineForm.WinePrice,
-                DisplayWine = wineForm.DisplayWine,
+                Price = wineForm.Price,
+                DisplayItem = wineForm.DisplayItem,
                 WineTypeID = wineForm.WineTypeID,
                 VarietalID = wineForm.VarietalID,
                 FilePath = filePath,

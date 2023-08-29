@@ -100,29 +100,29 @@ namespace API.Controllers
             }
 
             // If a file is included, process and update the image
-            if (eventForm.ImagePath != null)
+            if (eventForm.File != null)
             {
                 // You might want to delete the existing image here similar to the wine method
-                await DeleteImageFromGoogleCloudStorage(eventItem.ImagePath);
+                await DeleteImageFromGoogleCloudStorage(eventItem.FilePath);
 
-                var fileName = $"{Guid.NewGuid()}_{eventForm.ImagePath.FileName}";
-                var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.ImagePath.OpenReadStream());
+                var fileName = $"{Guid.NewGuid()}_{eventForm.File.FileName}";
+                var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.File.OpenReadStream());
 
                 if (string.IsNullOrEmpty(filePath))
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload the file to Google Cloud Storage.");
                 }
 
-                eventItem.ImagePath = filePath;
+                eventItem.FilePath = filePath;
             }
 
             // Map other properties from the form to the event object
-            eventItem.EventName = eventForm.EventName;
+            eventItem.Name = eventForm.Name;
             eventItem.EventDate = eventForm.EventDate;
             eventItem.Tickets_Available = eventForm.Tickets_Available;
             eventItem.Description = eventForm.Description;
-            eventItem.EventPrice = eventForm.EventPrice;
-            eventItem.DisplayEvent = eventForm.DisplayEvent;
+            eventItem.Price = eventForm.Price;
+            eventItem.DisplayItem = eventForm.DisplayItem;
 
             _context.Entry(eventItem).State = EntityState.Modified;
 
@@ -151,8 +151,8 @@ namespace API.Controllers
         public async Task<ActionResult<Event>> PostEvent([FromForm] EventFormViewModel eventForm)
         {
 
-            var fileName = $"{Guid.NewGuid()}_{eventForm.ImagePath.FileName}";
-            var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.ImagePath.OpenReadStream());
+            var fileName = $"{Guid.NewGuid()}_{eventForm.File.FileName}";
+            var filePath = await UploadFileToGoogleCloudStorage(fileName, eventForm.File.OpenReadStream());
 
             if (string.IsNullOrEmpty(filePath))
             {
@@ -162,13 +162,13 @@ namespace API.Controllers
 
             var eventItem = new Event
             {
-                EventName = eventForm.EventName,
+                Name = eventForm.Name,
                 EventDate = eventForm.EventDate,
                 Tickets_Available = eventForm.Tickets_Available,
                 Description = eventForm.Description,
-                EventPrice = eventForm.EventPrice,
-                ImagePath = filePath,
-                DisplayEvent = true
+                Price = eventForm.Price,
+                FilePath = filePath,
+                DisplayItem = true
             };
 
             if (eventForm.EarlyBirdID == 0)
@@ -207,9 +207,9 @@ namespace API.Controllers
             }
 
             // Delete the image from Google Cloud Storage
-            if (!string.IsNullOrEmpty(@event.ImagePath))
+            if (!string.IsNullOrEmpty(@event.FilePath))
             {
-                await DeleteImageFromGoogleCloudStorage(@event.ImagePath);
+                await DeleteImageFromGoogleCloudStorage(@event.FilePath);
             }
 
             _context.Events.Remove(@event);
@@ -268,7 +268,7 @@ namespace API.Controllers
 
             // Calculate the price. If the amount sold is less than or equal to the Early Bird limit, apply the discount.
             var earlyBird = await _context.EarlyBird.FindAsync(eventItem.EarlyBirdID);
-            var price = eventItem.EventPrice;
+            var price = eventItem.Price;
 
             if (earlyBird != null && eventItem.Tickets_Sold <= earlyBird.Limit)
             {
@@ -296,7 +296,7 @@ namespace API.Controllers
             }
 
             // Toggle the EventDisplay attribute
-            eventItem.DisplayEvent = !eventItem.DisplayEvent;
+            eventItem.DisplayItem = !eventItem.DisplayItem;
 
             _context.Entry(eventItem).State = EntityState.Modified;
 
