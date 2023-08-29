@@ -168,9 +168,9 @@ namespace API.Controllers
             string greeting = $"Dear {customer.Title} {customer.First_Name} {customer.Last_Name},";
 
             // Constructing the personalized message body
-            string messageBodyText = $"{greeting}\r\n\r\nThank you for your purchase for the event {eventDetails.EventName} on {eventDetails.EventDate}. Please find attached your QR code. Keep it safe and present it at the entrance. We look forward to seeing you!\r\n\r\nWarm regards,\r\nThe Promenade Team";
+            string messageBodyText = $"{greeting}\r\n\r\nThank you for your purchase for the event {eventDetails.Name} on {eventDetails.EventDate}. Please find attached your QR code. Keep it safe and present it at the entrance. We look forward to seeing you!\r\n\r\nWarm regards,\r\nThe Promenade Team";
 
-            string messageBodyHtml = $"<p>{greeting}</p><p>Thank you for your purchase for the event <strong>{eventDetails.EventName}</strong> on {eventDetails.EventDate}. Please find below your QR code. Keep it safe and present it at the entrance. We look forward to seeing you!</p><img src=\"data:image/png;base64,{qrCode}\" /><p>Warm regards,<br/>The Promenade Team</p>";
+            string messageBodyHtml = $"<p>{greeting}</p><p>Thank you for your purchase for the event <strong>{eventDetails.Name}</strong> on {eventDetails.EventDate}. Please find below your QR code. Keep it safe and present it at the entrance. We look forward to seeing you!</p><img src=\"data:image/png;base64,{qrCode}\" /><p>Warm regards,<br/>The Promenade Team</p>";
 
 
             body.Add(new TextPart("plain")

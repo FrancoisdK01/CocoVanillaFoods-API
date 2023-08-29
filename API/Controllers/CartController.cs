@@ -156,7 +156,7 @@ namespace API.Controllers
                 return NotFound("Cart not found.");
             }
 
-            var total = cart.CartItems.Sum(ci => ci.Quantity * ci.Wine.WinePrice);
+            var total = cart.CartItems.Sum(ci => ci.Quantity * ci.Wine.Price);
 
             return Ok(total);
         }

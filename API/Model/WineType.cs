@@ -4,16 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace API.Model
 {
-    public class WineType
+    public class WineType : Types
     {
         [Key]
         public int WineTypeID { get; set; }
-
-        [MaxLength(50)]
-        public string Name { get; set; }
-
-        [MaxLength(255)]
-        public string Description { get; set; }
 
         [JsonIgnore]
         public List<Wine> Wines { get; set; }

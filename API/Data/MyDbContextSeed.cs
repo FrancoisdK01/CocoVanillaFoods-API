@@ -70,10 +70,10 @@ namespace API.Data
                         }
                     }
                 }
-                var wineTypes = new List<string> { "Rooi", "Wit" };
-                var wineTypesDescriptions = new List<string> { "Dis rooi", "Dis wit" };
+                var wineTypes = new List<string> { "Red", "White" };
+                var wineTypesDescriptions = new List<string> { "Red in colour", "White in colour" };
                 var wineVarietal = new List<string> { "Chenin Blanc", "Pinotage" };
-                var wineVarietalDescriptions = new List<string> { "Dis n chenin blanc", "Dis n pinotage" };
+                var wineVarietalDescriptions = new List<string> { "Chenin blanc cultivar", "Pinotage cultivar" };
 
                 for (int i = 0; i < wineTypes.Count; i++)
                 {

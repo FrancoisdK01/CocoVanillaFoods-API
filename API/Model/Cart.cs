@@ -17,7 +17,7 @@ public class Cart
             {
                 return DiscountedCart;
             }
-            return (int)(CartItems != null ? CartItems.Sum(item => item.Quantity * item.Wine.WinePrice) : 0);
+            return (int)(CartItems != null ? CartItems.Sum(item => item.Quantity * item.Wine.Price) : 0);
         }
     }
 
