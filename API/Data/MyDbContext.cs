@@ -139,9 +139,15 @@ namespace API.Data
 
             modelBuilder.Entity<OrderStatus>().HasData(
               new OrderStatus { OrderStatusId = 1, StatusName = "ClientOrderPlaced" },
-                 new OrderStatus { OrderStatusId = 2, StatusName = "SupplierOrderPlaced" },
-                     new OrderStatus { OrderStatusId = 3, StatusName = "Received" },
-                                          new OrderStatus { OrderStatusId = 4, StatusName = "Collected" });
+                new OrderStatus { OrderStatusId = 2, StatusName = "SupplierOrderPlaced" },
+                  new OrderStatus { OrderStatusId = 3, StatusName = "Received" },
+                        new OrderStatus { OrderStatusId = 4, StatusName = "Collected" });
+
+            modelBuilder.Entity<TicketPurchasedStatus>()
+               .HasOne(tps => tps.TicketPurchase)
+               .WithMany()
+               .HasForeignKey(tps => tps.TicketPurchaseId)
+               .OnDelete(DeleteBehavior.Cascade);
 
 
 
@@ -185,7 +191,12 @@ namespace API.Data
         public DbSet<SuperUser> SuperUser { get; set; }
         public DbSet<EventPayments> EventsPayments { get; set; }
         public DbSet<TicketPurchase> TicketPurchases { get; set; }
+
+        public DbSet<TicketPurchasedStatus> TicketPurchasedStatuses { get; set; }
+
+
         public DbSet <Ticket> Tickets { get; set; }
+
 
         //carts
 

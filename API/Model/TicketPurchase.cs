@@ -11,10 +11,8 @@
         public string EventName { get; set; }  // New field
         public string Description { get; set; }
 
-        public bool EventDeleted { get; set; }
-        public bool IsScanned { get; set; }
-        public DateTime? ScannedAt { get; set; }
-        public string ScanningToken { get; set; }  // Unique token for each ticket
+        public virtual TicketPurchasedStatus TicketPurchasedStatus { get; set; }
+
 
     }
 }

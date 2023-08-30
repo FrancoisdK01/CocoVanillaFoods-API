@@ -21,35 +21,54 @@ namespace API.Controllers
             _context = context;
         }
 
-        // POST: api/Tickets
         [HttpPost]
-        public async Task<ActionResult<TicketPurchase>> PostTicket(TicketPurchase ticket)
+        public async Task<ActionResult<TicketPurchase>> PostTicket(TicketPurchaseDTO ticketDTO)
         {
-            _context.TicketPurchases.Add(ticket);
-            await _context.SaveChangesAsync();
-            ticket.ScanningToken = Guid.NewGuid().ToString();
+            // Lookup the event details and customer based on the DTO data
+            var eventDetails = await _context.Events.FirstOrDefaultAsync(e => e.EventID == ticketDTO.EventId);
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == ticketDTO.UserEmail);
 
-            // Generate a QR code
-            var qrCode = GenerateQRCode($"http://localhost:4200/Tickets/Scan/{ticket.ScanningToken}");
-
-            //ticket.QRCode = qrCode;
-            await _context.SaveChangesAsync();
-
-            var eventDetails = await _context.Events.FirstOrDefaultAsync(e => e.EventID == ticket.EventId);
-
-            // Get the customer associated with the ticket
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == ticket.UserEmail);
-
-            if (customer != null)
+            if (eventDetails == null || customer == null)
             {
-                // Send the email to the customer
-                await SendEmail(customer.Email, qrCode, customer, eventDetails);
+                return BadRequest("Event or customer not found");
             }
 
+            // Populate the TicketPurchase object based on looked-up data
+            TicketPurchase ticket = new TicketPurchase
+            {
+                UserEmail = ticketDTO.UserEmail,
+                EventId = ticketDTO.EventId,
+                EventDate = eventDetails.EventDate,
+                PurchaseDate = DateTime.UtcNow,
+                TicketPrice = (decimal)eventDetails.Price,
+                EventName = eventDetails.Name
+            };
 
+            _context.TicketPurchases.Add(ticket);
+            await _context.SaveChangesAsync();  // Save TicketPurchase first to generate Id
 
+            // Now that the TicketPurchase is saved, it should have an Id.
+            int ticketPurchaseId = ticket.Id;
 
-            return CreatedAtAction("GetTicket", new { id = ticket.UserEmail }, ticket);
+            // Create TicketPurchasedStatus and set its TicketPurchaseId
+            TicketPurchasedStatus status = new TicketPurchasedStatus
+            {
+                ScanningToken = Guid.NewGuid().ToString(),
+                IsScanned = false,
+                EventDeleted = false,
+                TicketPurchaseId = ticketPurchaseId  // Set the foreign key explicitly
+            };
+
+            _context.TicketPurchasedStatuses.Add(status);
+            await _context.SaveChangesAsync();  // Save TicketPurchasedStatus
+
+            // Generate a QR code
+            var qrCode = GenerateQRCode($"http://localhost:4200/Tickets/Scan/{status.ScanningToken}");
+
+            // Send the email to the customer
+            await SendEmail(customer.Email, qrCode, customer, eventDetails);
+
+            return CreatedAtAction("GetTicketPurchase", new { id = ticket.Id }, ticket);
         }
 
 
@@ -77,7 +96,7 @@ namespace API.Controllers
 
             if (ticketPurchases == null || ticketPurchases.Count == 0)
             {
-                return NotFound();
+                return NotFound("Customer tickets not found");
             }
 
             return ticketPurchases;
@@ -92,7 +111,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            if (ticketPurchase.EventDeleted)
+            if (ticketPurchase.TicketPurchasedStatus.EventDeleted)
             {
                 _context.TicketPurchases.Remove(ticketPurchase);
                 await _context.SaveChangesAsync();
@@ -121,25 +140,28 @@ namespace API.Controllers
         [HttpPost("Scan/{token}")]
         public async Task<IActionResult> ScanTicket(string token)
         {
-            var ticket = await _context.TicketPurchases.FirstOrDefaultAsync(t => t.ScanningToken == token);
+
+            var ticket = await _context.TicketPurchases
+                                          .Include(tp => tp.TicketPurchasedStatus)
+                                             .FirstOrDefaultAsync(tp => tp.TicketPurchasedStatus.ScanningToken == token);
 
             if (ticket == null)
             {
                 return NotFound(new { message = "Ticket not found." });
             }
 
-            if (ticket.IsScanned)
+            if (ticket.TicketPurchasedStatus.IsScanned)
             {
-                return BadRequest(new { message = $"Ticket already scanned at {ticket.ScannedAt}." });
+                return BadRequest(new { message = $"Ticket already scanned at {ticket.TicketPurchasedStatus.ScannedAt}." });
             }
 
-            ticket.IsScanned = true;
+            ticket.TicketPurchasedStatus.IsScanned = true;
 
             DateTime utcNow = DateTime.UtcNow;
             TimeZoneInfo saTimeZone = TimeZoneInfo.FindSystemTimeZoneById("South Africa Standard Time");
             DateTime localTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, saTimeZone);
 
-            ticket.ScannedAt = localTime;
+            ticket.TicketPurchasedStatus.ScannedAt = localTime;
 
             _context.TicketPurchases.Update(ticket);
             await _context.SaveChangesAsync();
