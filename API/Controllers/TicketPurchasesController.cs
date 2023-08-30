@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
+using Newtonsoft.Json;
 using QRCoder;
+using System;
 using System.Globalization;
 using static QRCoder.PayloadGenerator;
 
@@ -63,7 +65,7 @@ namespace API.Controllers
             await _context.SaveChangesAsync();  // Save TicketPurchasedStatus
 
             // Generate a QR code
-            var qrCode = GenerateQRCode($"http://localhost:4200/TicketPurchase/Scan/{status.ScanningToken}");
+            var qrCode = GenerateQRCode($"http://localhost:4200/TicketPurchases/Scan/{status.ScanningToken}");
 
             // Send the email to the customer
             await SendEmail(customer.Email, qrCode, customer, eventDetails);
@@ -136,39 +138,73 @@ namespace API.Controllers
             return Convert.ToBase64String(stream.ToArray());
         }
 
+
+
+
+
         // POST: api/Tickets/Scan/{token}
         [HttpPost("Scan/{token}")]
         public async Task<IActionResult> ScanTicket(string token)
         {
+            // Debugging lines
+            Console.WriteLine($"Scanning Token: {token}");
 
+
+            // Fetch TicketPurchasedStatus first
+            var status = await _context.TicketPurchasedStatuses.FirstOrDefaultAsync(s => s.ScanningToken == token);
+
+            if (status == null)
+            {
+                return NotFound(new { message = "TicketPurchasedStatus not found." });
+            }
+
+            // Fetch associated TicketPurchase object
             var ticket = await _context.TicketPurchases
-                                          .Include(tp => tp.TicketPurchasedStatus)
-                                             .FirstOrDefaultAsync(tp => tp.TicketPurchasedStatus.ScanningToken == token);
+                                       .Include(tp => tp.TicketPurchasedStatus)
+                                       .FirstOrDefaultAsync(tp => tp.Id == status.TicketPurchaseId);
 
-            if (ticket == null)
+            var manualStatus = await _context.TicketPurchasedStatuses
+                                .Where(s => s.TicketPurchaseId == ticket.Id)
+                                .FirstOrDefaultAsync();
+
+            //Console.WriteLine($"Manually fetched status: {JsonConvert.SerializeObject(manualStatus, Formatting.Indented)}");
+
+
+            // Debugging lines
+            Console.WriteLine($"Ticket found: {ticket}");
+            //Console.WriteLine($"Ticket found: {JsonConvert.SerializeObject(ticket, Formatting.Indented)}");
+
+
+
+            if (ticket == null || ticket.TicketPurchasedStatus == null)
             {
-                return NotFound(new { message = "Ticket not found." });
+                return NotFound(new { message = "Ticket or Ticket Status not found." });
             }
 
-            if (ticket.TicketPurchasedStatus.IsScanned)
+            // Check if TicketPurchasedStatus exists on the ticket
+            if (ticket.TicketPurchasedStatus == null)
             {
-                return BadRequest(new { message = $"Ticket already scanned at {ticket.TicketPurchasedStatus.ScannedAt}." });
+                return NotFound(new { message = "TicketPurchasedStatus not found on the ticket." });
             }
 
-            ticket.TicketPurchasedStatus.IsScanned = true;
-
+            if (status.IsScanned)
+            {
+                return BadRequest(new { message = $"Ticket already scanned at {status.ScannedAt}." });
+            }
+            // Updating the IsScanned and ScannedAt properties of status.
+            status.IsScanned = true;
             DateTime utcNow = DateTime.UtcNow;
             TimeZoneInfo saTimeZone = TimeZoneInfo.FindSystemTimeZoneById("South Africa Standard Time");
             DateTime localTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, saTimeZone);
+            status.ScannedAt = localTime;
+            // Saving changes.
 
-            ticket.TicketPurchasedStatus.ScannedAt = localTime;
-
-            _context.TicketPurchases.Update(ticket);
+            _context.TicketPurchasedStatuses.Update(status);
             await _context.SaveChangesAsync();
+
 
             return Ok(new { message = "Ticket successfully scanned." });
         }
-
 
         private async Task SendEmail(string email, string qrCode, Customer customer, Event eventDetails)
         {
