@@ -1,7 +1,11 @@
-﻿namespace API.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace API.Model
 {
     public class TicketPurchase
     {
+        [Key]
         public int Id { get; set; }
         public string UserEmail { get; set; }
         public int EventId { get; set; }

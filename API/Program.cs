@@ -5,6 +5,7 @@ using API.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +19,11 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(
         include.AllowAnyOrigin();
     }));
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers()
+        .AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+        );
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

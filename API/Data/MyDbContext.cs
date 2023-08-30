@@ -143,11 +143,13 @@ namespace API.Data
                   new OrderStatus { OrderStatusId = 3, StatusName = "Received" },
                         new OrderStatus { OrderStatusId = 4, StatusName = "Collected" });
 
+            //modelBuilder.Entity<TicketPurchasedStatus>()
+            //.HasKey(tps => tps.Id);  // Primary Key
+
             modelBuilder.Entity<TicketPurchasedStatus>()
-               .HasOne(tps => tps.TicketPurchase)
-               .WithMany()
-               .HasForeignKey(tps => tps.TicketPurchaseId)
-               .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(p => p.TicketPurchase)
+                     .WithOne(i => i.TicketPurchasedStatus)
+                       .HasForeignKey<TicketPurchasedStatus>(p => p.TicketPurchaseId);
 
 
 
