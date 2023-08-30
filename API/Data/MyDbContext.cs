@@ -170,9 +170,7 @@ namespace API.Data
         public DbSet<EarlyBird> EarlyBird { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
-        public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatus> OrderStatus { get; set; }
-        public DbSet<OrderPayment> OrderPayments { get; set; }
         public DbSet<WineOrderItem> OrderItems { get; set; }
         public DbSet<RefundResponse> RefundResponses { get; set; }
 

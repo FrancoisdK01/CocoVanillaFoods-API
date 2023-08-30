@@ -63,7 +63,7 @@ namespace API.Controllers
             await _context.SaveChangesAsync();  // Save TicketPurchasedStatus
 
             // Generate a QR code
-            var qrCode = GenerateQRCode($"http://localhost:4200/Tickets/Scan/{status.ScanningToken}");
+            var qrCode = GenerateQRCode($"http://localhost:4200/TicketPurchase/Scan/{status.ScanningToken}");
 
             // Send the email to the customer
             await SendEmail(customer.Email, qrCode, customer, eventDetails);
