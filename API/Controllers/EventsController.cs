@@ -198,12 +198,16 @@ namespace API.Controllers
             }
 
             // Find all ticket purchases related to this event
-            var ticketPurchases = _context.TicketPurchases.Where(tp => tp.EventId == id);
+            var ticketPurchases = _context.TicketPurchases
+                .Include(tp => tp.TicketPurchasedStatus) // Include TicketPurchasedStatus
+                .Where(tp => tp.EventId == id)
+                .ToList();
+
 
             // Set the EventDeleted property to true for all ticket purchases related to this event
             foreach (var ticketPurchase in ticketPurchases)
             {
-                ticketPurchase.EventDeleted = true;
+                ticketPurchase.TicketPurchasedStatus.EventDeleted = true;
             }
 
             // Delete the image from Google Cloud Storage
