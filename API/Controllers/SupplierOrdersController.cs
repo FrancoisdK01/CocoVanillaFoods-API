@@ -21,18 +21,22 @@ namespace API.Controllers
             _context = context;
         }
 
-        // GET: api/SupplierOrders
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SupplierOrder>>> GetSupplierOrders()
         {
-            return await _context.SupplierOrders.Include(so => so.Supplier).ToListAsync();
+            return await _context.SupplierOrders
+                                 .Include(so => so.Supplier)
+                                 .Include(so => so.SupplierOrderStatus)
+                                 .ToListAsync();
         }
 
-        // GET: api/SupplierOrders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<SupplierOrder>> GetSupplierOrder(int id)
         {
-            var supplierOrder = await _context.SupplierOrders.Include(so => so.Supplier).FirstOrDefaultAsync(so => so.SupplierOrderID == id);
+            var supplierOrder = await _context.SupplierOrders
+                                               .Include(so => so.Supplier)
+                                               .Include(so => so.SupplierOrderStatus)
+                                               .FirstOrDefaultAsync(so => so.SupplierOrderID == id);
 
             if (supplierOrder == null)
             {
@@ -42,17 +46,29 @@ namespace API.Controllers
             return supplierOrder;
         }
 
-        // PUT: api/SupplierOrders/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSupplierOrder(int id, SupplierOrder supplierOrder)
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> PutSupplierOrder(int id, UpdateSupplierOrderStatusDTO statusDTO)
         {
-            if (id != supplierOrder.SupplierOrderID)
+            if (id != statusDTO.SupplierOrderID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(supplierOrder).State = EntityState.Modified;
+            // Fetch the existing SupplierOrder from the database
+            var supplierOrder = await _context.SupplierOrders.Include(s => s.SupplierOrderStatus).FirstOrDefaultAsync(s => s.SupplierOrderID == id);
+
+            if (supplierOrder == null)
+            {
+                return NotFound();
+            }
+
+            // Update the supplierOrderStatus based on the UpdateSupplierOrderStatusDTO
+            supplierOrder.SupplierOrderStatus.Ordered = statusDTO.Ordered;
+            supplierOrder.SupplierOrderStatus.Paid = statusDTO.Paid;
+            supplierOrder.SupplierOrderStatus.Received = statusDTO.Received;
+
+            // Update the supplierOrderStatusID in case it has changed
+            supplierOrder.SupplierOrderStatus.SupplierOrderStatusID = statusDTO.SupplierOrderStatusID;
 
             try
             {
@@ -73,20 +89,33 @@ namespace API.Controllers
             return NoContent();
         }
 
-        // POST: api/SupplierOrders
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // POST: api/SupplierOrders
+
         [HttpPost]
-        public async Task<ActionResult<SupplierOrder>> PostSupplierOrder([Bind("SupplierOrderID,Quantity_Ordered,DateOrdered,SupplierID,Ordered,Paid,Received")] SupplierOrder supplierOrder)
+        public async Task<ActionResult<SupplierOrder>> PostSupplierOrder(SupplierOrder supplierOrder)
         {
+            supplierOrder.OrderTotal = supplierOrder.Quantity_Ordered * supplierOrder.WinePrice;
+
+            // Step 1: Add the SupplierOrder
             _context.SupplierOrders.Add(supplierOrder);
+            await _context.SaveChangesAsync(); // This will generate SupplierOrderID
+
+            // Step 2: Add the SupplierOrderStatus entry, referencing the generated SupplierOrderID
+            var supplierOrderStatus = new SupplierOrderStatus
+            {
+                SupplierOrderID = supplierOrder.SupplierOrderID,
+                Ordered = false, // set to true if the order is successfully created
+                Paid = false, // set initial status
+                Received = false // set initial status
+            };
+            _context.SupplierOrderStatuses.Add(supplierOrderStatus);
+
+            // Step 3: Save the SupplierOrderStatus
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSupplierOrder", new { id = supplierOrder.SupplierOrderID }, supplierOrder);
         }
 
 
-        // DELETE: api/SupplierOrders/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSupplierOrder(int id)
         {
