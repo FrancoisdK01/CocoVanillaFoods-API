@@ -170,10 +170,11 @@ namespace API.Data
         public DbSet<EarlyBird> EarlyBird { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatus> OrderStatus { get; set; }
+        public DbSet<OrderPayment> OrderPayments { get; set; }
         public DbSet<WineOrderItem> OrderItems { get; set; }
         public DbSet<RefundResponse> RefundResponses { get; set; }
-        public DbSet<ShippingDetails> ShippingDetails { get; set; }
 
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
@@ -190,7 +191,11 @@ namespace API.Data
         public DbSet<SuperUser> SuperUser { get; set; }
         public DbSet<EventPayments> EventsPayments { get; set; }
         public DbSet<TicketPurchase> TicketPurchases { get; set; }
+
         public DbSet<TicketPurchasedStatus> TicketPurchasedStatuses { get; set; }
+
+
+        public DbSet <Ticket> Tickets { get; set; }
 
 
         //carts
