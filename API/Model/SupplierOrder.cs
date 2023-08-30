@@ -9,7 +9,6 @@ namespace API.Model
         [Key]
         public int SupplierOrderID { get; set; }
 
-
         public int Quantity_Ordered { get; set; }
 
         public DateTime DateOrdered { get; set; }
@@ -24,17 +23,11 @@ namespace API.Model
 
         public double OrderTotal { get; set; }
 
-
         [ForeignKey("SupplierID")]
         public int SupplierID { get; set; }
         public virtual Supplier Supplier { get; set; }
 
-        public bool Ordered { get; set; } = false;
-
-        public bool Paid { get; set; } = false;
-
-        public bool Received { get; set; } = false;
-
-        
+        // Foreign key to the SupplierOrderStatus table
+        public virtual SupplierOrderStatus SupplierOrderStatus { get; set; }
     }
 }

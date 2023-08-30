@@ -86,7 +86,7 @@ namespace API.Data
                 .HasForeignKey(oi => oi.OrderId) // <- change here
                  .OnDelete(DeleteBehavior.Cascade);
 
-          
+
             //WishlistItem and Wine
             modelBuilder.Entity<WishlistItem>()
              .HasOne(wli => wli.Wine)
@@ -108,14 +108,14 @@ namespace API.Data
             .HasForeignKey<Wishlist>(wl => wl.CustomerID)
             .OnDelete(DeleteBehavior.Cascade);
 
-           
+
             modelBuilder.Entity<WriteOff>()
                 .HasOne(w => w.Employee)
                 .WithMany(e => e.WriteOffs)
                 .HasForeignKey(w => w.EmployeeID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-           
+
             modelBuilder.Entity<RefundRequest>()
                 .HasOne(rr => rr.WineOrder)
                   .WithMany(wo => wo.RefundRequests) // Assuming there's a collection of RefundRequests in WineOrder
@@ -151,9 +151,23 @@ namespace API.Data
                      .WithOne(i => i.TicketPurchasedStatus)
                        .HasForeignKey<TicketPurchasedStatus>(p => p.TicketPurchaseId);
 
+            modelBuilder.Entity<SupplierOrder>()
+                .HasOne(so => so.Supplier)
+                 .WithMany(s => s.SupplierOrders)
+                 .HasForeignKey(so => so.SupplierID)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            // Add these lines for SupplierOrderStatus
+            modelBuilder.Entity<SupplierOrder>()
+                .HasOne(so => so.SupplierOrderStatus)
+                .WithOne(sos => sos.SupplierOrder)
+                .HasForeignKey<SupplierOrderStatus>(sos => sos.SupplierOrderID)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<SupplierOrderStatus>()
+                .HasKey(sos => sos.SupplierOrderStatusID);
 
+            // ... (existing model configurations)
 
             base.OnModelCreating(modelBuilder);
         }
@@ -162,7 +176,7 @@ namespace API.Data
         public DbSet<OrderStatus> OrderStatuses { get; set; }
 
         public DbSet<Blacklist> Blacklists { get; set; }
-      
+
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<Employee> Employees { get; set; }
@@ -178,8 +192,9 @@ namespace API.Data
 
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
+        public DbSet<SupplierOrderStatus> SupplierOrderStatuses { get; set; }
         public DbSet<SystemPrivilege> SystemPrivileges { get; set; }
-     
+
         public DbSet<VAT> VATs { get; set; }
         public DbSet<Varietal> Varietals { get; set; }
         public DbSet<Wine> Wines { get; set; }
@@ -195,7 +210,7 @@ namespace API.Data
         public DbSet<TicketPurchasedStatus> TicketPurchasedStatuses { get; set; }
 
 
-        public DbSet <Ticket> Tickets { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
 
         //carts
@@ -210,6 +225,9 @@ namespace API.Data
 
         //Refunds
         public DbSet<RefundRequest> RefundRequests { get; set; }
+
+       
+
 
 
     }
