@@ -209,6 +209,7 @@ namespace API.Data
         public DbSet<WineOrderItem> WineOrderItems { get; set; }
         public DbSet<RefundRequest> RefundRequests { get; set; }
         public DbSet<HelpResource> HelpResources { get; set; }
+        public DbSet<AuditTrail> AuditTrails { get; set; }
 
 
 
