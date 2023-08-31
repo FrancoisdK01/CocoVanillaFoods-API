@@ -1,5 +1,7 @@
 ﻿using API.Model;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 
@@ -131,6 +133,23 @@ namespace API.Data
                 Console.WriteLine(ex);
             }
         }
+
+        public static async Task SeedHelpResource(MyDbContext context, IWebHostEnvironment _webHostEnvironment)
+        {
+            // Check if there's already an entry in the HelpResources table
+            if (!context.HelpResources.Any())
+            {
+                var resource = new HelpResource
+                {
+                    videoPath = "/assets/helpVideo.MP4",
+                    pdfPath = "/assets/helpDocument.pdf"
+                };
+
+                context.HelpResources.Add(resource);
+                await context.SaveChangesAsync();
+            }
+        }
+
     }
 }
 

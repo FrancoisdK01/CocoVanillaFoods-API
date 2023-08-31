@@ -174,9 +174,7 @@ namespace API.Data
 
 
         public DbSet<OrderStatus> OrderStatuses { get; set; }
-
         public DbSet<Blacklist> Blacklists { get; set; }
-
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<Employee> Employees { get; set; }
@@ -189,12 +187,10 @@ namespace API.Data
         public DbSet<OrderStatus> OrderStatus { get; set; }
         public DbSet<WineOrderItem> OrderItems { get; set; }
         public DbSet<RefundResponse> RefundResponses { get; set; }
-
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
         public DbSet<SupplierOrderStatus> SupplierOrderStatuses { get; set; }
         public DbSet<SystemPrivilege> SystemPrivileges { get; set; }
-
         public DbSet<VAT> VATs { get; set; }
         public DbSet<Varietal> Varietals { get; set; }
         public DbSet<Wine> Wines { get; set; }
@@ -206,27 +202,14 @@ namespace API.Data
         public DbSet<SuperUser> SuperUser { get; set; }
         public DbSet<EventPayments> EventsPayments { get; set; }
         public DbSet<TicketPurchase> TicketPurchases { get; set; }
-
         public DbSet<TicketPurchasedStatus> TicketPurchasedStatuses { get; set; }
-
-
-        public DbSet<Ticket> Tickets { get; set; }
-
-
-        //carts
-
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-
-        //orderHistory
-
         public DbSet<WineOrder> WineOrders { get; set; }
         public DbSet<WineOrderItem> WineOrderItems { get; set; }
-
-        //Refunds
         public DbSet<RefundRequest> RefundRequests { get; set; }
+        public DbSet<HelpResource> HelpResources { get; set; }
 
-       
 
 
 
