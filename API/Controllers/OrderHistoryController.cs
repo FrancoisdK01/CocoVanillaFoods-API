@@ -117,8 +117,7 @@ namespace API.Controllers
         {
             var allOrders = await _context.WineOrders.Include(o => o.OrderItems)
                                                      .ThenInclude(oi => oi.Wine)
-                                                     .Where(o => o.OrderStatusId != 4)
-                                                     .OrderBy(o => o.OrderDate)// Exclude orders with OrderStatusId = 4
+                                                     .OrderBy(o => o.OrderDate)
                                                      .ToListAsync();
 
             if (allOrders == null || allOrders.Count == 0)
