@@ -43,7 +43,8 @@ namespace API.Controllers
                 EventDate = eventDetails.EventDate,
                 PurchaseDate = DateTime.UtcNow,
                 TicketPrice = (decimal)eventDetails.Price,
-                EventName = eventDetails.Name
+                EventName = eventDetails.Name,
+                Description = eventDetails.Description,
             };
 
             _context.TicketPurchases.Add(ticket);
