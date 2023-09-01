@@ -51,33 +51,40 @@ namespace API.Controllers
             if(editInventory == null)
             {
                 return NotFound();
-            }
+            }          
 
-            var newInventory = new Inventory
-            {
-                // Stays the same as previous thingies
-                InventoryID = editInventory.InventoryID,
-                VarietalID = editInventory.VarietalID,
-                WineID = editInventory.WineID,
-                WineTypeID = editInventory.WineTypeID,
+            editInventory.QuantityOnHand = inventory.QuantityOnHand;
+            editInventory.StockLimit = inventory.StockLimit;
 
-                // Updated values
-                QuantityOnHand = inventory.QuantityOnHand,
-                StockLimit = inventory.StockLimit,
-            };
+            await _context.SaveChangesAsync();
 
-            _context.Inventories.Update(newInventory);
+            return Ok();
 
-            var result = await _context.SaveChangesAsync();
+            //var newInventory = new Inventory
+            //{
+            //    // Stays the same as previous thingies
+            //    InventoryID = editInventory.InventoryID,
+            //    VarietalID = editInventory.VarietalID,
+            //    WineID = editInventory.WineID,
+            //    WineTypeID = editInventory.WineTypeID,
 
-            if(result > 0)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            //    // Updated values
+            //    QuantityOnHand = inventory.QuantityOnHand,
+            //    StockLimit = inventory.StockLimit,
+            //};
+
+            //_context.Inventories.Update(newInventory);
+
+            //var result = await _context.SaveChangesAsync();
+
+            //if (result > 0)
+            //{
+            //    return Ok();
+            //}
+            //else
+            //{
+            //    return BadRequest();
+            //}
         }
 
         // POST: api/Inventory
