@@ -167,6 +167,19 @@ namespace API.Data
             modelBuilder.Entity<SupplierOrderStatus>()
                 .HasKey(sos => sos.SupplierOrderStatusID);
 
+
+            modelBuilder.Entity<TicketPurchase>()
+                 .HasOne(tp => tp.QrCode)
+                  .WithOne(qr => qr.TicketPurchase)
+                  .HasForeignKey<TicketPurchase>(tp => tp.QrId);
+
+              modelBuilder.Entity<QrCode>()
+                .HasOne(qr => qr.TicketPurchase)
+                .WithOne(tp => tp.QrCode)
+                .HasForeignKey<QrCode>(qr => qr.TicketPurchaseId); // Use TicketPurchaseId instead
+
+
+
             // ... (existing model configurations)
 
             base.OnModelCreating(modelBuilder);
@@ -184,7 +197,6 @@ namespace API.Data
         public DbSet<EarlyBird> EarlyBird { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
-        public DbSet<OrderStatus> OrderStatus { get; set; }
         public DbSet<WineOrderItem> OrderItems { get; set; }
         public DbSet<RefundResponse> RefundResponses { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
@@ -210,6 +222,8 @@ namespace API.Data
         public DbSet<RefundRequest> RefundRequests { get; set; }
         public DbSet<HelpResource> HelpResources { get; set; }
         public DbSet<AuditTrail> AuditTrails { get; set; }
+
+        public DbSet<QrCode> QrCodes { get; set; }
 
 
 

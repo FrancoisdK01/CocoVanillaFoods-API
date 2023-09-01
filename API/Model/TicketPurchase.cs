@@ -18,5 +18,12 @@ namespace API.Model
         public virtual TicketPurchasedStatus TicketPurchasedStatus { get; set; }
 
 
+        public int QrId { get; set; }
+
+        // Navigation property for one-to-one relationship with QrCode
+        [ForeignKey("QrId")]
+        public virtual QrCode QrCode { get; set; }
+
+
     }
 }
