@@ -4,6 +4,7 @@ using API.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -21,11 +22,17 @@ namespace API.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AuditTrail>>> GetAuditTrail()
+        {
+            return await _context.AuditTrails.ToListAsync();
+        }
 
         [HttpPost]
-        public async Task<ActionResult<AuditTrail>> writeToAuditLog(AuditLogViewModel alVM)
+        [Route("AddAuditLog")]
+        public async Task<ActionResult<AuditTrail>> writeToAuditLog(AuditTrail auditLog)
         {
-            var loggedInUser = await _userManager.FindByEmailAsync(alVM.email);
+            var loggedInUser = await _userManager.FindByEmailAsync(auditLog.UserEmail);
 
             if(loggedInUser == null)
             {
@@ -34,11 +41,11 @@ namespace API.Controllers
 
             var auditTrail = new AuditTrail
             {
-                ButtonPressed = alVM.buttonClicked,
+                ButtonPressed = auditLog.ButtonPressed,
                 UserName = loggedInUser.UserName,
-                UserEmail = alVM.email,
-                TransactionDate = DateTime.UtcNow,
-                Quantity = alVM.quantity
+                UserEmail = auditLog.UserEmail,
+                TransactionDate = DateTime.Now,
+                Quantity = auditLog.Quantity
             };
 
             var addRecord = await _context.AuditTrails.AddAsync(auditTrail);
