@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Model;
+using iTextSharp.text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,8 +48,9 @@ namespace API.Controllers
                 Description = eventDetails.Description,
             };
 
+            // Save the TicketPurchase first to generate an ID
             _context.TicketPurchases.Add(ticket);
-            await _context.SaveChangesAsync();  // Save TicketPurchase first to generate Id
+            await _context.SaveChangesAsync();  // Save the TicketPurchase
 
             // Now that the TicketPurchase is saved, it should have an Id.
             int ticketPurchaseId = ticket.Id;
@@ -68,11 +70,22 @@ namespace API.Controllers
             // Generate a QR code
             var qrCode = GenerateQRCode($"http://localhost:4200/TicketPurchases/Scan/{status.ScanningToken}");
 
+            QrCode qr = new QrCode
+            {
+                QrCodeBase64 = qrCode,
+                TicketPurchaseId = ticket.Id // Assuming TicketPurchaseId is the foreign key
+            };
+
+            _context.QrCodes.Add(qr);
+            await _context.SaveChangesAsync();
+
+
             // Send the email to the customer
             await SendEmail(customer.Email, qrCode, customer, eventDetails);
 
             return CreatedAtAction("GetTicketPurchase", new { id = ticket.Id }, ticket);
         }
+
 
 
 
@@ -95,6 +108,7 @@ namespace API.Controllers
         {
             var ticketPurchases = await _context.TicketPurchases
                 .Where(tp => tp.UserEmail == userEmail)
+                .Include(tp => tp.QrCode)
                 .ToListAsync();
 
             if (ticketPurchases == null || ticketPurchases.Count == 0)
