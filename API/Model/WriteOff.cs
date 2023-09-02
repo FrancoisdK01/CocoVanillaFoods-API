@@ -9,15 +9,18 @@ namespace API.Model
         [Key]
         public int WriteOffID { get; set; }
 
-        public DateTime WriteOff_Date { get; set; }
-
-        //[JsonIgnore]
-        //public List<WriteOffItem> WriteOffItems { get; set; }
-
-        [ForeignKey("Id")]
-        public string EmployeeID { get; set; }
+        public int WriteOff_ReasonID { get; set; }
 
         [JsonIgnore]
-        public Employee Employee { get; set; }
+        public virtual WriteOff_Reason WriteOff_Reason { get; set; }
+
+        public DateTime WriteOff_Date { get; set; }
+
+        public int InventoryID { get; set; }
+
+        [JsonIgnore]
+        public virtual Inventory Inventory { get; set; }
+
+        public int Quantity { get; set; }
     }
 }
