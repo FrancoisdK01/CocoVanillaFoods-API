@@ -23,5 +23,11 @@ namespace API.Model
         public EarlyBird EarlyBird { get; set; }
         // Other specific properties
 
+        // Adding EventType relationship
+        public int? EventTypeID { get; set; }
+        [ForeignKey("EventTypeID")]
+        public EventType EventType { get; set; }
+
+
     }
 }

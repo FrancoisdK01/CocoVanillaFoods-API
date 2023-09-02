@@ -11,8 +11,6 @@ namespace API.Model
         [MaxLength(50)]
         public string EventTypeName { get; set; }
 
-        [MaxLength(255)]
-        public string EventDescription { get; set; }
 
         [JsonIgnore]
         public List<Event> Events { get; set; }
