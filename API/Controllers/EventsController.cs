@@ -65,14 +65,21 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
         {
-            return await _context.Events.ToListAsync();
+            return await _context.Events
+                .Include(e => e.EventType) // Include EventType
+                .Include(e => e.EarlyBird) // Include EarlyBird
+                .ToListAsync();
         }
+
 
         // GET: api/Events/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            var @event = await _context.Events
+                .Include(e => e.EventType) // Include EventType
+                .Include(e => e.EarlyBird) // Include EarlyBird
+                .FirstOrDefaultAsync(e => e.EventID == id);
 
             if (@event == null)
             {
@@ -81,6 +88,7 @@ namespace API.Controllers
 
             return @event;
         }
+
 
         // PUT: api/Events/5
         [HttpPut("{id}")]
@@ -123,6 +131,27 @@ namespace API.Controllers
             eventItem.Description = eventForm.Description;
             eventItem.Price = eventForm.Price;
             eventItem.DisplayItem = eventForm.DisplayItem;
+            eventItem.EarlyBirdID = eventForm.EarlyBirdID;
+
+            // Update EarlyBirdID
+            if (eventForm.EarlyBirdID == 0)
+            {
+                eventItem.EarlyBirdID = null;
+            }
+            else
+            {
+                eventItem.EarlyBirdID = eventForm?.EarlyBirdID;
+            }
+
+            // Update EventTypeID
+            if (eventForm.EventTypeID == 0)
+            {
+                eventItem.EventTypeID = null;
+            }
+            else
+            {
+                eventItem.EventTypeID = eventForm?.EventTypeID;
+            }
 
             _context.Entry(eventItem).State = EntityState.Modified;
 
@@ -168,9 +197,11 @@ namespace API.Controllers
                 Description = eventForm.Description,
                 Price = eventForm.Price,
                 FilePath = filePath,
-                DisplayItem = true
+                DisplayItem = true,
+                EventTypeID = eventForm.EventTypeID
             };
 
+            // Setting EarlyBirdID
             if (eventForm.EarlyBirdID == 0)
             {
                 eventItem.EarlyBirdID = null;
@@ -180,8 +211,19 @@ namespace API.Controllers
                 eventItem.EarlyBirdID = eventForm?.EarlyBirdID;
             }
 
+            // Setting EventTypeID
+            if (eventForm.EventTypeID == 0)
+            {
+                eventItem.EventTypeID = null;
+            }
+            else
+            {
+                eventItem.EventTypeID = eventForm?.EventTypeID;
+            }
+
             _context.Events.Add(eventItem);
             await _context.SaveChangesAsync();
+
 
             return CreatedAtAction("GetEvent", new { id = eventItem.EventID }, eventItem);
         }

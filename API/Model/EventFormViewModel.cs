@@ -12,5 +12,8 @@
         public IFormFile File { get; set; }
         public int? EarlyBirdID { get; set; }
         public Boolean DisplayItem { get; set; }
+
+        public int? EventTypeID { get; set; }
+
     }
 }

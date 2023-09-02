@@ -21,14 +21,36 @@ namespace API.Data
                 eb.HasKey(e => e.EarlyBirdID);
             });
 
+            modelBuilder.Entity<EventType>(et =>
+            {
+                et.HasKey(e => e.EventTypeID);
+            });
+
             modelBuilder.Entity<Event>(e =>
             {
                 e.HasKey(e => e.EventID);
+
                 e.HasOne(e => e.EarlyBird)
                     .WithMany(eb => eb.Events)
                     .HasForeignKey(e => e.EarlyBirdID)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(e => e.EventType) // Add EventType
+                    .WithMany(et => et.Events) // Assuming EventType has a collection of Events
+                    .HasForeignKey(e => e.EventTypeID)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
+
+            // Seed EventType data
+            modelBuilder.Entity<EventType>().HasData(
+                new EventType { EventTypeID = 1, EventTypeName = "Internal" },
+                new EventType { EventTypeID = 2, EventTypeName = "External" },
+                new EventType { EventTypeID = 3, EventTypeName = "Social" },
+                new EventType { EventTypeID = 4, EventTypeName = "Corporate" },
+                new EventType { EventTypeID = 5, EventTypeName = "Other" }
+            );
+
+
 
             modelBuilder.Entity<SystemPrivilege>().HasKey(sp => sp.Id);
 
