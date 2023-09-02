@@ -114,7 +114,7 @@ namespace API.Controllers
             // Initialize Twilio here, or make sure it's initialized in Startup.cs
             // Ideally, you would read these from a configuration file or environment variables.
             string accountSid = "AC14ac294ab00ac67c898644d8f27851e4";
-            string authToken = "4a12a9794a75820b85de95c0b6902f8f";
+            string authToken = "b6feebfd098dedb8d5414e067027cb05";
             TwilioClient.Init(accountSid, authToken);
 
             try
