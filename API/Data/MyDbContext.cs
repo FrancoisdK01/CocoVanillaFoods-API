@@ -222,7 +222,7 @@ namespace API.Data
         public DbSet<RefundRequest> RefundRequests { get; set; }
         public DbSet<HelpResource> HelpResources { get; set; }
         public DbSet<AuditTrail> AuditTrails { get; set; }
-
+        public DbSet<StockTake> StockTakes { get; set; }
         public DbSet<QrCode> QrCodes { get; set; }
 
 
