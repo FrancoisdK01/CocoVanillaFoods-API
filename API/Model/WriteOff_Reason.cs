@@ -12,8 +12,6 @@ namespace API.Model
         [MaxLength(255)]
         public string Description { get; set; }
 
-        public DateTime Date_of_last_update { get; set; }
-
         public int TimesUsed { get; set; }
 
         public int BottelsLost { get; set; }
