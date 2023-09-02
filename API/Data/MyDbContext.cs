@@ -106,14 +106,7 @@ namespace API.Data
             .HasOne(wl => wl.Customer)
             .WithOne(c => c.Wishlist)
             .HasForeignKey<Wishlist>(wl => wl.CustomerID)
-            .OnDelete(DeleteBehavior.Cascade);
-
-
-            modelBuilder.Entity<WriteOff>()
-                .HasOne(w => w.Employee)
-                .WithMany(e => e.WriteOffs)
-                .HasForeignKey(w => w.EmployeeID)
-                .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);          
 
 
             modelBuilder.Entity<RefundRequest>()
