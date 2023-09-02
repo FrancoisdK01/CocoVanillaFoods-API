@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Twilio;
 
 namespace API
 {
@@ -21,6 +22,9 @@ namespace API
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             );
+
+            var twilioSettings = Configuration.GetSection("Twilio");
+            TwilioClient.Init(twilioSettings["AccountSid"], twilioSettings["AuthToken"]);
 
             services.AddDataProtection();
 

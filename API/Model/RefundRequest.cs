@@ -20,7 +20,7 @@ namespace API.Model
         public string Description { get; set; } // New field
         public RefundStatus Status { get; set; }
         public string OrderRefNum { get; set; }
-
+        public string PhoneNumber { get; set; }
         public Boolean isRefunded { get; set; }
 
         [JsonIgnore]
