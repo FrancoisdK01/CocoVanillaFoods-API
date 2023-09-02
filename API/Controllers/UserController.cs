@@ -182,6 +182,9 @@ namespace API.Controllers
         [HttpGet]
         private TokenResult GenerateJWTToken(User user)
         {
+            // Fetch the customer details for this user
+            var customer = _context.Customers.FirstOrDefault(c => c.UserID == user.Id);
+
             var roles = _userManager.GetRolesAsync(user).Result;
 
             // Create JWT Token
@@ -191,6 +194,12 @@ namespace API.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
             };
+
+            // Add phone number if customer is not null and has a phone number
+            if (customer != null && !string.IsNullOrEmpty(customer.PhoneNumber))
+            {
+                claims.Add(new Claim("phoneNumber", customer.PhoneNumber));
+            }
 
             // Add the role claim(s) to the claims list
             foreach (var role in roles)

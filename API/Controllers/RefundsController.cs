@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio;
 
 namespace API.Controllers
 {
@@ -47,7 +49,8 @@ namespace API.Controllers
                     RequestedOn = DateTime.UtcNow,
                     Cost = model.Cost,
                     Description = model.Description,
-                    isRefunded = true
+                    isRefunded = true,
+                    PhoneNumber = model.PhoneNumber
                 };
                 if(wineOrderToUpdate != null)
                 {
@@ -68,9 +71,6 @@ namespace API.Controllers
             }
         }
 
-
-
-
         // GET: api/Refunds
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RefundRequest>>> GetRefundRequests()
@@ -88,14 +88,13 @@ namespace API.Controllers
         }
 
 
-
-
-
         [HttpGet("{email}")]
         public async Task<ActionResult<IEnumerable<RefundRequest>>> GetUserRefundRequests(string email)
         {
             return await _context.RefundRequests.Where(r => r.Email == email).ToListAsync();
         }
+
+
 
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] StatusUpdateModel model)
@@ -107,12 +106,44 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            refundRequest.Status = model.Status;
+            Console.WriteLine($"OrderRefNum before SMS send: {refundRequest.OrderRefNum}");  // Debug log
 
+            refundRequest.Status = model.Status;
             await _context.SaveChangesAsync();
+
+            // Initialize Twilio here, or make sure it's initialized in Startup.cs
+            // Ideally, you would read these from a configuration file or environment variables.
+            string accountSid = "AC14ac294ab00ac67c898644d8f27851e4";
+            string authToken = "4a12a9794a75820b85de95c0b6902f8f";
+            TwilioClient.Init(accountSid, authToken);
+
+            try
+            {
+                // Send SMS
+                var to = $"+27{refundRequest.PhoneNumber.Substring(1)}";  // Assuming phoneNumber is like '0721843438'
+                var from = "+18589018233";
+                var message = $"Your refund request for order number {model.OrderRefNum} has been updated to {model.Status}.";
+
+                var smsResponse = MessageResource.Create(
+                    body: message,
+                    from: new Twilio.Types.PhoneNumber(from),
+                    to: new Twilio.Types.PhoneNumber(to)
+                );
+
+                if (smsResponse.ErrorCode != null)
+                {
+                    return BadRequest($"SMS failed with error code: {smsResponse.ErrorCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception, or handle it as per your requirements
+                return BadRequest($"An error occurred while sending SMS: {ex.Message}");
+            }
 
             return NoContent();
         }
+
 
 
 
