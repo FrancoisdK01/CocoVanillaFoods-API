@@ -227,7 +227,7 @@ namespace API.Data
         public DbSet<WriteOff> WriteOffs { get; set; }
         public DbSet<WriteOff_Reason> WriteOffReasons { get; set; }
         public DbSet<SuperUser> SuperUser { get; set; }
-        public DbSet<EventPayments> EventsPayments { get; set; }
+        //public DbSet<EventPayments> EventsPayments { get; set; }
         public DbSet<TicketPurchase> TicketPurchases { get; set; }
         public DbSet<TicketPurchasedStatus> TicketPurchasedStatuses { get; set; }
         public DbSet<Cart> Carts { get; set; }
