@@ -9,17 +9,11 @@ namespace API.Model
         [Key]
         public int WriteOffID { get; set; }
 
-        public int WriteOff_ReasonID { get; set; }
-
-        [JsonIgnore]
-        public virtual WriteOff_Reason WriteOff_Reason { get; set; }
+        public string WriteOff_Reason { get; set; }
 
         public DateTime WriteOff_Date { get; set; }
 
-        public int InventoryID { get; set; }
-
-        [JsonIgnore]
-        public virtual Inventory Inventory { get; set; }
+        public string WineName { get; set; }
 
         public int Quantity { get; set; }
     }

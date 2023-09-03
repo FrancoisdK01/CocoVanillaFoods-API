@@ -38,9 +38,9 @@ namespace API.Controllers
 
             var newwriteoff = new WriteOff
             {
-                WriteOff_ReasonID = writeOff.WriteOff_ReasonID,
+                WriteOff_Reason = writeOff.WriteOff_Reason,
                 WriteOff_Date = writeOff.WriteOff_Date,
-                InventoryID = writeOff.InventoryID,
+                WineName = writeOff.WineName,
                 Quantity = writeOff.Quantity
             };
 
