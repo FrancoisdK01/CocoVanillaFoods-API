@@ -50,7 +50,12 @@ namespace API.Data
                 new EventType { EventTypeID = 5, EventTypeName = "Other" }
             );
 
-
+            //Refund Status data
+            modelBuilder.Entity<RefundResponse>().HasData(
+                new RefundResponse { RefundResponseID = 1, ResponseValue = "InProgress", Description = "In Progress" },
+                new RefundResponse { RefundResponseID = 2, ResponseValue = "Approved", Description = "Approved" },
+                new RefundResponse { RefundResponseID = 3, ResponseValue = "NotApproved", Description = "Not Approved" }
+            );
 
             modelBuilder.Entity<SystemPrivilege>().HasKey(sp => sp.Id);
 
