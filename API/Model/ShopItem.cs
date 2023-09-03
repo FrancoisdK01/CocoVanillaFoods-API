@@ -12,7 +12,7 @@ namespace API.Model
         //public int Id { get; set; }
 
         [Required]
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string Name { get; set; }
 
         [Required]
