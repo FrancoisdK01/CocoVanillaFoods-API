@@ -201,7 +201,7 @@ namespace API.Controllers
                     }
                 }
             }
-            return Ok("The superuser has been removed from the system");
+            return Ok();
         }
 
         private bool SuperUserExists(string id)
