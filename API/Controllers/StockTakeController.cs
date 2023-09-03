@@ -28,22 +28,46 @@ namespace API.Controllers
         [HttpPost]
         [Route("AddStockTake")]
         public async Task<ActionResult<StockTake>> PostStockTake(StockTake stocktake)
-        {
-            //var wine = _context.Wines.FirstOrDefault(w => w.WineID == stocktake.WineID);
-
-            //if (wine == null)
-            //{
-            //    return NoContent();
-            //}
+        {            
 
             var addStockTake = new StockTake
             {
                 stocktakeID = stocktake.stocktakeID,
+                DateDone = DateTime.Now,
                 wineName = stocktake.wineName,
                 QuantityOrdered = stocktake.QuantityOrdered,
                 QuantityReceived = stocktake.QuantityReceived,
+                Added = false
             };
             _context.StockTakes.Add(addStockTake);
+
+            var result = await _context.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                return CreatedAtAction("GetStockTake", new { id = stocktake.stocktakeID }, stocktake);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+
+        [HttpPut("UpdateStockTake/{id}")]
+        public async Task<ActionResult<StockTake>> PutStockTake(StockTake stocktake)
+        {
+
+            var putStockTake = new StockTake
+            {
+                stocktakeID = stocktake.stocktakeID,
+                DateDone = stocktake.DateDone,
+                wineName = stocktake.wineName,
+                QuantityOrdered = stocktake.QuantityOrdered,
+                QuantityReceived = stocktake.QuantityReceived,
+                Added = stocktake.Added
+            };
+            _context.StockTakes.Update(putStockTake);
 
             var result = await _context.SaveChangesAsync();
 

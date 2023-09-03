@@ -10,11 +10,15 @@ namespace API.Model
         [Key]
         public int stocktakeID { get; set; }
 
+        public DateTime DateDone { get; set; }
+
         public string wineName { get; set; }
 
         public int QuantityOrdered { get; set; }
 
         public int QuantityReceived { get; set; }
+
+        public bool? Added { get; set; }
 
     }
 }
