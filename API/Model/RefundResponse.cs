@@ -8,10 +8,10 @@ namespace API.Model
         [Key]
         public int RefundResponseID { get; set; }
 
-        [MaxLength(8)]
+        [MaxLength(50)]
         public string ResponseValue { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string Description { get; set; }
 
     }
