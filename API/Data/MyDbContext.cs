@@ -244,6 +244,7 @@ namespace API.Data
         public DbSet<AuditTrail> AuditTrails { get; set; }
         public DbSet<StockTake> StockTakes { get; set; }
         public DbSet<QrCode> QrCodes { get; set; }
+        public DbSet<WinePrice> WinePrice { get; set; }
 
 
 

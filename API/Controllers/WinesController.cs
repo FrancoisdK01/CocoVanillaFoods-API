@@ -206,7 +206,15 @@ namespace API.Controllers
                 FilePath = filePath,
             };
 
+            var winePrice = new WinePrice
+            {
+                Amount = wineForm.Price,
+                Date = DateTime.Now,
+                Wine = wine
+            };
+
             _context.Wines.Add(wine);
+            _context.WinePrice.Add(winePrice);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetWine", new { id = wine.WineID }, wine);

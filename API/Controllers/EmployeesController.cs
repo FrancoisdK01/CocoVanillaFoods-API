@@ -227,7 +227,7 @@ namespace API.Controllers
                     }
                 }
             }
-            return Ok("User has been removed from the system");
+            return Ok();
         }
 
         private bool EmployeeExists(string id)
