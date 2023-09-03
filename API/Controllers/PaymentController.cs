@@ -141,7 +141,7 @@ namespace API.Controllers
 
             // If the signatures match, continue with saving the payment to the database
             var eventPayment = MapToEventPayment(payment);
-            _context.EventsPayments.Add(eventPayment);
+            //_context.EventsPayments.Add(eventPayment);
             await _context.SaveChangesAsync();
 
             // After saving the payment to the database, return a successful response
