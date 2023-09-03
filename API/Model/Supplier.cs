@@ -8,7 +8,7 @@ namespace API.Model
         [Key]
         public int SupplierID { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(50)]
         public string Name { get; set; }
 
         [MaxLength(50)]
