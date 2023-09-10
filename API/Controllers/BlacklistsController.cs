@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using API.ViewModels;
 
 namespace API.Controllers
 {
@@ -15,10 +16,12 @@ namespace API.Controllers
     public class BlacklistsController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public BlacklistsController(MyDbContext context)
+        public BlacklistsController(MyDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;   
         }
 
         // GET: api/Blacklists
@@ -86,14 +89,38 @@ namespace API.Controllers
 
         // DELETE: api/Blacklists/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBlacklist(int id)
+        public async Task<IActionResult> DeleteBlacklist(BlacklistDeleteViewModel deleteViewModel)
         {
-            var blacklist = await _context.Blacklists.FindAsync(id);
+            var blacklist = await _context.Blacklists.FindAsync(deleteViewModel.id);
             if (blacklist == null)
             {
                 return NotFound();
             }
+            var customerName = _context.Customers.FirstOrDefault(x => x.Email == blacklist.Email);
 
+            var email = new EmailViewModel
+            {
+                To = blacklist.Email,
+                Subject = "Your account has been removed from the blacklist.",
+                Body = $@"
+                    <h1>Hello {customerName.First_Name + " " + customerName.Last_Name},</h1>
+                    <p>We are pleased to inform you that your account has been removed from our blacklist. This means you are now eligible to purchase event tickets using your account.</p>
+                    <p><strong>Reason for removal:</strong> {deleteViewModel.reason}</p>
+                    <p>We apologize for any inconvenience caused during the period your account was blacklisted. We value your patronage and look forward to serving you in the future.</p>
+                    <p>If you have any questions or concerns, please do not hesitate to contact our support team.</p>
+                    <p>Thank you for your understanding and continued trust in us.</p>
+                    <p>Kind regards,</p>
+                    <p>[Your Company Name] Team</p>
+                "
+            };
+
+            try
+            {
+                _emailService.SendEmail(email);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
             _context.Blacklists.Remove(blacklist);
             await _context.SaveChangesAsync();
 

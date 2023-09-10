@@ -129,7 +129,20 @@ namespace API.Controllers
                 UserID = user.Id,
             };
 
+            var customer = new Customer
+            {
+                First_Name = superUserModel.FirstName,
+                Last_Name = superUserModel.LastName,
+                Email = registerModel.Email,
+                PhoneNumber = superUserModel.PhoneNumber,
+                ID_Number = superUserModel.IDNumber,
+                Date_Created = DateTime.Now,
+                Date_of_last_update = DateTime.Now,
+                UserID = user.Id
+            };
+
             _context.SuperUser.Add(superuser);
+            _context.Customers.Add(customer);
             var superUserSavedChanges = await _context.SaveChangesAsync();
 
             if(superUserSavedChanges > 0)
@@ -180,6 +193,11 @@ namespace API.Controllers
             if (superuser == null)
             {
                 return NotFound();
+            }
+
+            if (superuser.Email.Equals("marinda.bloem@promenade.com"))
+            {
+                return BadRequest();
             }
             else
             {
