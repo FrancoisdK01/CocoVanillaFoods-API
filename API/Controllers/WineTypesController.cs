@@ -25,7 +25,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WineType>>> GetWineTypes()
         {
-            return await _context.WineTypes.ToListAsync();
+            return await _context.WineTypes.Include(vt => vt.Varietals).ToListAsync();
         }
 
         // GET: api/WineTypes/5
@@ -89,6 +89,7 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteWineType(int id)
         {
             var wineType = await _context.WineTypes.FindAsync(id);
+
             if (wineType == null)
             {
                 return NotFound();

@@ -113,6 +113,14 @@ namespace API.Data
                 .HasForeignKey(w => w.VarietalID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // WineType and Varietal relationship
+            modelBuilder.Entity<Varietal>()
+                .HasOne(v => v.WineType)
+                .WithMany(wt => wt.Varietals)
+                .HasForeignKey(v => v.WineTypeID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             modelBuilder.Entity<WineOrderItem>()
               .HasOne(oi => oi.WineOrder)
                 .WithMany(o => o.OrderItems)

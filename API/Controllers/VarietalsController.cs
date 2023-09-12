@@ -25,7 +25,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Varietal>>> GetVarietals()
         {
-            return await _context.Varietals.ToListAsync();
+            return await _context.Varietals.Include(wt => wt.WineType).ToListAsync();
         }
 
         // GET: api/Varietals/5
@@ -73,16 +73,28 @@ namespace API.Controllers
             return NoContent();
         }
 
+     
         // POST: api/Varietals
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Varietal>> PostVarietal(Varietal varietal)
         {
+            var existingWineType = await _context.WineTypes.FindAsync(varietal.WineTypeID);
+
+            if (existingWineType == null)
+            {
+                return BadRequest("WineType with provided WineTypeID does not exist.");
+            }
+
+            // Explicitly set the WineType to null so Entity Framework doesn't try to create a new one.
+            varietal.WineType = null;
+
             _context.Varietals.Add(varietal);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetVarietal", new { id = varietal.VarietalID }, varietal);
         }
+
+
 
         // DELETE: api/Varietals/5
         [HttpDelete("{id}")]

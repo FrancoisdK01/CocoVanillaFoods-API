@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace API.Model
@@ -9,7 +9,11 @@ namespace API.Model
         [Key]
         public int WineTypeID { get; set; }
 
+        // Navigation properties
         [JsonIgnore]
         public List<Wine> Wines { get; set; }
+
+        [JsonIgnore]
+        public List<Varietal> Varietals { get; set; }
     }
 }
