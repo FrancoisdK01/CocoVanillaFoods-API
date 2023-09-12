@@ -57,6 +57,12 @@ namespace API.Data
                 new RefundResponse { RefundResponseID = 3, ResponseValue = "NotApproved", Description = "Not Approved" }
             );
 
+            modelBuilder.Entity<RefundItem>()
+                .HasOne(ri => ri.WineOrderItem)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             modelBuilder.Entity<SystemPrivilege>().HasKey(sp => sp.Id);
 
             // Cart and CartItem relationship
@@ -113,7 +119,7 @@ namespace API.Data
                 .HasForeignKey(oi => oi.OrderId) // <- change here
                  .OnDelete(DeleteBehavior.Cascade);
 
-
+          
             //WishlistItem and Wine
             modelBuilder.Entity<WishlistItem>()
              .HasOne(wli => wli.Wine)
@@ -136,10 +142,6 @@ namespace API.Data
             .OnDelete(DeleteBehavior.Cascade);          
 
 
-            modelBuilder.Entity<RefundRequest>()
-                .HasOne(rr => rr.WineOrder)
-                  .WithMany(wo => wo.RefundRequests) // Assuming there's a collection of RefundRequests in WineOrder
-                    .HasForeignKey(rr => rr.WineId);
 
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.SuperUser)
@@ -245,9 +247,6 @@ namespace API.Data
         public DbSet<StockTake> StockTakes { get; set; }
         public DbSet<QrCode> QrCodes { get; set; }
         public DbSet<WinePrice> WinePrice { get; set; }
-
-
-
-
+        public DbSet<RefundItem> RefundItems { get; set; }
     }
 }
