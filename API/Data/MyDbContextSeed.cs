@@ -76,6 +76,7 @@ namespace API.Data
                 var wineTypesDescriptions = new List<string> { "Red in colour", "White in colour" };
                 var wineVarietal = new List<string> { "Chenin Blanc", "Pinotage" };
                 var wineVarietalDescriptions = new List<string> { "Chenin blanc cultivar", "Pinotage cultivar" };
+                var wineVarietalWineTypes = new List<int> { 2, 1 };
 
                 for (int i = 0; i < wineTypes.Count; i++)
                 {
@@ -83,9 +84,11 @@ namespace API.Data
                     context.WineTypes.Add(addedWineType);
                 }
 
+                await context.SaveChangesAsync();
+
                 for (int i = 0; i < wineVarietal.Count; i++)
                 {
-                    var addedVarietal = new Varietal { Name = wineVarietal[i], Description = wineVarietalDescriptions[i] };
+                    var addedVarietal = new Varietal { Name = wineVarietal[i], Description = wineVarietalDescriptions[i], WineTypeID = wineVarietalWineTypes[i] };
                     context.Varietals.Add(addedVarietal);
                 }
                 await context.SaveChangesAsync();
