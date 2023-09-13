@@ -11,7 +11,13 @@ namespace API.Model
         public int WineOrderItemId { get; set; } // Foreign Key referencing WineOrderItem
 
         public int Quantity { get; set; } // Quantity of the wine to be refunded
+
         public string Reason { get; set; }
+
+        public int ResponseID { get; set; } // Foreign Key referencing RefundResponse for the status of this specific item
+
+        [JsonIgnore]
+        public RefundResponse RefundResponse { get; set; }
 
         [JsonIgnore]
         public RefundRequest RefundRequest { get; set; }
