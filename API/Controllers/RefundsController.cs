@@ -81,6 +81,15 @@ namespace API.Controllers
             return allRefunds;
         }
 
+        [HttpGet]
+        [Route("allRefundsResponses")]
+        public async Task<ActionResult<IEnumerable<RefundResponse>>> GetRefundReponses()
+        {
+            var allRefundsResponses = _context.RefundResponses.ToList();
+
+            return allRefundsResponses;
+        }
+
         [HttpPost]
         [Route("RequestARefund")]
         public IActionResult RequestRefund([FromBody] RefundRequestViewModel request)
@@ -129,7 +138,7 @@ namespace API.Controllers
             var refundRequest = new RefundRequest
             {
                 WineOrderId = request.WineOrderId,
-                Status = "Pending", // Assuming a default status of "Pending" for new requests
+                Status = "Incomplete", 
                 RefundItems = new List<RefundItem>()
             };
 
@@ -182,34 +191,79 @@ namespace API.Controllers
             {
                 WineId = ri.WineOrderItem.WineId,
                 WineName = ri.WineOrderItem.Wine.Name,
-                Quantity = ri.Quantity
+                Quantity = ri.Quantity,
+                Cost = ri.Quantity * ri.WineOrderItem.Wine.Price,
+                Reason = ri.Reason
             }).ToList();
 
             return Ok(wineDetails);
         }
 
 
-        [HttpPost]
-        [Route("UpdateRefundStatus")]
-        public IActionResult UpdateRefundStatus(int refundRequestId, string newStatus)
+        [HttpPut]
+        [Route("UpdateRefundStatus/{refundRequestId}")]
+        public IActionResult UpdateRefundStatus(int refundRequestId, [FromBody] List<RefundItemUpdateViewModel> itemsStatuses)
         {
-            var refundRequest = _context.RefundRequests.FirstOrDefault(rr => rr.RefundRequestId == refundRequestId);
-
-            if (refundRequest == null)
+            try
             {
-                return NotFound("Refund request not found.");
+                var refundRequest = _context.RefundRequests
+                                           .Include(rr => rr.RefundItems)  // Load associated RefundItems
+                                           .FirstOrDefault(rr => rr.RefundRequestId == refundRequestId);
+
+                if (refundRequest == null)
+                {
+                    return NotFound("Refund request not found.");
+                }
+
+                foreach (var itemStatus in itemsStatuses)
+                {
+                    var refundItem = refundRequest.RefundItems.FirstOrDefault(ri => ri.RefundItemId == itemStatus.RefundItemId);
+                    if (refundItem != null)
+                    {
+                        var responseId = _context.RefundResponses.FirstOrDefault(r => r.Description == itemStatus.Status)?.RefundResponseID;
+                        if (responseId.HasValue)
+                        {
+                            refundItem.ResponseID = responseId.Value;
+                        }
+                        else
+                        {
+                            return BadRequest($"Invalid status value: {itemStatus.Status}");
+                        }
+                    }
+                    else
+                    {
+                        return NotFound($"Refund item with ID {itemStatus.RefundItemId} not found.");
+                    }
+                }
+                if (refundRequest.RefundItems.All(ri => ri.ResponseID == 2 || ri.ResponseID == 3))
+                {
+                    refundRequest.Status = "Completed";
+                }
+                else
+                {
+                    refundRequest.Status = "Incomplete";
+                }
+
+                _context.SaveChanges();
+
+                return Ok(refundRequest);
             }
-
-            refundRequest.Status = newStatus;
-            _context.SaveChanges();
-
-            return Ok(refundRequest);
+            catch (DbUpdateException ex)
+            {
+                // Handle database update exceptions
+                return StatusCode(500, $"Internal server error 1. Failed to update the database. Error details: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, $"Internal server error. Error details: {ex.Message}");
+            }
         }
 
 
 
 
-
+        
 
 
         //Customer side stuff
