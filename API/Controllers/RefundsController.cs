@@ -90,6 +90,37 @@ namespace API.Controllers
             return allRefundsResponses;
         }
 
+        [HttpGet]
+        [Route("getResponse/{id}")]
+        public IActionResult GetResponse(int id)
+        {
+            // First, find the RefundItems with the matching RefundRequestId
+            var refundItems = _context.RefundItems.Where(ri => ri.RefundRequestId == id).ToList();
+
+            if (!refundItems.Any())
+            {
+                return NotFound($"No refund items found for RefundRequestId: {id}");
+            }
+
+            // Create a list to hold the result
+            List<RefundResponseViewModel> responseList = new List<RefundResponseViewModel>();
+
+            foreach (var item in refundItems)
+            {
+                var response = _context.RefundResponses.Find(item.ResponseID);
+                if (response != null)
+                {
+                    responseList.Add(new RefundResponseViewModel
+                    {
+                        RefundItemId = item.RefundItemId,
+                        Description = response.Description
+                    });
+                }
+            }
+
+            return Ok(responseList);
+        }
+
         [HttpPost]
         [Route("RequestARefund")]
         public IActionResult RequestRefund([FromBody] RefundRequestViewModel request)
