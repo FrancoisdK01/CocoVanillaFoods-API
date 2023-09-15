@@ -18,10 +18,13 @@ namespace API.Controllers
     public class RefundsController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly IConfiguration _config;
+        private string userPhoneNumber;
 
-        public RefundsController(MyDbContext context)
+        public RefundsController(MyDbContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;   
         }
 
         //[HttpPost("RequestRefund")]
@@ -170,7 +173,7 @@ namespace API.Controllers
             {
                 WineOrderId = request.WineOrderId,
                 Status = "Incomplete", 
-                RefundItems = new List<RefundItem>()
+                RefundItems = new List<RefundItem>(),
             };
 
             foreach (var item in request.RefundItems)
@@ -275,6 +278,50 @@ namespace API.Controllers
                     refundRequest.Status = "Incomplete";
                 }
 
+                var wineOrder = _context.WineOrders.FirstOrDefault(wo => wo.WineOrderId == refundRequest.WineOrderId);
+                if (wineOrder == null)
+                {
+                    return NotFound();
+                }
+
+                var user = _context.Customers.FirstOrDefault(c => c.Id == wineOrder.CustomerId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                userPhoneNumber = user.PhoneNumber;
+
+                // SMS HERE
+
+                string accountSid = _config["Twilio:AccountSid"];
+                string authToken = _config["Twilio:AuthToken"];
+                TwilioClient.Init(accountSid, authToken);
+
+                try
+                {
+                    // Send SMS
+                    var to = $"+27{userPhoneNumber.Substring(1)}";  // Assuming phoneNumber is like '0721843438'
+                    var from = "+18589018233";
+                    var message = $"Your refund request for order number {wineOrder.OrderRefNum} has been completed. \nShould you wish to see more information, please few your refunds page.";
+
+                    var smsResponse = MessageResource.Create(
+                        body: message,
+                        from: new Twilio.Types.PhoneNumber(from),
+                        to: new Twilio.Types.PhoneNumber(to)
+                    );
+
+                    if (smsResponse.ErrorCode != null)
+                    {
+                        return BadRequest($"SMS failed with error code: {smsResponse.ErrorCode}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception, or handle it as per your requirements
+                    return BadRequest($"An error occurred while sending SMS: {ex.Message}");
+                }
+
                 _context.SaveChanges();
 
                 return Ok(refundRequest);
@@ -291,21 +338,13 @@ namespace API.Controllers
             }
         }
 
-
-
-
-        
-
-
         //Customer side stuff
 
-        //[HttpGet("{email}")]
-        //public async Task<ActionResult<IEnumerable<RefundRequest>>> GetUserRefundRequests(string email)
-        //{
-        //    var wineOrder = 
-
-        //    return await _context.RefundRequests.Where(r => r.WineOrderId == email).ToListAsync();
-        //}
+        [HttpGet("CustomerRefunds/{email}")]
+        public async Task<ActionResult<IEnumerable<RefundRequest>>> GetUserRefundRequests(string email)
+        {
+            return await _context.RefundRequests.Where(r => r.WineOrder.Customer.Email == email).Include(wo => wo.WineOrder).ThenInclude(w => w.OrderItems).ThenInclude(oi => oi.Wine).ToListAsync();
+        }
     }
 }
 
