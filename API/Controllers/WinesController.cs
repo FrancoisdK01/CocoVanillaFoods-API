@@ -227,6 +227,15 @@ namespace API.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteWine(int id)
         {
+
+            // First, check if the wine is part of any order
+            bool isWineInAnyOrder = await _context.WineOrderItems.AnyAsync(oi => oi.WineId == id);
+            if (isWineInAnyOrder)
+            {
+                return BadRequest("This wine is part of an existing order and cannot be deleted.");
+            }
+
+
             var wine = await _context.Wines.FindAsync(id);
             if (wine == null)
             {

@@ -239,29 +239,40 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            // Find all ticket purchases related to this event
             var ticketPurchases = _context.TicketPurchases
-                .Include(tp => tp.TicketPurchasedStatus) // Include TicketPurchasedStatus
                 .Where(tp => tp.EventId == id)
                 .ToList();
 
+            // Check the new conditions
+            bool noTicketsPurchased = !ticketPurchases.Any();
+            bool eventDatePassed = DateTime.Now > @event.EventDate;
 
-            // Set the EventDeleted property to true for all ticket purchases related to this event
-            foreach (var ticketPurchase in ticketPurchases)
+            if (noTicketsPurchased || eventDatePassed)
             {
-                ticketPurchase.TicketPurchasedStatus.EventDeleted = true;
-            }
+                // Added null check for TicketPurchasedStatus
+                foreach (var ticketPurchase in ticketPurchases)
+                {
+                    if (ticketPurchase.TicketPurchasedStatus != null)
+                    {
+                        ticketPurchase.TicketPurchasedStatus.EventDeleted = true;
+                    }
+                }
 
-            // Delete the image from Google Cloud Storage
-            if (!string.IsNullOrEmpty(@event.FilePath))
+                // Delete the image from Google Cloud Storage
+                if (!string.IsNullOrEmpty(@event.FilePath))
+                {
+                    await DeleteImageFromGoogleCloudStorage(@event.FilePath);
+                }
+
+                _context.Events.Remove(@event);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            else
             {
-                await DeleteImageFromGoogleCloudStorage(@event.FilePath);
+                return BadRequest("Event cannot be deleted as it doesn't meet the criteria.");
             }
-
-            _context.Events.Remove(@event);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
 

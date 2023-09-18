@@ -40,5 +40,7 @@ namespace API.Model
         [JsonIgnore]
         public List<CartItem> CartItems { get; set; }
 
+        [JsonIgnore]
+        public List<WinePrice> WinePrice { get; set; }
     }
 }

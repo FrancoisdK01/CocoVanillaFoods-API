@@ -120,6 +120,12 @@ namespace API.Data
                 .HasForeignKey(v => v.WineTypeID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //Wine and wineprice
+            modelBuilder.Entity<Wine>()
+                .HasMany(w => w.WinePrice)  // Use the new navigation property
+                .WithOne(p => p.Wine)
+                .HasForeignKey(p => p.WineID)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<WineOrderItem>()
               .HasOne(oi => oi.WineOrder)
