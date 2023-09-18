@@ -7,7 +7,6 @@ namespace API.Model
 {
     public class Event : ShopItem
     {
-
         [Key]
         public int EventID { get; set; }
 
@@ -27,7 +26,6 @@ namespace API.Model
         public int? EventTypeID { get; set; }
         [ForeignKey("EventTypeID")]
         public EventType EventType { get; set; }
-
 
     }
 }

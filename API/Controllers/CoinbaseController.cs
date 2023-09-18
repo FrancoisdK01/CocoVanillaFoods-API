@@ -120,5 +120,6 @@ namespace API.Controllers
             var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(input));
             return BitConverter.ToString(hash).Replace("-", "").ToLower();
         }
+
     }
 }

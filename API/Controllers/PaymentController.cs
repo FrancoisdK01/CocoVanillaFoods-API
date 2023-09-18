@@ -38,7 +38,7 @@ namespace API.Controllers
 
             // Change this line to use the live PayFast URL
     
-            var url = "https://www.payfast.co.za/eng/process";
+            var url = "https://sandbox.payfast.co.za/eng/process";
 
             if (int.TryParse(_configuration["PayFast:MerchantId"], out int merchantId))
             {
