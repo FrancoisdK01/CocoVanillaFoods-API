@@ -56,7 +56,7 @@ namespace API.Controllers
 
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutEmployee(string id, Customer customer)
+        public async Task<IActionResult> PutCustomer(string id, Customer customer)
         {
             var customerDetailsBeforeUpdate = await _context.Customers.FindAsync(id);
             var existingCustomer = await _context.Customers.FindAsync(id);
