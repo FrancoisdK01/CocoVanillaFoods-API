@@ -22,6 +22,34 @@ namespace API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("API.Model.AuditTrail", b =>
+                {
+                    b.Property<int>("AuditLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuditLogId"), 1L, 1);
+
+                    b.Property<string>("ButtonPressed")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AuditLogId");
+
+                    b.ToTable("AuditTrails");
+                });
+
             modelBuilder.Entity("API.Model.Blacklist", b =>
                 {
                     b.Property<int>("BlacklistID")
@@ -314,8 +342,8 @@ namespace API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
@@ -335,40 +363,6 @@ namespace API.Migrations
                     b.HasIndex("EventTypeID");
 
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("API.Model.EventPayments", b =>
-                {
-                    b.Property<int>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"), 1L, 1);
-
-                    b.Property<int>("amount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("cell_number")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("email_address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("item_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("merchant_id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("merchant_key")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("signature")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PaymentId");
-
-                    b.ToTable("EventsPayments");
                 });
 
             modelBuilder.Entity("API.Model.EventPrice", b =>
@@ -403,10 +397,6 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventTypeID"), 1L, 1);
 
-                    b.Property<string>("EventDescription")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("EventTypeName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -414,6 +404,33 @@ namespace API.Migrations
                     b.HasKey("EventTypeID");
 
                     b.ToTable("EventTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            EventTypeID = 1,
+                            EventTypeName = "Internal"
+                        },
+                        new
+                        {
+                            EventTypeID = 2,
+                            EventTypeName = "External"
+                        },
+                        new
+                        {
+                            EventTypeID = 3,
+                            EventTypeName = "Social"
+                        },
+                        new
+                        {
+                            EventTypeID = 4,
+                            EventTypeName = "Corporate"
+                        },
+                        new
+                        {
+                            EventTypeID = 5,
+                            EventTypeName = "Other"
+                        });
                 });
 
             modelBuilder.Entity("API.Model.FAQ", b =>
@@ -435,6 +452,25 @@ namespace API.Migrations
                     b.HasKey("FAQID");
 
                     b.ToTable("FAQs");
+                });
+
+            modelBuilder.Entity("API.Model.HelpResource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("pdfPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("videoPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HelpResources");
                 });
 
             modelBuilder.Entity("API.Model.Inventory", b =>
@@ -474,7 +510,7 @@ namespace API.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("API.Model.RefundRequest", b =>
+            modelBuilder.Entity("API.Model.MethodPrivilegeMapping", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -482,36 +518,103 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<decimal>("Cost")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("ControllerName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("MethodName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OrderRefNum")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RequestedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WineId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isRefunded")
-                        .HasColumnType("bit");
+                    b.Property<string>("SystemPrivilegeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WineId");
+                    b.HasIndex("SystemPrivilegeId");
+
+                    b.ToTable("MethodPrivilegeMappings");
+                });
+
+            modelBuilder.Entity("API.Model.QrCode", b =>
+                {
+                    b.Property<int>("QrId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QrId"), 1L, 1);
+
+                    b.Property<string>("QrCodeBase64")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketPurchaseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QrId");
+
+                    b.HasIndex("TicketPurchaseId")
+                        .IsUnique();
+
+                    b.ToTable("QrCodes");
+                });
+
+            modelBuilder.Entity("API.Model.RefundItem", b =>
+                {
+                    b.Property<int>("RefundItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefundItemId"), 1L, 1);
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RefundRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RefundResponseID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResponseID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WineOrderItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RefundItemId");
+
+                    b.HasIndex("RefundRequestId");
+
+                    b.HasIndex("RefundResponseID");
+
+                    b.HasIndex("WineOrderItemId");
+
+                    b.ToTable("RefundItems");
+                });
+
+            modelBuilder.Entity("API.Model.RefundRequest", b =>
+                {
+                    b.Property<int>("RefundRequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefundRequestId"), 1L, 1);
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WineOrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RefundRequestId");
+
+                    b.HasIndex("WineOrderId");
 
                     b.ToTable("RefundRequests");
                 });
@@ -525,39 +628,64 @@ namespace API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefundResponseID"), 1L, 1);
 
                     b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ResponseValue")
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("RefundResponseID");
 
                     b.ToTable("RefundResponses");
+
+                    b.HasData(
+                        new
+                        {
+                            RefundResponseID = 1,
+                            Description = "In Progress",
+                            ResponseValue = "InProgress"
+                        },
+                        new
+                        {
+                            RefundResponseID = 2,
+                            Description = "Approved",
+                            ResponseValue = "Approved"
+                        },
+                        new
+                        {
+                            RefundResponseID = 3,
+                            Description = "Not Approved",
+                            ResponseValue = "NotApproved"
+                        });
                 });
 
-            modelBuilder.Entity("API.Model.ShippingDetails", b =>
+            modelBuilder.Entity("API.Model.StockTake", b =>
                 {
-                    b.Property<int>("ShippingID")
+                    b.Property<int>("stocktakeID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShippingID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("stocktakeID"), 1L, 1);
 
-                    b.Property<int>("OrderID")
-                        .HasColumnType("int");
+                    b.Property<bool?>("Added")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("ShippingDate")
+                    b.Property<DateTime>("DateDone")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("TrackingNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("QuantityOrdered")
+                        .HasColumnType("int");
 
-                    b.HasKey("ShippingID");
+                    b.Property<int>("QuantityReceived")
+                        .HasColumnType("int");
 
-                    b.ToTable("ShippingDetails");
+                    b.Property<string>("wineName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("stocktakeID");
+
+                    b.ToTable("StockTakes");
                 });
 
             modelBuilder.Entity("API.Model.SuperUser", b =>
@@ -647,8 +775,8 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(50)
@@ -673,17 +801,8 @@ namespace API.Migrations
                     b.Property<double>("OrderTotal")
                         .HasColumnType("float");
 
-                    b.Property<bool>("Ordered")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Paid")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Quantity_Ordered")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Received")
-                        .HasColumnType("bit");
 
                     b.Property<int>("SupplierID")
                         .HasColumnType("int");
@@ -744,26 +863,17 @@ namespace API.Migrations
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("EventDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
                     b.Property<string>("EventName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsScanned")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("ScannedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ScanningToken")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("QrId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TicketPrice")
                         .HasColumnType("decimal(18,2)");
@@ -774,6 +884,37 @@ namespace API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TicketPurchases");
+                });
+
+            modelBuilder.Entity("API.Model.TicketPurchasedStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("EventDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsScanned")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ScannedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ScanningToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketPurchaseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TicketPurchaseId")
+                        .IsUnique();
+
+                    b.ToTable("TicketPurchasedStatuses");
                 });
 
             modelBuilder.Entity("API.Model.User", b =>
@@ -861,7 +1002,12 @@ namespace API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("WineTypeID")
+                        .HasColumnType("int");
+
                     b.HasKey("VarietalID");
+
+                    b.HasIndex("WineTypeID");
 
                     b.ToTable("Varietals");
                 });
@@ -905,8 +1051,8 @@ namespace API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
@@ -934,6 +1080,30 @@ namespace API.Migrations
                     b.HasIndex("WineTypeID");
 
                     b.ToTable("Wines");
+                });
+
+            modelBuilder.Entity("API.Model.WinePrice", b =>
+                {
+                    b.Property<int>("WinePriceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WinePriceID"), 1L, 1);
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("WineID")
+                        .HasColumnType("int");
+
+                    b.HasKey("WinePriceID");
+
+                    b.HasIndex("WineID");
+
+                    b.ToTable("WinePrice");
                 });
 
             modelBuilder.Entity("API.Model.WineType", b =>
@@ -988,15 +1158,24 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WriteOffID"), 1L, 1);
 
-                    b.Property<string>("EmployeeID")
+                    b.Property<string>("EmployeeId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WineName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("WriteOff_Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("WriteOff_Reason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("WriteOffID");
 
-                    b.HasIndex("EmployeeID");
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("WriteOffs");
                 });
@@ -1011,9 +1190,6 @@ namespace API.Migrations
 
                     b.Property<int>("BottelsLost")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("Date_of_last_update")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
@@ -1183,6 +1359,69 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("OrderStatus", b =>
+                {
+                    b.Property<int>("OrderStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StatusName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderStatusId");
+
+                    b.ToTable("OrderStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderStatusId = 1,
+                            StatusName = "ClientOrderPlaced"
+                        },
+                        new
+                        {
+                            OrderStatusId = 2,
+                            StatusName = "SupplierOrderPlaced"
+                        },
+                        new
+                        {
+                            OrderStatusId = 3,
+                            StatusName = "Received"
+                        },
+                        new
+                        {
+                            OrderStatusId = 4,
+                            StatusName = "Collected"
+                        });
+                });
+
+            modelBuilder.Entity("SupplierOrderStatus", b =>
+                {
+                    b.Property<int>("SupplierOrderStatusID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierOrderStatusID"), 1L, 1);
+
+                    b.Property<bool>("Ordered")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Paid")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Received")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SupplierOrderID")
+                        .HasColumnType("int");
+
+                    b.HasKey("SupplierOrderStatusID");
+
+                    b.HasIndex("SupplierOrderID")
+                        .IsUnique();
+
+                    b.ToTable("SupplierOrderStatuses");
+                });
+
             modelBuilder.Entity("WineOrder", b =>
                 {
                     b.Property<int>("WineOrderId")
@@ -1203,7 +1442,7 @@ namespace API.Migrations
                     b.Property<string>("OrderRefNum")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrderStatus")
+                    b.Property<int>("OrderStatusId")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderTotal")
@@ -1215,6 +1454,8 @@ namespace API.Migrations
                     b.HasKey("WineOrderId");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderStatusId");
 
                     b.ToTable("WineOrders");
                 });
@@ -1325,11 +1566,14 @@ namespace API.Migrations
                         .WithMany("Events")
                         .HasForeignKey("EmployeeId");
 
-                    b.HasOne("API.Model.EventType", null)
+                    b.HasOne("API.Model.EventType", "EventType")
                         .WithMany("Events")
-                        .HasForeignKey("EventTypeID");
+                        .HasForeignKey("EventTypeID")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("EarlyBird");
+
+                    b.Navigation("EventType");
                 });
 
             modelBuilder.Entity("API.Model.EventPrice", b =>
@@ -1368,11 +1612,56 @@ namespace API.Migrations
                     b.Navigation("WineType");
                 });
 
+            modelBuilder.Entity("API.Model.MethodPrivilegeMapping", b =>
+                {
+                    b.HasOne("API.Model.SystemPrivilege", "SystemPrivilege")
+                        .WithMany()
+                        .HasForeignKey("SystemPrivilegeId");
+
+                    b.Navigation("SystemPrivilege");
+                });
+
+            modelBuilder.Entity("API.Model.QrCode", b =>
+                {
+                    b.HasOne("API.Model.TicketPurchase", "TicketPurchase")
+                        .WithOne("QrCode")
+                        .HasForeignKey("API.Model.QrCode", "TicketPurchaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TicketPurchase");
+                });
+
+            modelBuilder.Entity("API.Model.RefundItem", b =>
+                {
+                    b.HasOne("API.Model.RefundRequest", "RefundRequest")
+                        .WithMany("RefundItems")
+                        .HasForeignKey("RefundRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.RefundResponse", "RefundResponse")
+                        .WithMany()
+                        .HasForeignKey("RefundResponseID");
+
+                    b.HasOne("WineOrderItem", "WineOrderItem")
+                        .WithMany()
+                        .HasForeignKey("WineOrderItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RefundRequest");
+
+                    b.Navigation("RefundResponse");
+
+                    b.Navigation("WineOrderItem");
+                });
+
             modelBuilder.Entity("API.Model.RefundRequest", b =>
                 {
                     b.HasOne("WineOrder", "WineOrder")
                         .WithMany("RefundRequests")
-                        .HasForeignKey("WineId")
+                        .HasForeignKey("WineOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1403,6 +1692,28 @@ namespace API.Migrations
                     b.Navigation("Supplier");
                 });
 
+            modelBuilder.Entity("API.Model.TicketPurchasedStatus", b =>
+                {
+                    b.HasOne("API.Model.TicketPurchase", "TicketPurchase")
+                        .WithOne("TicketPurchasedStatus")
+                        .HasForeignKey("API.Model.TicketPurchasedStatus", "TicketPurchaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TicketPurchase");
+                });
+
+            modelBuilder.Entity("API.Model.Varietal", b =>
+                {
+                    b.HasOne("API.Model.WineType", "WineType")
+                        .WithMany("Varietals")
+                        .HasForeignKey("WineTypeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("WineType");
+                });
+
             modelBuilder.Entity("API.Model.Wine", b =>
                 {
                     b.HasOne("API.Model.Employee", null)
@@ -1426,6 +1737,15 @@ namespace API.Migrations
                     b.Navigation("WineType");
                 });
 
+            modelBuilder.Entity("API.Model.WinePrice", b =>
+                {
+                    b.HasOne("API.Model.Wine", "Wine")
+                        .WithMany()
+                        .HasForeignKey("WineID");
+
+                    b.Navigation("Wine");
+                });
+
             modelBuilder.Entity("API.Model.WishlistItem", b =>
                 {
                     b.HasOne("API.Model.Wine", "Wine")
@@ -1447,12 +1767,9 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.WriteOff", b =>
                 {
-                    b.HasOne("API.Model.Employee", "Employee")
+                    b.HasOne("API.Model.Employee", null)
                         .WithMany("WriteOffs")
-                        .HasForeignKey("EmployeeID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Employee");
+                        .HasForeignKey("EmployeeId");
                 });
 
             modelBuilder.Entity("Cart", b =>
@@ -1515,13 +1832,32 @@ namespace API.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SupplierOrderStatus", b =>
+                {
+                    b.HasOne("API.Model.SupplierOrder", "SupplierOrder")
+                        .WithOne("SupplierOrderStatus")
+                        .HasForeignKey("SupplierOrderStatus", "SupplierOrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SupplierOrder");
+                });
+
             modelBuilder.Entity("WineOrder", b =>
                 {
                     b.HasOne("API.Model.Customer", "Customer")
                         .WithMany("WineOrders")
                         .HasForeignKey("CustomerId");
 
+                    b.HasOne("OrderStatus", "OrderStatus")
+                        .WithMany("WineOrders")
+                        .HasForeignKey("OrderStatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("OrderStatus");
                 });
 
             modelBuilder.Entity("WineOrderItem", b =>
@@ -1581,6 +1917,11 @@ namespace API.Migrations
                     b.Navigation("Events");
                 });
 
+            modelBuilder.Entity("API.Model.RefundRequest", b =>
+                {
+                    b.Navigation("RefundItems");
+                });
+
             modelBuilder.Entity("API.Model.SuperUser", b =>
                 {
                     b.Navigation("Employees");
@@ -1589,6 +1930,18 @@ namespace API.Migrations
             modelBuilder.Entity("API.Model.Supplier", b =>
                 {
                     b.Navigation("SupplierOrders");
+                });
+
+            modelBuilder.Entity("API.Model.SupplierOrder", b =>
+                {
+                    b.Navigation("SupplierOrderStatus");
+                });
+
+            modelBuilder.Entity("API.Model.TicketPurchase", b =>
+                {
+                    b.Navigation("QrCode");
+
+                    b.Navigation("TicketPurchasedStatus");
                 });
 
             modelBuilder.Entity("API.Model.Varietal", b =>
@@ -1609,12 +1962,19 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.WineType", b =>
                 {
+                    b.Navigation("Varietals");
+
                     b.Navigation("Wines");
                 });
 
             modelBuilder.Entity("Cart", b =>
                 {
                     b.Navigation("CartItems");
+                });
+
+            modelBuilder.Entity("OrderStatus", b =>
+                {
+                    b.Navigation("WineOrders");
                 });
 
             modelBuilder.Entity("WineOrder", b =>
