@@ -26,8 +26,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{email}")]
-        [Authorize(Roles = "Customer")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [DynamicAuthorize]
         public async Task<ActionResult<Wishlist>> GetWishlist(string email)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
@@ -50,6 +49,7 @@ namespace API.Controllers
         }
 
         [HttpPost("{email}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Wishlist>> AddToWishlist(string email, [FromBody] WishlistItem wishlistItem)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
@@ -92,6 +92,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{email}/{wishlistItemId}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> RemoveFromWishlist(string email, int wishlistItemId)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);

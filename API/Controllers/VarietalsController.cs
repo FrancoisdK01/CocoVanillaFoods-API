@@ -23,6 +23,7 @@ namespace API.Controllers
 
         // GET: api/Varietals
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Varietal>>> GetVarietals()
         {
             return await _context.Varietals.Include(wt => wt.WineType).ToListAsync();
@@ -30,6 +31,7 @@ namespace API.Controllers
 
         // GET: api/Varietals/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Varietal>> GetVarietal(int id)
         {
             var varietal = await _context.Varietals.FindAsync(id);
@@ -45,6 +47,7 @@ namespace API.Controllers
         // PUT: api/Varietals/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutVarietal(int id, Varietal varietal)
         {
             if (id != varietal.VarietalID)
@@ -76,6 +79,7 @@ namespace API.Controllers
      
         // POST: api/Varietals
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<Varietal>> PostVarietal(Varietal varietal)
         {
             var existingWineType = await _context.WineTypes.FindAsync(varietal.WineTypeID);
@@ -98,6 +102,7 @@ namespace API.Controllers
 
         // DELETE: api/Varietals/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteVarietal(int id)
         {
             var varietal = await _context.Varietals.FindAsync(id);

@@ -22,6 +22,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<SupplierOrder>>> GetSupplierOrders()
         {
             return await _context.SupplierOrders
@@ -31,6 +32,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<SupplierOrder>> GetSupplierOrder(int id)
         {
             var supplierOrder = await _context.SupplierOrders
@@ -47,6 +49,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}/status")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutSupplierOrder(int id, UpdateSupplierOrderStatusDTO statusDTO)
         {
             if (id != statusDTO.SupplierOrderID)
@@ -91,6 +94,7 @@ namespace API.Controllers
 
 
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<SupplierOrder>> PostSupplierOrder(SupplierOrder supplierOrder)
         {
             supplierOrder.OrderTotal = supplierOrder.Quantity_Ordered * supplierOrder.WinePrice;
@@ -117,6 +121,7 @@ namespace API.Controllers
 
 
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteSupplierOrder(int id)
         {
             var supplierOrder = await _context.SupplierOrders.FindAsync(id);

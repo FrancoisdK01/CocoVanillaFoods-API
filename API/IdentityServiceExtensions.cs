@@ -33,14 +33,25 @@ namespace API
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Tokens:Key"])),
                     ValidIssuer = config["Tokens:Issuer"],
                     ValidAudience = config["Tokens:Audience"],
-                    ValidateIssuer = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Tokens:Key"])),
                     RequireExpirationTime = true,
-                    ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(0)
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine("Authentication Failed");
+                        Console.WriteLine(context.ToString());
+                        return Task.CompletedTask;
+                    }
                 };
             });
             services.AddAuthorization();

@@ -18,6 +18,7 @@ namespace API.Controllers
 
         // GET: api/Inventory
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Inventory>>> GetInventory()
         {
             return await _context.Inventories.ToListAsync();

@@ -27,56 +27,9 @@ namespace API.Controllers
             _config = config;   
         }
 
-        //[HttpPost("RequestRefund")]
-        //public async Task<IActionResult> RequestRefund([FromBody] RefundRequestModel model)
-        //{
-
-        //    var wineOrderToUpdate = await _context.WineOrders.FirstOrDefaultAsync(o => o.OrderRefNum == model.ReferenceNumber);
-
-        //    if (model == null || !ModelState.IsValid)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    TimeSpan difference = DateTime.UtcNow - wineOrderToUpdate.CollectedDate;
-        //    if (difference.TotalDays > 7)
-        //    {
-        //        return BadRequest("Can't request refund after 7 days of purchase.");
-        //    }
-
-        //    try
-        //    {
-        //        var refundRequest = new RefundRequest
-        //        {
-        //            WineId = model.WineId,
-        //            Email = model.Email,
-        //            RequestedOn = DateTime.UtcNow,
-        //            Cost = model.Cost,
-        //            Description = model.Description,
-        //            isRefunded = true,
-        //            PhoneNumber = model.PhoneNumber
-        //        };
-        //        if(wineOrderToUpdate != null)
-        //        {
-        //            wineOrderToUpdate.isRefunded = true;
-        //        }
-
-        //        _context.RefundRequests.Add(refundRequest);
-        //        await _context.SaveChangesAsync();
-
-        //        // Possibly send a notification about the refund request here...
-
-        //        return Ok();
-        //    }
-        //    catch (Exception)
-        //    {
-        //        // Log the exception...
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
         // GET: api/Refunds
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<RefundRequest>>> GetRefundRequests()
         {
             var allRefunds = _context.RefundRequests.Include(ri => ri.RefundItems).Include(wo => wo.WineOrder).ThenInclude(wo => wo.OrderItems).ToList();
@@ -86,6 +39,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("allRefundsResponses")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<RefundResponse>>> GetRefundReponses()
         {
             var allRefundsResponses = _context.RefundResponses.ToList();
@@ -95,6 +49,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("getResponse/{id}")]
+        [DynamicAuthorize]
         public IActionResult GetResponse(int id)
         {
             // First, find the RefundItems with the matching RefundRequestId
@@ -126,6 +81,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("RequestARefund")]
+        [DynamicAuthorize]
         public IActionResult RequestRefund([FromBody] RefundRequestViewModel request)
         {
             var wineOrder = _context.WineOrders
@@ -199,6 +155,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetWineDetailsForRefund/{refundRequestId}")]
+        [DynamicAuthorize]
         public IActionResult GetWineDetailsForRefund(int refundRequestId)
         {
             // First, check if the RefundRequest exists
@@ -236,6 +193,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("UpdateRefundStatus/{refundRequestId}")]
+        [DynamicAuthorize]
         public IActionResult UpdateRefundStatus(int refundRequestId, [FromBody] List<RefundItemUpdateViewModel> itemsStatuses)
         {
             try
@@ -339,43 +297,11 @@ namespace API.Controllers
         }
 
         //Customer side stuff
-
         [HttpGet("CustomerRefunds/{email}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<RefundRequest>>> GetUserRefundRequests(string email)
         {
             return await _context.RefundRequests.Where(r => r.WineOrder.Customer.Email == email).Include(wo => wo.WineOrder).ThenInclude(w => w.OrderItems).ThenInclude(oi => oi.Wine).ToListAsync();
         }
     }
 }
-
-
-
-//// Initialize Twilio here, or make sure it's initialized in Startup.cs
-//// Ideally, you would read these from a configuration file or environment variables.
-//string accountSid = "AC14ac294ab00ac67c898644d8f27851e4";
-//string authToken = "b6feebfd098dedb8d5414e067027cb05";
-//TwilioClient.Init(accountSid, authToken);
-
-//try
-//{
-//    // Send SMS
-//    var to = $"+27{refundRequest.PhoneNumber.Substring(1)}";  // Assuming phoneNumber is like '0721843438'
-//    var from = "+18589018233";
-//    var message = $"Your refund request for order number {model.OrderRefNum} has been updated to {model.Status}.";
-
-//    var smsResponse = MessageResource.Create(
-//        body: message,
-//        from: new Twilio.Types.PhoneNumber(from),
-//        to: new Twilio.Types.PhoneNumber(to)
-//    );
-
-//    if (smsResponse.ErrorCode != null)
-//    {
-//        return BadRequest($"SMS failed with error code: {smsResponse.ErrorCode}");
-//    }
-//}
-//catch (Exception ex)
-//{
-//    // Log the exception, or handle it as per your requirements
-//    return BadRequest($"An error occurred while sending SMS: {ex.Message}");
-//}

@@ -12,8 +12,6 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Superuser")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class EmployeesController : ControllerBase
     {
         private readonly MyDbContext _context;
@@ -30,6 +28,7 @@ namespace API.Controllers
         // GET: api/Employees
         [HttpGet]
         [Route("GetEmployees")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
             return await _context.Employees.ToListAsync();
@@ -37,6 +36,7 @@ namespace API.Controllers
 
         // GET: api/Employees/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Employee>> GetEmployee(string id)
         {
             var employee = await _context.Employees.FindAsync(id);
@@ -52,8 +52,7 @@ namespace API.Controllers
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "Employee,Superuser")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutEmployee(string id, Employee employee)
         {
             var employeeDetailsBeforeUpdate = await _context.Employees.FindAsync(id);
@@ -117,6 +116,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Route("AddEmployee")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Employee>> PostEmployee(EmployeeRegistrationViewModel viewModel)
         {
             RegisterViewModel registerModel = viewModel.RegisterModel;
@@ -199,6 +199,7 @@ namespace API.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("DeleteEmployee/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteEmployee(string id)
         {
             var employee = await _context.Employees.FindAsync(id);
@@ -234,7 +235,8 @@ namespace API.Controllers
         {
             return _context.Employees.Any(e => e.Id.Equals(id));
         }
-        
+
+        [DynamicAuthorize]
         public static string GeneratePassword()
         {
             string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

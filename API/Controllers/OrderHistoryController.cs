@@ -29,6 +29,7 @@ namespace API.Controllers
         }
 
         [HttpPost("{email}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<WineOrder>> CreateOrder(string email)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
@@ -68,6 +69,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{email}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<WineOrder>>> GetOrdersForUser(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -92,6 +94,7 @@ namespace API.Controllers
         }
 
         [HttpGet("Order/{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<WineOrder>> GetOrder(int id)
         {
             var order = await _context.WineOrders.Include(o => o.OrderItems)
@@ -113,6 +116,7 @@ namespace API.Controllers
 
 
         [HttpGet("AllOrders")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<WineOrder>>> GetAllOrders()
         {
             var allOrders = await _context.WineOrders.Include(o => o.OrderItems)
@@ -139,6 +143,7 @@ namespace API.Controllers
         }
 
         [HttpGet("AllSales")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<WineOrder>>> GetAllSales()
         {
             var orders = await _context.WineOrders
@@ -155,6 +160,7 @@ namespace API.Controllers
 
         /////////////////////////////Marco kode om die sales chart te display/////////////////////////////////////
         [HttpGet("SalesReport")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<object>>> GetSalesReport(string? startDate, string? endDate)
         {
             if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
@@ -191,6 +197,7 @@ namespace API.Controllers
         }
 
         [HttpPut("UpdateOrder/{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult> UpdateOrderStatus(int id, [FromQuery] int newStatus)
         {
             {

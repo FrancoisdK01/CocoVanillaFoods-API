@@ -63,6 +63,7 @@ namespace API.Controllers
 
         // GET: api/Events
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
         {
             return await _context.Events
@@ -74,6 +75,7 @@ namespace API.Controllers
 
         // GET: api/Events/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Event>> GetEvent(int id)
         {
             var @event = await _context.Events
@@ -92,6 +94,7 @@ namespace API.Controllers
 
         // PUT: api/Events/5
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutEvent(int id, [FromForm] EventFormViewModel eventForm)
         {
             // Ensure ID matches
@@ -177,6 +180,7 @@ namespace API.Controllers
 
         // POST: api/Events
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<Event>> PostEvent([FromForm] EventFormViewModel eventForm)
         {
 
@@ -231,6 +235,7 @@ namespace API.Controllers
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             var @event = await _context.Events.FindAsync(id);
@@ -305,6 +310,7 @@ namespace API.Controllers
         }
 
         [HttpPost("purchase/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PurchaseTicket(int id)
         {
             var eventItem = await _context.Events.FindAsync(id);
@@ -343,6 +349,7 @@ namespace API.Controllers
 
 
         [HttpPut("display-toggle/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> ToggleEventDisplay(int id)
         {
             var eventItem = await _context.Events.FindAsync(id);

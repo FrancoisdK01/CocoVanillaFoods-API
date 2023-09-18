@@ -25,6 +25,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<TicketPurchase>> PostTicket(TicketPurchaseDTO ticketDTO)
         {
             // Lookup the event details and customer based on the DTO data
@@ -90,6 +91,7 @@ namespace API.Controllers
 
 
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<TicketPurchase>> GetTicketPurchase(int id)
         {
             var ticketPurchase = await _context.TicketPurchases.FindAsync(id);
@@ -104,6 +106,7 @@ namespace API.Controllers
 
         // New method to get all purchases for a user
         [HttpGet("User/{userEmail}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<TicketPurchase>>> GetPurchasesForUser(string userEmail)
         {
             var ticketPurchases = await _context.TicketPurchases
@@ -119,6 +122,7 @@ namespace API.Controllers
             return ticketPurchases;
         }
         [HttpDelete("CheckAndDelete/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> CheckAndDeletePurchasedTicket(int id)
         {
             var ticketPurchase = await _context.TicketPurchases.FindAsync(id);
@@ -159,6 +163,7 @@ namespace API.Controllers
 
         // POST: api/Tickets/Scan/{token}
         [HttpPost("Scan/{token}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> ScanTicket(string token)
         {
             // Debugging lines
@@ -280,6 +285,7 @@ namespace API.Controllers
         }
 
         [HttpGet("TicketSalesReport")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<object>>> GetTicketSalesReport(string? startDate, string? endDate)
         {
             Console.WriteLine($"Received start date: {startDate}, end date: {endDate}"); // Debugging line

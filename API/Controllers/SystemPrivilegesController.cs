@@ -16,7 +16,6 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Superuser")]
     [Route("api/[controller]")]
     [ApiController]
     public class SystemPrivilegesController : ControllerBase
@@ -33,6 +32,7 @@ namespace API.Controllers
         // GET: api/SystemPrivileges
         [HttpGet]
         [Route("GetSystemPrivileges")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<SystemPrivilege>>> GetSystemPrivileges()
         {
             return await _context.SystemPrivileges.ToListAsync();
@@ -41,6 +41,7 @@ namespace API.Controllers
 
         // GET: api/SystemPrivileges/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<SystemPrivilege>> GetSystemPrivilege(string id)
         {
             var systemPrivilege = await _context.SystemPrivileges.FindAsync(id);
@@ -56,6 +57,7 @@ namespace API.Controllers
         // PUT: api/SystemPrivileges/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutSystemPrivilege(string id, SystemPrivilege systemPrivilege)
         {
             var existingSystemPrivilege = await _context.SystemPrivileges.FindAsync(id);
@@ -103,6 +105,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Route("AddPrivilege")]
+        [DynamicAuthorize]
         public async Task<ActionResult<SystemPrivilege>> PostSystemPrivilege(SystemPrivilegeViewModel viewModel)
         {
             // Check if the role name already exists in SystemPrivileges
@@ -160,6 +163,7 @@ namespace API.Controllers
 
         // DELETE: api/SystemPrivileges/5
         [HttpDelete("DeleteSystemPrivilege/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteSystemPrivilege(string id)
         {
             var systemPrivilege = await _context.SystemPrivileges.FindAsync(id);

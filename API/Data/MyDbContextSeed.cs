@@ -1,7 +1,9 @@
 ﻿using API.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Controller;
 using System.IO;
 using System.Linq;
 
@@ -137,6 +139,80 @@ namespace API.Data
             }
         }
 
+        public static async Task SeedMethodPrivilegeMappingsAsync(MyDbContext context)
+        {
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "API");
+            var controllerType = typeof(ControllerBase);
+
+            var superuserPrivilegeId = context.SystemPrivileges.FirstOrDefault(p => p.Name == "Superuser")?.Id;
+            var adminPrivilegeId = context.SystemPrivileges.FirstOrDefault(p => p.Name == "Admin")?.Id;
+            var employeePrivilegeId = context.SystemPrivileges.FirstOrDefault(p => p.Name == "Employee")?.Id;
+
+            // Ensure the privilege IDs are found.
+            if (superuserPrivilegeId == null || adminPrivilegeId == null || employeePrivilegeId == null)
+            {
+                throw new Exception("Required privilege not found.");
+            }
+
+            var adminControllers = new[]
+            {
+                "BlacklistController", "ChatBotController", "DiscountsController", "EarlyBirdsController",
+                "EventPriceController", "EventsController", "EventTypeController", "HelpResourceController",
+                "MailController", "SupplierOrdersController", "VarietalsController", "WinesController", "WineTypesController"
+            };
+
+            var employeeControllers = new[]
+            {
+                "ChatBotController", "HelpResourceController", "InventoryController", "MailController",
+                "StockTakeController", "SupplierOrdersController", "SuppliersController", "VarietalsController",
+                "WineTypesController", "WinesController", "WriteOffsController", "WriteOff_ReasonController"
+            };
+
+            var mappings = new List<MethodPrivilegeMapping>();
+
+            foreach (var type in assembly.GetTypes().Where(t => t.IsSubclassOf(controllerType)))
+            {
+                foreach (var method in type.GetMethods().Where(m => m.IsPublic && m.DeclaringType == type))
+                {
+                    if (adminControllers.Contains(type.Name))
+                    {
+                        mappings.Add(new MethodPrivilegeMapping
+                        {
+                            ControllerName = type.Name,
+                            MethodName = method.Name,
+                            SystemPrivilegeId = adminPrivilegeId
+                        });
+                    }
+                    if (employeeControllers.Contains(type.Name))
+                    {
+                        mappings.Add(new MethodPrivilegeMapping
+                        {
+                            ControllerName = type.Name,
+                            MethodName = method.Name,
+                            SystemPrivilegeId = employeePrivilegeId
+                        });
+                    }
+
+                    mappings.Add(new MethodPrivilegeMapping
+                    {
+                        ControllerName = type.Name,
+                        MethodName = method.Name,
+                        SystemPrivilegeId = superuserPrivilegeId
+                    });
+
+                }
+            }
+
+            if (!context.MethodPrivilegeMappings.Any())
+            {
+                await context.MethodPrivilegeMappings.AddRangeAsync(mappings);
+                await context.SaveChangesAsync();
+            }
+        }
+
+
+
+
         public static async Task SeedHelpResource(MyDbContext context, IWebHostEnvironment _webHostEnvironment)
         {
             // Check if there's already an entry in the HelpResources table
@@ -152,7 +228,6 @@ namespace API.Data
                 await context.SaveChangesAsync();
             }
         }
-
     }
 }
 

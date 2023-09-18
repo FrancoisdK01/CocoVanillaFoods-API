@@ -19,6 +19,7 @@ namespace API.Controllers
         // GET: api/GetStockTake
         [HttpGet]
         [Route("GetStockTake")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<StockTake>>> GetStockTake()
         {
             return await _context.StockTakes.ToListAsync();
@@ -27,6 +28,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("AddStockTake")]
+        [DynamicAuthorize]
         public async Task<ActionResult<StockTake>> PostStockTake(StockTake stocktake)
         {            
 
@@ -55,6 +57,7 @@ namespace API.Controllers
 
 
         [HttpPut("UpdateStockTake/{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<StockTake>> PutStockTake(StockTake stocktake)
         {
 
