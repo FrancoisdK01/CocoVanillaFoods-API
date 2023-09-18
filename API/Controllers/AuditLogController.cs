@@ -23,6 +23,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<AuditTrail>>> GetAuditTrail()
         {
             return await _context.AuditTrails.ToListAsync();
@@ -30,6 +31,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("AddAuditLog")]
+        [DynamicAuthorize]
         public async Task<ActionResult<AuditTrail>> writeToAuditLog(AuditTrail auditLog)
         {
             var loggedInUser = await _userManager.FindByEmailAsync(auditLog.UserEmail);

@@ -25,6 +25,7 @@ namespace API.Controllers
 
         // GET: api/Discounts
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Discount>>> GetDiscounts()
         {
             return await _context.Discounts.ToListAsync();
@@ -47,6 +48,7 @@ namespace API.Controllers
         // PUT: api/Discounts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutDiscount(int id, Discount discount)
         {
             if (id != discount.DiscountID)
@@ -78,6 +80,7 @@ namespace API.Controllers
         // POST: api/Discounts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<Discount>> PostDiscount(Discount discount)
         {
             _context.Discounts.Add(discount);
@@ -88,6 +91,7 @@ namespace API.Controllers
 
         // DELETE: api/Discounts/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteDiscount(int id)
         {
             var discount = await _context.Discounts.FindAsync(id);
@@ -108,6 +112,7 @@ namespace API.Controllers
         }
 
         [HttpPost("Validate")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Discount>> ValidateDiscountCode([FromBody] DiscountCodeDto discountCodeDto)
         {
             Console.WriteLine("Received discount code: " + discountCodeDto.Code);

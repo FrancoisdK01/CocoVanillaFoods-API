@@ -23,6 +23,7 @@ namespace API.Controllers
 
         // GET: api/WriteOff_Reason
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<WriteOff_Reason>>> GetWriteOffReasons()
         {
             return await _context.WriteOffReasons.ToListAsync();
@@ -30,6 +31,7 @@ namespace API.Controllers
 
         // GET: api/WriteOff_Reason/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<WriteOff_Reason>> GetWriteOff_Reason(int id)
         {
             var writeOff_Reason = await _context.WriteOffReasons.FindAsync(id);
@@ -45,6 +47,7 @@ namespace API.Controllers
         // PUT: api/WriteOff_Reason/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutWriteOff_Reason(int id, WriteOff_Reason writeOff_Reason)
         {
             if (id != writeOff_Reason.WriteOff_ReasonID)
@@ -76,6 +79,7 @@ namespace API.Controllers
         // POST: api/WriteOff_Reason
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<WriteOff_Reason>> PostWriteOff_Reason(WriteOff_Reason writeOff_Reason)
         {
             _context.WriteOffReasons.Add(writeOff_Reason);
@@ -86,6 +90,7 @@ namespace API.Controllers
 
         // DELETE: api/WriteOff_Reason/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteWriteOff_Reason(int id)
         {
             var writeOff_Reason = await _context.WriteOffReasons.FindAsync(id);

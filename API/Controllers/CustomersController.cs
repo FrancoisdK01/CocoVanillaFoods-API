@@ -30,6 +30,7 @@ namespace API.Controllers
         // GET: api/Customers
         [HttpGet]
         [Route("GetCustomers")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
             return await _context.Customers.ToListAsync();
@@ -38,6 +39,7 @@ namespace API.Controllers
         // GET: api/Customers/5
         [HttpGet]
         [Route("GetUser/{email}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> GetCustomer(string email)
         {
             var user = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
@@ -53,8 +55,7 @@ namespace API.Controllers
 
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Customer")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutEmployee(string id, Customer customer)
         {
             var customerDetailsBeforeUpdate = await _context.Customers.FindAsync(id);
@@ -128,6 +129,7 @@ namespace API.Controllers
 
         // DELETE: api/Customers/5
         [HttpDelete("DeleteCustomer/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteCustomer(string id)
         {
             var customer = await _context.Customers.FindAsync(id);
@@ -177,6 +179,7 @@ namespace API.Controllers
         //////////////////////////Marco se code om die age groups in charts te display ////////////////////////////////////////
         [HttpGet]
         [Route("AgeDistribution")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Dictionary<string, int>>> GetAgeDistribution()
         {
             var users = await _context.Customers.ToListAsync();

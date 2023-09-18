@@ -21,37 +21,9 @@ namespace API.Controllers
             _context = context;
         }
 
-        //[HttpGet]
-        //[Route("getRefundReport/{beginDate}/{endDate}")]
-        //[Authorize(Roles = "Superuser")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        //public async Task<IActionResult> GetAllRefunds(DateTime beginDate, DateTime endDate)
-        //{
-        //    // Ensure dates are in correct order (swap if necessary)
-        //    if (beginDate > endDate)
-        //    {
-        //        var temp = beginDate;
-        //        beginDate = endDate;
-        //        endDate = temp;
-        //    }
-
-
-        //    var listOfWriteOffs = await _context.RefundRequests
-        //                                     .Where(r => r.RequestedOn >= beginDate && r.RequestedOn <= endDate)
-        //                                     .ToListAsync();
-
-        //    foreach (var request in listOfWriteOffs)
-        //    {
-        //        request.OrderRefNum = request.WineOrder?.OrderRefNum; // Set the OrderRefNum property
-        //    }
-
-        //    return Ok(listOfWriteOffs);
-        //}
-
         [HttpGet]
         [Route("getEventReport/{beginDate}/{endDate}")]
-        [Authorize(Roles = "Superuser")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [DynamicAuthorize]
         public async Task<IActionResult> GetEventsReport(DateTime beginDate, DateTime endDate)
         {
             // Ensure dates are in correct order (swap if necessary)
@@ -72,8 +44,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("getAllSupplierOrders")]
-        [Authorize(Roles = "Superuser")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [DynamicAuthorize]
         public async Task<IActionResult> GetAllSupplierOrders()
         {
             DateTime currentDate = DateTime.Now;

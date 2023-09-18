@@ -23,6 +23,7 @@ namespace API.Controllers
 
         // GET: api/FAQs
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<FAQ>>> GetFAQs()
         {
             return await _context.FAQs.ToListAsync();
@@ -45,6 +46,7 @@ namespace API.Controllers
         // PUT: api/FAQs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutFAQ(int id, FAQ fAQ)
         {
             if (id != fAQ.FAQID)
@@ -76,6 +78,7 @@ namespace API.Controllers
         // POST: api/FAQs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<FAQ>> PostFAQ(FAQ fAQ)
         {
             _context.FAQs.Add(fAQ);
@@ -86,6 +89,7 @@ namespace API.Controllers
 
         // DELETE: api/FAQs/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteFAQ(int id)
         {
             var fAQ = await _context.FAQs.FindAsync(id);

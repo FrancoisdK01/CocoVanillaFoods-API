@@ -23,6 +23,7 @@ namespace API.Controllers
 
         // GET: api/EventPrices
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<EventPrice>>> GetEventPrices()
         {
             return await _context.EventPrices.ToListAsync();
@@ -30,6 +31,7 @@ namespace API.Controllers
 
         // GET: api/EventPrices/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<EventPrice>> GetEventPrice(int id)
         {
             var eventPrice = await _context.EventPrices.FindAsync(id);
@@ -45,6 +47,7 @@ namespace API.Controllers
         // PUT: api/EventPrices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutEventPrice(int id, EventPrice eventPrice)
         {
             if (id != eventPrice.EventPriceID)
@@ -76,6 +79,7 @@ namespace API.Controllers
         // POST: api/EventPrices
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<EventPrice>> PostEventPrice(EventPrice eventPrice)
         {
             _context.EventPrices.Add(eventPrice);
@@ -86,6 +90,7 @@ namespace API.Controllers
 
         // DELETE: api/EventPrices/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteEventPrice(int id)
         {
             var eventPrice = await _context.EventPrices.FindAsync(id);

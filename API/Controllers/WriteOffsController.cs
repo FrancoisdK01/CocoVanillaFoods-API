@@ -23,6 +23,7 @@ namespace API.Controllers
 
         // GET: api/WriteOffs
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<WriteOff>>> GetWriteOffs()
         {
             return await _context.WriteOffs.ToListAsync();
@@ -33,6 +34,7 @@ namespace API.Controllers
         // POST: api/WriteOffs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<WriteOff>> PostWriteOff(WriteOff writeOff)
         {                  
 
@@ -57,6 +59,7 @@ namespace API.Controllers
 
         // DELETE: api/WriteOffs/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteWriteOff(int id)
         {
             var writeOff = await _context.WriteOffs.FindAsync(id);

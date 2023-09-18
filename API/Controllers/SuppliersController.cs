@@ -23,6 +23,7 @@ namespace API.Controllers
 
         // GET: api/Suppliers
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Supplier>>> GetSuppliers()
         {
             return await _context.Suppliers.ToListAsync();
@@ -30,6 +31,7 @@ namespace API.Controllers
 
         // GET: api/Suppliers/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Supplier>> GetSupplier(int id)
         {
             var supplier = await _context.Suppliers.FindAsync(id);
@@ -45,6 +47,7 @@ namespace API.Controllers
         // PUT: api/Suppliers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutSupplier(int id, Supplier supplier)
         {
             if (id != supplier.SupplierID)
@@ -76,6 +79,7 @@ namespace API.Controllers
         // POST: api/Suppliers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<Supplier>> PostSupplier(Supplier supplier)
         {
             _context.Suppliers.Add(supplier);
@@ -86,6 +90,7 @@ namespace API.Controllers
 
         // DELETE: api/Suppliers/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteSupplier(int id)
         {
             var supplier = await _context.Suppliers.FindAsync(id);

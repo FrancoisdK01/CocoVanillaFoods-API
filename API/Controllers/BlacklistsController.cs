@@ -26,6 +26,7 @@ namespace API.Controllers
 
         // GET: api/Blacklists
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<Blacklist>>> GetBlacklists()
         {
             return await _context.Blacklists.ToListAsync();
@@ -33,6 +34,7 @@ namespace API.Controllers
 
         // GET: api/Blacklists/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<Blacklist>> GetBlacklist(int id)
         {
             var blacklist = await _context.Blacklists.FindAsync(id);
@@ -48,6 +50,7 @@ namespace API.Controllers
         // PUT: api/Blacklists/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutBlacklist(int id, Blacklist blacklist)
         {
             if (id != blacklist.BlacklistID)
@@ -79,6 +82,7 @@ namespace API.Controllers
         // POST: api/Blacklists
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<Blacklist>> PostBlacklist(Blacklist blacklist)
         {
             _context.Blacklists.Add(blacklist);
@@ -89,6 +93,7 @@ namespace API.Controllers
 
         // DELETE: api/Blacklists/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteBlacklist(BlacklistDeleteViewModel deleteViewModel)
         {
             var blacklist = await _context.Blacklists.FindAsync(deleteViewModel.id);
@@ -134,6 +139,7 @@ namespace API.Controllers
 
         //Check if users are in Blacklist
         [HttpGet("check/{email}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<bool>> CheckBlacklist(string email)
         {
             var blacklist = await _context.Blacklists

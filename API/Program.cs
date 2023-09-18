@@ -94,6 +94,7 @@ try
     await context.Database.MigrateAsync();
     await MyDbContextSeed.SeedUserRolesAsync(services, context);
     await MyDbContextSeed.SeedUsersAsync(userManager, context);
+    await MyDbContextSeed.SeedMethodPrivilegeMappingsAsync(context);
     await MyDbContextSeed.SeedHelpResource(context, webHostEnvironment);
 }
 catch (Exception ex)

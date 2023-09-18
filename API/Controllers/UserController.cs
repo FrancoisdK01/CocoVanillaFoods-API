@@ -354,47 +354,6 @@ namespace API.Controllers
             }
         }
 
-
-        // AUTH CHECKING
-        //Test Authentication
-        [HttpGet]
-        [Route("testAuth")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<string> SuperSecretThing()
-        {
-            return "Super secret text has been placed here";
-        }
-
-
-        [HttpGet]
-        [Route("testCustAuth")]
-        [Authorize(Roles = "Customer")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<string> CustomerAuth()
-        {
-            return "Super secret text for Customers only";
-        }
-
-        [HttpGet]
-        [Route("testSuperAuth")]
-        [Authorize(Roles = "Superuser")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<string> SuperAuth()
-        {
-            return "Super secret text for Superusers only";
-        }
-
-
-        [HttpGet]
-        [Route("testEmployeeAuth")]
-        [Authorize(Roles = "Employee")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<string> EmployeeAuth()
-        {
-            return "Super secret text for Employees only";
-        }
-
-
         [HttpPost]
         [Route("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)

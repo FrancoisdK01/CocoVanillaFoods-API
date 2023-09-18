@@ -17,6 +17,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<IActionResult> SendMessageToBot([FromBody] UserMessage message)
         {
             var response = await _httpClient.PostAsJsonAsync("http://localhost:5005/webhooks/rest/webhook", message);

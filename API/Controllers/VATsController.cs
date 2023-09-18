@@ -28,6 +28,7 @@ namespace API.Controllers
 
         // GET: api/VATs
         [HttpGet]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<VAT>>> GetVATs()
         {
             return await _context.VATs.ToListAsync();
@@ -35,6 +36,7 @@ namespace API.Controllers
 
         // GET: api/VATs/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<VAT>> GetVAT(int id)
         {
             var vAT = await _context.VATs.FindAsync(id);
@@ -50,6 +52,7 @@ namespace API.Controllers
         // PUT: api/VATs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutVAT(int id, VAT vAT)
         {
             if (id != vAT.VATID)
@@ -81,6 +84,7 @@ namespace API.Controllers
         // POST: api/VATs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [DynamicAuthorize]
         public async Task<ActionResult<VAT>> PostVAT(VAT vAT)
         {
             _context.VATs.Add(vAT);
@@ -91,6 +95,7 @@ namespace API.Controllers
 
         // DELETE: api/VATs/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteVAT(int id)
         {
             var vAT = await _context.VATs.FindAsync(id);

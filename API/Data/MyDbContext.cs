@@ -262,5 +262,7 @@ namespace API.Data
         public DbSet<QrCode> QrCodes { get; set; }
         public DbSet<WinePrice> WinePrice { get; set; }
         public DbSet<RefundItem> RefundItems { get; set; }
+        public DbSet<MethodPrivilegeMapping> MethodPrivilegeMappings { get; set; }
+
     }
 }

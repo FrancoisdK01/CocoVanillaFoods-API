@@ -18,8 +18,6 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Superuser")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SuperUsersController : ControllerBase
     {
         private readonly MyDbContext _context;
@@ -39,6 +37,7 @@ namespace API.Controllers
         // GET: api/SuperUsers
         [HttpGet]
         [Route("GetSuperusers")]
+        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<SuperUser>>> GetSuperUser()
         {
             return await _context.SuperUser.ToListAsync();
@@ -46,6 +45,7 @@ namespace API.Controllers
 
         // GET: api/SuperUsers/5
         [HttpGet("{id}")]
+        [DynamicAuthorize]
         public async Task<ActionResult<SuperUser>> GetSuperUser(string id)
         {
             var superUser = await _context.SuperUser.FindAsync(id);
@@ -61,6 +61,7 @@ namespace API.Controllers
         // PUT: api/SuperUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("UpdateSuperUser/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> PutSuperUser(string id, SuperUser superUser)
         {
             var existingSuperUser = await _context.SuperUser.FindAsync(id);
@@ -102,6 +103,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Route("AddSuperuser")]
+        [DynamicAuthorize]
         public async Task<ActionResult<SuperUser>> PostSuperUser(SuperUserRegistrationViewModel viewModel)
         {
             RegisterViewModel registerModel = viewModel.RegisterModel;
@@ -187,6 +189,7 @@ namespace API.Controllers
 
         // DELETE: api/SuperUsers/5
         [HttpDelete("DeleteSuperuser/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteSuperUser(string id)
         {
             var superuser = await _context.SuperUser.FindAsync(id);
@@ -252,6 +255,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("UpdateUserRoles")]
+        [DynamicAuthorize]
         public async Task<IActionResult> UpdateUserRoles(UserRolesViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.UserEmail);
@@ -311,6 +315,7 @@ namespace API.Controllers
         }
 
         [HttpGet("GetAllRoles")]
+        [DynamicAuthorize]
         public async Task<IEnumerable<string>> GetAllRoles()
         {
             var allRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
