@@ -308,8 +308,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("UpdateLoginDetails/{id}")]
-        [AllowAnonymous]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [DynamicAuthorize]
         public async Task<IActionResult> UpdateLoginDetails(string id, LoginUpdateViewModel model)
         {
             var loggedInUser = await _userManager.FindByIdAsync(id);
@@ -472,6 +471,7 @@ namespace API.Controllers
         //////////////////////////Marco se code om die gender chart inligting te kry vir Charts ////////////////////////////////////////
         [HttpGet]
         [Route("GetGenderDistribution")]
+        [DynamicAuthorize]
         public IActionResult GetGenderDistribution()
         {
             var genderDistribution = _context.Customers.GroupBy(c => c.Gender)

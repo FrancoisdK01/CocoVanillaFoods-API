@@ -147,9 +147,10 @@ namespace API.Data
             var superuserPrivilegeId = context.SystemPrivileges.FirstOrDefault(p => p.Name == "Superuser")?.Id;
             var adminPrivilegeId = context.SystemPrivileges.FirstOrDefault(p => p.Name == "Admin")?.Id;
             var employeePrivilegeId = context.SystemPrivileges.FirstOrDefault(p => p.Name == "Employee")?.Id;
+            var customerPrivilegeId = context.SystemPrivileges.FirstOrDefault(p => p.Name == "Customer")?.Id;
 
             // Ensure the privilege IDs are found.
-            if (superuserPrivilegeId == null || adminPrivilegeId == null || employeePrivilegeId == null)
+            if (superuserPrivilegeId == null || adminPrivilegeId == null || employeePrivilegeId == null || customerPrivilegeId == null)
             {
                 throw new Exception("Required privilege not found.");
             }
@@ -166,6 +167,23 @@ namespace API.Data
                 "ChatBotController", "HelpResourceController", "InventoryController", "MailController",
                 "StockTakeController", "SupplierOrdersController", "SuppliersController", "VarietalsController",
                 "WineTypesController", "WinesController", "WriteOffsController", "WriteOff_ReasonController"
+            };
+
+            var customerControllersWithMethods = new Dictionary<string, List<string>>
+            {
+                {"CartController", new List<string> {"GetCart", "AddToCart", "IncrementCartItemQuantity", "DecrementCartItemQuantity", "GetCartTotal", "ApplyDiscount", "ClearCart"}},
+                {"ChatBotController", new List<string> { "SendMessageToBot" }},
+                {"CustomersController", new List<string> { "GetCustomer", "PutCustomer" }},
+                {"DiscountsController", new List<string> {"ValidateDiscountCode"}},
+                {"EventsController", new List<string> {"GetEvents", "GetEvent", "PurchaseTicket" }},
+                //{"FAQsController", new List<string> {"GetFAQs", "GetFAQ" }},
+                {"OrderHistoryController", new List<string> { "CreateOrder", "GetOrdersForUser", "GetOrder" }},
+                {"PaymentController", new List<string> {"CreatePayment", "HandlePaymentResult"}},
+                {"RefundsController", new List<string> { "GetRefundRequests", "GetRefundReponses", "GetResponse", "RequestRefund", "GetWineDetailsForRefund", "GetUserRefundRequests"}},
+                {"TicketPurchasesController", new List<string> { "PostTicket", "GetTicketPurchase", "GetPurchasesForUser" }},
+                {"UserController", new List<string> { "GetUserIdByEmail", "UpdateLoginDetails" }},
+                {"WinesController", new List<string> {"GetWinesForCustomers"}},
+                {"WishlistController", new List<string> { "GetWishlist", "AddToWishlist", "RemoveFromWishlist" }}
             };
 
             var mappings = new List<MethodPrivilegeMapping>();
@@ -192,6 +210,17 @@ namespace API.Data
                             SystemPrivilegeId = employeePrivilegeId
                         });
                     }
+
+                    if (customerControllersWithMethods.TryGetValue(type.Name, out var allowedMethods) && allowedMethods.Contains(method.Name))
+                    {
+                        mappings.Add(new MethodPrivilegeMapping
+                        {
+                            ControllerName = type.Name,
+                            MethodName = method.Name,
+                            SystemPrivilegeId = customerPrivilegeId
+                        });
+                    }
+
 
                     mappings.Add(new MethodPrivilegeMapping
                     {

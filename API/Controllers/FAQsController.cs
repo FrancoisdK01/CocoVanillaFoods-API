@@ -23,7 +23,6 @@ namespace API.Controllers
 
         // GET: api/FAQs
         [HttpGet]
-        [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<FAQ>>> GetFAQs()
         {
             return await _context.FAQs.ToListAsync();
