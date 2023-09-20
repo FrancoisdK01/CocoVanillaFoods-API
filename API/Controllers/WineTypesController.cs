@@ -90,6 +90,7 @@ namespace API.Controllers
 
         // DELETE: api/WineTypes/5
         [HttpDelete("{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteWineType(int id)
         {
             var wineType = await _context.WineTypes.FindAsync(id);
