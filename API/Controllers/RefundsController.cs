@@ -143,6 +143,8 @@ namespace API.Controllers
                 refundRequest.RefundItems.Add(refundItem);
             }
 
+            wineOrder.isRefunded = true;
+
             _context.RefundRequests.Add(refundRequest);
             _context.SaveChanges();
 
