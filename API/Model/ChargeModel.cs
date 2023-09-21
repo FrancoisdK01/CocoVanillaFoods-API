@@ -15,14 +15,5 @@ namespace API.Model
 
         [JsonProperty("local_price")]
         public LocalPrice LocalPrice { get; set; }
-
-        [JsonProperty("metadata")]
-        public Metadata Metadata { get; set; }
-
-        [JsonProperty("redirect_url")]
-        public string RedirectUrl { get; set; }
-
-        [JsonProperty("cancel_url")]
-        public string CancelUrl { get; set; }
     }
 }
