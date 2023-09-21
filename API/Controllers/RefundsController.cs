@@ -144,8 +144,6 @@ namespace API.Controllers
             }
             wineOrder.isRefunded = true;
 
-            wineOrder.isRefunded = true;
-
             _context.RefundRequests.Add(refundRequest);
             _context.SaveChanges();
 
