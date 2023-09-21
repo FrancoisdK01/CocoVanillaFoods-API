@@ -33,23 +33,26 @@ namespace API.Controllers
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Content = new StringContent(JsonConvert.SerializeObject(charge), Encoding.UTF8, "application/json");
 
+
+            var requestContent = JsonConvert.SerializeObject(charge);
+            request.Content = new StringContent(requestContent, Encoding.UTF8, "application/json");
+
             var response = await client.SendAsync(request);
+
+            Console.WriteLine(JsonConvert.SerializeObject(charge));
 
             // Check if the request is successful
             if (response.IsSuccessStatusCode)
             {
-                // Read the response content as string
                 var responseContent = await response.Content.ReadAsStringAsync();
-
-                // Log the raw response content
-                Console.WriteLine(responseContent);
-
+                Console.WriteLine("Full Response: " + responseContent);
                 var result = JsonConvert.DeserializeObject<ChargeResponseModel>(responseContent);
-                return Ok(result);
+                return Ok(new { hostedUrl = result.Data.HostedUrl });
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Error content: " + errorContent);  // <-- Add this line for debugging
                 return BadRequest(errorContent);
             }
         }
