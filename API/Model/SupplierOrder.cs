@@ -19,7 +19,7 @@ namespace API.Model
 
         public string WineType { get; set; }
 
-        public int WinePrice { get; set; }
+        public double WinePrice { get; set; }
 
         public double OrderTotal { get; set; }
 
