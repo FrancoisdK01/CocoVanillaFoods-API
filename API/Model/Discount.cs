@@ -14,7 +14,7 @@ namespace API.Model
         [MaxLength(50)]
         public string DiscountDescription { get; set; }
 
-        public double DiscountPercentage { get; set; }
+        public double DiscountAmount { get; set; }
 
     }
 }
