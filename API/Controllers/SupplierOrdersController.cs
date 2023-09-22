@@ -59,7 +59,7 @@ namespace API.Controllers
 
             // Fetch the existing SupplierOrder from the database
             var supplierOrder = await _context.SupplierOrders.Include(s => s.SupplierOrderStatus).FirstOrDefaultAsync(s => s.SupplierOrderID == id);
-
+            var originalOrderPrice = supplierOrder.OrderTotal;
             if (supplierOrder == null)
             {
                 return NotFound();
@@ -70,11 +70,22 @@ namespace API.Controllers
             supplierOrder.SupplierOrderStatus.Paid = statusDTO.Paid;
             supplierOrder.SupplierOrderStatus.Received = statusDTO.Received;
 
+            if(statusDTO.Ordered == true && statusDTO.Paid == true && statusDTO.Received == false) 
+            {
+                supplierOrder.OrderTotal = statusDTO.orderPrice;
+            }else if(statusDTO.Ordered == true && statusDTO.Paid == true && statusDTO.Received == true){
+                supplierOrder.OrderTotal = originalOrderPrice;
+            }
+            else
+            {
+                supplierOrder.OrderTotal = 0;
+            }
             // Update the supplierOrderStatusID in case it has changed
             supplierOrder.SupplierOrderStatus.SupplierOrderStatusID = statusDTO.SupplierOrderStatusID;
 
             try
             {
+                _context.SupplierOrders.Update(supplierOrder);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -97,8 +108,6 @@ namespace API.Controllers
         [DynamicAuthorize]
         public async Task<ActionResult<SupplierOrder>> PostSupplierOrder(SupplierOrder supplierOrder)
         {
-            supplierOrder.OrderTotal = supplierOrder.Quantity_Ordered * supplierOrder.WinePrice;
-
             // Step 1: Add the SupplierOrder
             _context.SupplierOrders.Add(supplierOrder);
             await _context.SaveChangesAsync(); // This will generate SupplierOrderID
