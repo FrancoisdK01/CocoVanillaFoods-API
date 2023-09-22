@@ -76,9 +76,10 @@ namespace API.Data
                 }
                 var wineTypes = new List<string> { "Red", "White" };
                 var wineTypesDescriptions = new List<string> { "Red in colour", "White in colour" };
-                var wineVarietal = new List<string> { "Chenin Blanc", "Pinotage" };
-                var wineVarietalDescriptions = new List<string> { "Chenin blanc cultivar", "Pinotage cultivar" };
-                var wineVarietalWineTypes = new List<int> { 2, 1 };
+                var wineVarietal = new List<string> { "Chenin Blanc", "Pinotage", "Pinotage / Cabernet Savignon / Merlot and Shiraz" };
+                var wineVarietalBlends = new List<Boolean> { false, false, true };
+                var wineVarietalDescriptions = new List<string> { "Chenin blanc cultivar", "Pinotage cultivar", "Cape Blend" };
+                var wineVarietalWineTypes = new List<int> { 2, 1, 1 };
 
                 for (int i = 0; i < wineTypes.Count; i++)
                 {
@@ -90,7 +91,7 @@ namespace API.Data
 
                 for (int i = 0; i < wineVarietal.Count; i++)
                 {
-                    var addedVarietal = new Varietal { Name = wineVarietal[i], Description = wineVarietalDescriptions[i], WineTypeID = wineVarietalWineTypes[i] };
+                    var addedVarietal = new Varietal { Name = wineVarietal[i], Description = wineVarietalDescriptions[i], WineTypeID = wineVarietalWineTypes[i], Blend = wineVarietalBlends[i]};
                     context.Varietals.Add(addedVarietal);
                 }
                 await context.SaveChangesAsync();
