@@ -19,6 +19,8 @@ namespace API.Model
         // Navigation properties
         public virtual WineType WineType { get; set; }
 
+        public bool Blend { get; set; }
+
         [JsonIgnore]
         public List<Wine> Wines { get; set; }
     }
