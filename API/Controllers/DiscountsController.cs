@@ -129,7 +129,7 @@ namespace API.Controllers
             }
 
             // Removing the discount after it's applied
-            _context.Discounts.Remove(discount);
+          
             await _context.SaveChangesAsync();
 
             return discount;
