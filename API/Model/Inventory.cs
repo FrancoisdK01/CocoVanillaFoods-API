@@ -28,6 +28,8 @@ namespace API.Model
 
         public decimal WinePrice { get; set; } // Change the data type to decimal for the price.
 
+        public virtual ICollection<SupplierOrder> SupplierOrders { get; set; } // Collection of SupplierOrder
+
         //[JsonIgnore]
         //public List<StockTake_Item> StockTake_Items { get; set; }
 

@@ -158,7 +158,7 @@ namespace API.Data
 
             var adminControllers = new[]
             {
-                "BlacklistController", "ChatBotController", "DiscountsController", "EarlyBirdsController",
+                "BlacklistsController", "ChatBotController", "DiscountsController", "EarlyBirdsController",
                 "EventPriceController", "EventsController", "EventTypeController", "HelpResourceController",
                 "MailController", "SupplierOrdersController", "VarietalsController", "WinesController", "WineTypesController"
             };
@@ -172,6 +172,7 @@ namespace API.Data
 
             var customerControllersWithMethods = new Dictionary<string, List<string>>
             {
+                {"BlacklistsController", new List<string> { "GetBlacklist", "CheckBlacklist"}},
                 {"CartController", new List<string> {"GetCart", "AddToCart", "IncrementCartItemQuantity", "DecrementCartItemQuantity", "GetCartTotal", "ApplyDiscount", "ClearCart"}},
                 {"ChatBotController", new List<string> { "SendMessageToBot" }},
                 {"CustomersController", new List<string> { "GetCustomer", "PutCustomer" }},
@@ -235,6 +236,13 @@ namespace API.Data
 
             if (!context.MethodPrivilegeMappings.Any())
             {
+                await context.MethodPrivilegeMappings.AddRangeAsync(mappings);
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                context.MethodPrivilegeMappings.RemoveRange(mappings);
+                context.SaveChanges();
                 await context.MethodPrivilegeMappings.AddRangeAsync(mappings);
                 await context.SaveChangesAsync();
             }
