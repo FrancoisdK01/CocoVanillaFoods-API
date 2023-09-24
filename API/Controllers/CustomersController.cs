@@ -20,11 +20,13 @@ namespace API.Controllers
     {
         private readonly MyDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<CustomersController> _logger;
 
-        public CustomersController(MyDbContext context, UserManager<User> userManager)
+        public CustomersController(MyDbContext context, UserManager<User> userManager, ILogger<CustomersController> logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
 
         // GET: api/Customers
@@ -129,51 +131,91 @@ namespace API.Controllers
 
         // DELETE: api/Customers/5
         [HttpDelete("DeleteCustomer/{id}")]
-        [DynamicAuthorize]
         public async Task<IActionResult> DeleteCustomer(string id)
         {
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
+            // Start an async transaction
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                return NotFound();
-            }
-            else
-            {
-                var user = await _userManager.FindByIdAsync(customer.UserID);
-                if (user == null)
+                try
                 {
-                    return NotFound();
+                    _logger.LogInformation("Deleting customer with ID: {id}", id);
+                    var customer = await _context.Customers.FindAsync(id);
+                    if (customer == null)
+                    {
+                        await transaction.RollbackAsync();
+                        return NotFound();
+                    }
+
+                    var query = _context.WineOrders.Where(o => o.CustomerId == id);
+                    _logger.LogInformation("Executing query: {0}", query.ToQueryString());
+                    var undeliveredOrdersquery = await query.ToListAsync();
+
+                    // Check for undelivered orders
+                    var undeliveredOrders = await _context.WineOrders
+                        .Where(o => o.CustomerId == id && o.OrderStatusId != (int)OrderStatusEnum.Collected)
+                        .ToListAsync();
+
+                    if (undeliveredOrders.Count > 0)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest("You have undelivered orders. Account cannot be deleted.");
+                    }
+
+                    // Check if user exists and get roles
+                    var user = await _userManager.FindByIdAsync(customer.UserID);
+                    if (user == null)
+                    {
+                        await transaction.RollbackAsync();
+                        return NotFound();
+                    }
+
+                    var roles = await _userManager.GetRolesAsync(user);
+                    _logger.LogInformation($"User roles: {string.Join(", ", roles)}");
+
+                    if (roles.Any(role => new[] { "SuperUser", "Admin", "Employee" }.Contains(role, StringComparer.OrdinalIgnoreCase))) // Case-insensitive comparison
+                    {
+                        _logger.LogInformation("Role-based deletion block triggered"); // Logging the block
+                        await transaction.RollbackAsync();
+                        return BadRequest("Super Users, Admins and Employees can't delete accounts from the client side. Go to the admin side for deletion.");
+                    }
+
+                    //Check if the user has any tickets they can still use
+                    // Check for tickets to future events
+                    var futureEventTickets = await _context.TicketPurchases
+                        .Where(tp => tp.UserEmail == customer.Email && tp.EventDate > DateTime.UtcNow)
+                        .ToListAsync();
+
+                    if (futureEventTickets.Count > 0)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest("You have tickets for future events. Account cannot be deleted.");
+                    }
+
+                    // Delete cart details if any
+                    var cartDetails = await _context.Carts.Include(c => c.CartItems).ThenInclude(ci => ci.Wine).FirstOrDefaultAsync(c => c.CustomerID == id);
+                    if (cartDetails != null) _context.Carts.Remove(cartDetails);
+
+                    // Delete wine orders if any
+                    var wineOrder = await _context.WineOrders.FirstOrDefaultAsync(x => x.CustomerId == id);
+                    if (wineOrder != null) _context.WineOrders.Remove(wineOrder);
+
+                    // Delete the customer and user
+                    _context.Customers.Remove(customer);
+                    _context.Users.Remove(user);
+
+                    // Commit changes
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return Ok();
                 }
-                else
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        var cartDetails = await _context.Carts.Include(c => c.CartItems).ThenInclude(ci => ci.Wine).FirstOrDefaultAsync(c => c.CustomerID == id);
-                        var wineOrder = await _context.WineOrders.FirstOrDefaultAsync(x => x.CustomerId == id);
-                        if (cartDetails == null && wineOrder == null) {
-                            _context.Customers.Remove(customer);
-                            _context.Users.Remove(user);
-                            await _userManager.DeleteAsync(user);
-                            await _context.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            cartDetails = new Cart { CustomerID = "" };
-                            wineOrder = new WineOrder { CustomerId = "" };
-                            _context.Customers.Remove(customer);
-                            _context.Users.Remove(user);
-                            await _userManager.DeleteAsync(user);
-                            await _context.SaveChangesAsync();
-                        }
-                        
-                    }
-                    catch (Exception ex)
-                    {
-                        return BadRequest(ex.Message);
-                    }
+                    _logger.LogError($"An error occurred: {ex.Message}");  // More specific logging
+                    await transaction.RollbackAsync();
+                    return BadRequest($"An error occurred while saving the entity changes: {ex.Message}");
                 }
             }
-            return Ok();
         }
 
         //////////////////////////Marco se code om die age groups in charts te display ////////////////////////////////////////
