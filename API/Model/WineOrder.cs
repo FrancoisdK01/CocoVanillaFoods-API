@@ -31,6 +31,7 @@ public class WineOrder
     [JsonIgnore]
     public Customer Customer { get; set; }
 
+
     public List<WineOrderItem> OrderItems { get; set; }
 
     public virtual ICollection<RefundRequest> RefundRequests { get; set; }

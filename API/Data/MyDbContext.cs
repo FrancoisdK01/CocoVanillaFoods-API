@@ -215,12 +215,8 @@ namespace API.Data
                 .HasForeignKey<QrCode>(qr => qr.TicketPurchaseId); // Use TicketPurchaseId instead
 
 
-
-            // ... (existing model configurations)
-
             base.OnModelCreating(modelBuilder);
         }
-
 
         public DbSet<OrderStatus> OrderStatuses { get; set; }
         public DbSet<Blacklist> Blacklists { get; set; }

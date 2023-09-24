@@ -77,7 +77,7 @@ namespace API.Controllers
 
             if (customer == null)
             {
-                return BadRequest();
+                return BadRequest("Customer not found.");
             }
 
             var orders = await _context.WineOrders.Include(o => o.OrderItems)
@@ -85,12 +85,13 @@ namespace API.Controllers
                                                   .Where(x => x.CustomerId == customer.Id)
                                                   .ToListAsync();
 
+            // Return an empty list if no orders are found
             if (orders == null || orders.Count == 0)
             {
-                return NotFound("No orders found for this user.");
+                return Ok(new List<WineOrder>());
             }
 
-            return orders;
+            return Ok(orders);
         }
 
         [HttpGet("Order/{id}")]
