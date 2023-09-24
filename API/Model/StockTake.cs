@@ -12,13 +12,17 @@ namespace API.Model
 
         public DateTime DateDone { get; set; }
 
-        public string wineName { get; set; }
-
         public int QuantityOrdered { get; set; }
 
         public int QuantityReceived { get; set; }
 
         public bool? Added { get; set; }
+        
+        [ForeignKey("SupplierOrder")]
+        public int SupplierOrderID { get; set; }
+
+        [JsonIgnore] // To avoid circular references during serialization
+        public virtual SupplierOrder SupplierOrder { get; set; }
 
     }
 }

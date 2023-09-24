@@ -13,19 +13,17 @@ namespace API.Model
 
         public DateTime DateOrdered { get; set; }
 
-        public string WineName { get; set; }
-
-        public string WineYear { get; set; }
-
-        public string WineType { get; set; }
-
-        public double WinePrice { get; set; }
-
         public double OrderTotal { get; set; }
 
         [ForeignKey("SupplierID")]
         public int SupplierID { get; set; }
         public virtual Supplier Supplier { get; set; }
+
+        [ForeignKey("InventoryID")]
+        public int InventoryID { get; set; } // Foreign Key for Inventory
+        public virtual Inventory Inventory { get; set; } // Navigation property for Inventory
+
+        public Boolean isBackOrder { get; set; } = false;
 
         // Foreign key to the SupplierOrderStatus table
         public virtual SupplierOrderStatus SupplierOrderStatus { get; set; }
