@@ -58,6 +58,7 @@ namespace API.Controllers
             {
                 var backOrder = new SupplierOrder
                 {
+                    SupplierOrderRefNum = "B-" + supplierOrder.SupplierOrderRefNum,
                     Quantity_Ordered = checkReceivedEqualsOrdered,
                     DateOrdered = DateTime.Now,
                     OrderTotal = 0,
