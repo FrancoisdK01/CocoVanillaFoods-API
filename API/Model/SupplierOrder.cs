@@ -15,6 +15,8 @@ namespace API.Model
 
         public double OrderTotal { get; set; }
 
+        public string SupplierOrderRefNum { get; set; }
+
         [ForeignKey("SupplierID")]
         public int SupplierID { get; set; }
         public virtual Supplier Supplier { get; set; }

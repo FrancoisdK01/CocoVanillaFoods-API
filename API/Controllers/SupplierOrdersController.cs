@@ -108,6 +108,11 @@ namespace API.Controllers
         [DynamicAuthorize]
         public async Task<ActionResult<SupplierOrder>> PostSupplierOrder(SupplierOrder supplierOrder)
         {
+            supplierOrder.SupplierOrderRefNum = generateOrderRefNum();
+            var inventory = await _context.Inventories.FirstOrDefaultAsync(x => x.InventoryID == supplierOrder.InventoryID);
+
+            supplierOrder.Inventory = inventory;
+
             // Step 1: Add the SupplierOrder
             _context.SupplierOrders.Add(supplierOrder);
             await _context.SaveChangesAsync(); // This will generate SupplierOrderID
@@ -148,6 +153,15 @@ namespace API.Controllers
         private bool SupplierOrderExists(int id)
         {
             return _context.SupplierOrders.Any(e => e.SupplierOrderID == id);
+        }
+
+        private string generateOrderRefNum()
+        {
+            var guid = Guid.NewGuid();
+            var str = Convert.ToBase64String(guid.ToByteArray());
+            str = str.Replace("=", "").Replace("+", "").Replace("/", "");
+            var stringRetrn = str.Substring(1, 5);
+            return stringRetrn.ToUpper();
         }
     }
 }
