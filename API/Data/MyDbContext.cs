@@ -133,13 +133,17 @@ namespace API.Data
                 .HasForeignKey(oi => oi.OrderId) // <- change here
                  .OnDelete(DeleteBehavior.Cascade);
 
-          
+
             //WishlistItem and Wine
             modelBuilder.Entity<WishlistItem>()
              .HasOne(wli => wli.Wine)
              .WithMany(w => w.WishlistItems)
              .HasForeignKey(wli => wli.WineID)
              .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VAT>().HasData(
+                 new VAT { VATID = 1, Percentage = 15, Date = new DateTime(2018, 4, 1) }
+                );
 
             //WishListitem and Wishlist
             modelBuilder.Entity<WishlistItem>()
@@ -153,7 +157,7 @@ namespace API.Data
             .HasOne(wl => wl.Customer)
             .WithOne(c => c.Wishlist)
             .HasForeignKey<Wishlist>(wl => wl.CustomerID)
-            .OnDelete(DeleteBehavior.Cascade);          
+            .OnDelete(DeleteBehavior.Cascade);
 
 
 
@@ -209,10 +213,10 @@ namespace API.Data
                   .WithOne(qr => qr.TicketPurchase)
                   .HasForeignKey<TicketPurchase>(tp => tp.QrId);
 
-              modelBuilder.Entity<QrCode>()
-                .HasOne(qr => qr.TicketPurchase)
-                .WithOne(tp => tp.QrCode)
-                .HasForeignKey<QrCode>(qr => qr.TicketPurchaseId); // Use TicketPurchaseId instead
+            modelBuilder.Entity<QrCode>()
+              .HasOne(qr => qr.TicketPurchase)
+              .WithOne(tp => tp.QrCode)
+              .HasForeignKey<QrCode>(qr => qr.TicketPurchaseId); // Use TicketPurchaseId instead
 
 
             base.OnModelCreating(modelBuilder);
