@@ -21,7 +21,7 @@ namespace API.Controllers
         // Endpoint to retrieve video
         [HttpGet("getHelpPaths")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<HelpResource>>> GetHelpPaths()
+        public async Task<ActionResult<IEnumerable<HelpResource>>> HelpPaths()
         {
             return await _context.HelpResources.ToListAsync();
         }

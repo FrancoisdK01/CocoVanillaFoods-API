@@ -24,7 +24,7 @@ namespace API.Controllers
         // GET: api/WineTypes
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<WineType>>> GetWineTypes()
+        public async Task<ActionResult<IEnumerable<WineType>>> GetAllWineTypes()
         {
             return await _context.WineTypes.Include(vt => vt.Varietals).ToListAsync();
         }
@@ -32,7 +32,7 @@ namespace API.Controllers
         // GET: api/WineTypes/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<WineType>> GetWineType(int id)
+        public async Task<ActionResult<WineType>> GetSingleWineTypeEntry(int id)
         {
             var wineType = await _context.WineTypes.FindAsync(id);
 
@@ -48,7 +48,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutWineType(int id, WineType wineType)
+        public async Task<IActionResult> UpdateWineType(int id, WineType wineType)
         {
             if (id != wineType.WineTypeID)
             {
@@ -80,7 +80,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<WineType>> PostWineType(WineType wineType)
+        public async Task<ActionResult<WineType>> AddWineType(WineType wineType)
         {
             _context.WineTypes.Add(wineType);
             await _context.SaveChangesAsync();

@@ -26,14 +26,14 @@ namespace API.Controllers
         // GET: api/Discounts
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<Discount>>> GetDiscounts()
+        public async Task<ActionResult<IEnumerable<Discount>>> GetAllDiscounts()
         {
             return await _context.Discounts.ToListAsync();
         }
 
         // GET: api/Discounts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Discount>> GetDiscount(int id)
+        public async Task<ActionResult<Discount>> GetSingleDiscountEntry(int id)
         {
             var discount = await _context.Discounts.FindAsync(id);
 
@@ -49,7 +49,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutDiscount(int id, Discount discount)
+        public async Task<IActionResult> UpdateDiscount(int id, Discount discount)
         {
             if (id != discount.DiscountID)
             {
@@ -81,12 +81,12 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<Discount>> PostDiscount(Discount discount)
+        public async Task<ActionResult<Discount>> AddDiscount(Discount discount)
         {
             _context.Discounts.Add(discount);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDiscount", new { id = discount.DiscountID }, discount);
+            return CreatedAtAction("GetSingleDiscountEntry", new { id = discount.DiscountID }, discount);
         }
 
         // DELETE: api/Discounts/5

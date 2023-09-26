@@ -64,7 +64,7 @@ namespace API.Controllers
         // GET: api/Events
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<Event>>> GetAllEvents()
         {
             return await _context.Events
                 .Include(e => e.EventType) // Include EventType
@@ -76,7 +76,7 @@ namespace API.Controllers
         // GET: api/Events/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Event>> GetEvent(int id)
+        public async Task<ActionResult<Event>> GetSingleEventEntry(int id)
         {
             var @event = await _context.Events
                 .Include(e => e.EventType) // Include EventType
@@ -95,7 +95,7 @@ namespace API.Controllers
         // PUT: api/Events/5
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutEvent(int id, [FromForm] EventFormViewModel eventForm)
+        public async Task<IActionResult> UpdateEventDetails(int id, [FromForm] EventFormViewModel eventForm)
         {
             // Ensure ID matches
             if (id != eventForm.EventID)
@@ -181,7 +181,7 @@ namespace API.Controllers
         // POST: api/Events
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<Event>> PostEvent([FromForm] EventFormViewModel eventForm)
+        public async Task<ActionResult<Event>> AddEventDetails([FromForm] EventFormViewModel eventForm)
         {
 
             var fileName = $"{Guid.NewGuid()}_{eventForm.File.FileName}";
@@ -229,7 +229,7 @@ namespace API.Controllers
             await _context.SaveChangesAsync();
 
 
-            return CreatedAtAction("GetEvent", new { id = eventItem.EventID }, eventItem);
+            return CreatedAtAction("GetSingleEventEntry", new { id = eventItem.EventID }, eventItem);
         }
 
 
@@ -350,7 +350,7 @@ namespace API.Controllers
 
         [HttpPut("display-toggle/{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> ToggleEventDisplay(int id)
+        public async Task<IActionResult> UpdateEventDisplay(int id)
         {
             var eventItem = await _context.Events.FindAsync(id);
 

@@ -24,7 +24,7 @@ namespace API.Controllers
         // GET: api/WriteOff_Reason
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<WriteOff_Reason>>> GetWriteOffReasons()
+        public async Task<ActionResult<IEnumerable<WriteOff_Reason>>> GetAllWriteOffReasons()
         {
             return await _context.WriteOffReasons.ToListAsync();
         }
@@ -32,7 +32,7 @@ namespace API.Controllers
         // GET: api/WriteOff_Reason/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<WriteOff_Reason>> GetWriteOff_Reason(int id)
+        public async Task<ActionResult<WriteOff_Reason>> GetSingleWriteOff_ReasonEntry(int id)
         {
             var writeOff_Reason = await _context.WriteOffReasons.FindAsync(id);
 
@@ -48,7 +48,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutWriteOff_Reason(int id, WriteOff_Reason writeOff_Reason)
+        public async Task<IActionResult> UpdateWriteOff_Reason(int id, WriteOff_Reason writeOff_Reason)
         {
             if (id != writeOff_Reason.WriteOff_ReasonID)
             {
@@ -80,7 +80,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<WriteOff_Reason>> PostWriteOff_Reason(WriteOff_Reason writeOff_Reason)
+        public async Task<ActionResult<WriteOff_Reason>> AddWriteOff_Reason(WriteOff_Reason writeOff_Reason)
         {
             _context.WriteOffReasons.Add(writeOff_Reason);
             await _context.SaveChangesAsync();

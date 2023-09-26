@@ -170,23 +170,34 @@ namespace API.Data
                 "WineTypesController", "WinesController", "WriteOffsController", "WriteOff_ReasonController"
             };
 
-            var customerControllersWithMethods = new Dictionary<string, List<string>>
+            //var customerControllersWithMethods = new Dictionary<string, List<string>>
+            //{
+            //    {"BlacklistsController", new List<string> { "GetAllBlackListEntries", "GetSingleBlacklistEntry"}},
+            //    {"CartController", new List<string> {"GetCart", "AddToCart", "IncrementCartItemQuantity", "DecrementCartItemQuantity", "GetCartTotal", "ApplyDiscount", "ClearCart"}},
+            //    {"ChatBotController", new List<string> { "SendMessageToBot" }},
+            //    {"CustomersController", new List<string> { "GetCustomer", "PutCustomer" }},
+            //    {"DiscountsController", new List<string> {"ValidateDiscountCode"}},
+            //    {"EventsController", new List<string> {"GetEvents", "GetEvent", "PurchaseTicket" }},
+            //    //{"FAQsController", new List<string> {"GetFAQs", "GetFAQ" }},
+            //    {"OrderHistoryController", new List<string> { "CreateOrder", "GetOrdersForUser", "GetOrder" }},
+            //    {"PaymentController", new List<string> {"CreatePayment", "HandlePaymentResult"}},
+            //    {"RefundsController", new List<string> { "GetRefundRequests", "GetRefundReponses", "GetResponse", "RequestRefund", "GetWineDetailsForRefund", "GetUserRefundRequests"}},
+            //    {"TicketPurchasesController", new List<string> { "PostTicket", "GetTicketPurchase", "GetPurchasesForUser" }},
+            //    {"UserController", new List<string> { "GetUserIdByEmail", "UpdateLoginDetails" }},
+            //    {"VATsController", new List<string> { "GetLatestVAT", "GetVATs" } },
+            //    {"WinesController", new List<string> {"GetWinesForCustomers"}},
+            //    {"WishlistController", new List<string> { "GetWishlist", "AddToWishlist", "RemoveFromWishlist" }}
+            //};
+
+            var customerControllerNames = new List<string>
             {
-                {"BlacklistsController", new List<string> { "GetBlacklist", "CheckBlacklist"}},
-                {"CartController", new List<string> {"GetCart", "AddToCart", "IncrementCartItemQuantity", "DecrementCartItemQuantity", "GetCartTotal", "ApplyDiscount", "ClearCart"}},
-                {"ChatBotController", new List<string> { "SendMessageToBot" }},
-                {"CustomersController", new List<string> { "GetCustomer", "PutCustomer" }},
-                {"DiscountsController", new List<string> {"ValidateDiscountCode"}},
-                {"EventsController", new List<string> {"GetEvents", "GetEvent", "PurchaseTicket" }},
-                //{"FAQsController", new List<string> {"GetFAQs", "GetFAQ" }},
-                {"OrderHistoryController", new List<string> { "CreateOrder", "GetOrdersForUser", "GetOrder" }},
-                {"PaymentController", new List<string> {"CreatePayment", "HandlePaymentResult"}},
-                {"RefundsController", new List<string> { "GetRefundRequests", "GetRefundReponses", "GetResponse", "RequestRefund", "GetWineDetailsForRefund", "GetUserRefundRequests"}},
-                {"TicketPurchasesController", new List<string> { "PostTicket", "GetTicketPurchase", "GetPurchasesForUser" }},
-                {"UserController", new List<string> { "GetUserIdByEmail", "UpdateLoginDetails" }},
-                {"WinesController", new List<string> {"GetWinesForCustomers"}},
-                {"WishlistController", new List<string> { "GetWishlist", "AddToWishlist", "RemoveFromWishlist" }}
+                "BlacklistsController", "CartController", "ChatBotController", "CustomersController",
+                "DiscountsController", "EventsController", "OrderHistoryController", "PaymentController",
+                "RefundsController", "TicketPurchasesController", "UserController", "VATsController",
+                "WinesController", "WishlistController"
             };
+
+            var methodPrefixes = new List<string> { "GetAll", "GetSingle", "Validate", "Clear", "Purchase", "SendMessage", "Increment", "Decrement", "User" };
 
             var mappings = new List<MethodPrivilegeMapping>();
 
@@ -212,8 +223,8 @@ namespace API.Data
                             SystemPrivilegeId = employeePrivilegeId
                         });
                     }
-
-                    if (customerControllersWithMethods.TryGetValue(type.Name, out var allowedMethods) && allowedMethods.Contains(method.Name))
+                    //if (customerControllerNames.Contains(type.Name) && methodPrefixes.Any(prefix => method.Name.StartsWith(prefix)))
+                    if (methodPrefixes.Any(prefix => method.Name.StartsWith(prefix)))
                     {
                         mappings.Add(new MethodPrivilegeMapping
                         {

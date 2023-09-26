@@ -24,7 +24,7 @@ namespace API.Controllers
         // GET: api/EarlyBirds
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<EarlyBird>>> GetEarlyBird()
+        public async Task<ActionResult<IEnumerable<EarlyBird>>> GetAllEarlyBirds()
         {
             return await _context.EarlyBird.ToListAsync();
         }
@@ -32,7 +32,7 @@ namespace API.Controllers
         // GET: api/EarlyBirds/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<EarlyBird>> GetEarlyBird(int id)
+        public async Task<ActionResult<EarlyBird>> GetSingleEarlyBirdEntry(int id)
         {
             var earlyBird = await _context.EarlyBird.FindAsync(id);
 
@@ -48,7 +48,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutEarlyBird(int id, EarlyBird earlyBird)
+        public async Task<IActionResult> UpdateEarlyBird(int id, EarlyBird earlyBird)
         {
             if (id != earlyBird.EarlyBirdID)
             {
@@ -80,12 +80,12 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<EarlyBird>> PostEarlyBird(EarlyBird earlyBird)
+        public async Task<ActionResult<EarlyBird>> AddEarlyBird(EarlyBird earlyBird)
         {
             _context.EarlyBird.Add(earlyBird);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEarlyBird", new { id = earlyBird.EarlyBirdID }, earlyBird);
+            return CreatedAtAction("GetSingleEarlyBirdEntry", new { id = earlyBird.EarlyBirdID }, earlyBird);
         }
 
         // DELETE: api/EarlyBirds/5

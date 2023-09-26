@@ -24,7 +24,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("getEventReport/{beginDate}/{endDate}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> GetEventsReport(DateTime beginDate, DateTime endDate)
+        public async Task<IActionResult> GenerateEventsReport(DateTime beginDate, DateTime endDate)
         {
             // Ensure dates are in correct order (swap if necessary)
             if (beginDate > endDate)
@@ -45,7 +45,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("getAllSupplierOrders")]
         [DynamicAuthorize]
-        public async Task<IActionResult> GetAllSupplierOrders()
+        public async Task<IActionResult> GenerateSupplierOrders()
         {
             DateTime currentDate = DateTime.Now;
 

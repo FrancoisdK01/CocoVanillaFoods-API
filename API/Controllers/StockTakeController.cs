@@ -20,7 +20,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetStockTake")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<StockTake>>> GetStockTake()
+        public async Task<ActionResult<IEnumerable<StockTake>>> GetAllStockTakes()
         {
             return await _context.StockTakes.ToListAsync();
             // GET request to retrieve all stocktake items from the database.
@@ -29,7 +29,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("AddStockTake")]
         [DynamicAuthorize]
-        public async Task<ActionResult<StockTake>> PostStockTake(StockTake stocktake)
+        public async Task<ActionResult<StockTake>> AddStockTake(StockTake stocktake)
         {
             var addStockTake = new StockTake
             {
@@ -88,7 +88,7 @@ namespace API.Controllers
 
                 if (result > 0)
                 {
-                    return CreatedAtAction("GetStockTake", new { id = stocktake.stocktakeID }, stocktake);
+                    return CreatedAtAction("GetAllStockTakes", new { id = stocktake.stocktakeID }, stocktake);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace API.Controllers
 
         [HttpPut("UpdateStockTake/{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<StockTake>> PutStockTake(StockTake stocktake)
+        public async Task<ActionResult<StockTake>> UpdateStockTake(StockTake stocktake)
         {
 
             var putStockTake = new StockTake
@@ -122,7 +122,7 @@ namespace API.Controllers
 
             if (result > 0)
             {
-                return CreatedAtAction("GetStockTake", new { id = stocktake.stocktakeID }, stocktake);
+                return CreatedAtAction("GetAllStockTakes", new { id = stocktake.stocktakeID }, stocktake);
             }
             else
             {

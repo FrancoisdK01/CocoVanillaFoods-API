@@ -32,7 +32,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetEmployees")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<Employee>>> GetAllEmployees()
         {
             return await _context.Employees.ToListAsync();
         }
@@ -40,7 +40,7 @@ namespace API.Controllers
         // GET: api/Employees/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Employee>> GetEmployee(string id)
+        public async Task<ActionResult<Employee>> GetSingleEmployeeEntry(string id)
         {
             var employee = await _context.Employees.FindAsync(id);
 
@@ -56,7 +56,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutEmployee(string id, Employee employee)
+        public async Task<IActionResult> UpdateEmployee(string id, Employee employee)
         {
             var employeeDetailsBeforeUpdate = await _context.Employees.FindAsync(id);
             var existingEmployee = await _context.Employees.FindAsync(id);
@@ -120,7 +120,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("AddEmployee")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Employee>> PostEmployee(EmployeeRegistrationViewModel viewModel)
+        public async Task<ActionResult<Employee>> AddEmployee(EmployeeRegistrationViewModel viewModel)
         {
             RegisterViewModel registerModel = viewModel.RegisterModel;
             EmployeeViewModel employeeModel = viewModel.EmployeeModel;
@@ -193,7 +193,7 @@ namespace API.Controllers
 
                         _emailService.SendEmail(evm);
 
-                        return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+                        return CreatedAtAction("GetSingleEmployeeEntry", new { id = employee.Id }, employee);
                     }
                     else
                     {
@@ -235,11 +235,6 @@ namespace API.Controllers
                 }
             }
             return Ok();
-        }
-
-        private bool EmployeeExists(string id)
-        {
-            return _context.Employees.Any(e => e.Id.Equals(id));
         }
 
         [DynamicAuthorize]

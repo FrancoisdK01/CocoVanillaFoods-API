@@ -24,7 +24,7 @@ namespace API.Controllers
         // GET: api/EventTypes
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<EventType>>> GetEventTypes()
+        public async Task<ActionResult<IEnumerable<EventType>>> GetAllEventTypes()
         {
             return await _context.EventTypes.ToListAsync();
         }
@@ -32,7 +32,7 @@ namespace API.Controllers
         // GET: api/EventTypes/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<EventType>> GetEventType(int id)
+        public async Task<ActionResult<EventType>> GetSingleEventTypeEntry(int id)
         {
             var eventType = await _context.EventTypes.FindAsync(id);
 
@@ -48,7 +48,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutEventType(int id, EventType eventType)
+        public async Task<IActionResult> UpdateEventType(int id, EventType eventType)
         {
             if (id != eventType.EventTypeID)
             {
@@ -80,12 +80,12 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<EventType>> PostEventType(EventType eventType)
+        public async Task<ActionResult<EventType>> AddEventType(EventType eventType)
         {
             _context.EventTypes.Add(eventType);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEventType", new { id = eventType.EventTypeID }, eventType);
+            return CreatedAtAction("GetSingleEventTypeEntry", new { id = eventType.EventTypeID }, eventType);
         }
 
         // DELETE: api/EventTypes/5

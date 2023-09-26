@@ -30,7 +30,7 @@ namespace API.Controllers
         // GET: api/Refunds
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<RefundRequest>>> GetRefundRequests()
+        public async Task<ActionResult<IEnumerable<RefundRequest>>> GetAllRefundRequests()
         {
             var allRefunds = _context.RefundRequests.Include(ri => ri.RefundItems).Include(wo => wo.WineOrder).ThenInclude(wo => wo.OrderItems).ToList();
 
@@ -40,7 +40,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("allRefundsResponses")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<RefundResponse>>> GetRefundReponses()
+        public async Task<ActionResult<IEnumerable<RefundResponse>>> GetSingleRefundReponsesEntry()
         {
             var allRefundsResponses = _context.RefundResponses.ToList();
 
@@ -50,7 +50,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("getResponse/{id}")]
         [DynamicAuthorize]
-        public IActionResult GetResponse(int id)
+        public IActionResult GetSingleResponses(int id)
         {
             // First, find the RefundItems with the matching RefundRequestId
             var refundItems = _context.RefundItems.Where(ri => ri.RefundRequestId == id).ToList();
@@ -82,7 +82,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("RequestARefund")]
         [DynamicAuthorize]
-        public IActionResult RequestRefund([FromBody] RefundRequestViewModel request)
+        public IActionResult UserAddRefundRequest([FromBody] RefundRequestViewModel request)
         {
             var wineOrder = _context.WineOrders
                 .Include(wo => wo.OrderItems)
@@ -157,7 +157,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetWineDetailsForRefund/{refundRequestId}")]
         [DynamicAuthorize]
-        public IActionResult GetWineDetailsForRefund(int refundRequestId)
+        public IActionResult GetAllWineDetailsForRefund(int refundRequestId)
         {
             // First, check if the RefundRequest exists
             var refundRequest = _context.RefundRequests.FirstOrDefault(rr => rr.RefundRequestId == refundRequestId);
@@ -308,7 +308,7 @@ namespace API.Controllers
         //Customer side stuff
         [HttpGet("CustomerRefunds/{email}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<RefundRequest>>> GetUserRefundRequests(string email)
+        public async Task<ActionResult<IEnumerable<RefundRequest>>> GetAllUserRefundRequests(string email)
         {
             return await _context.RefundRequests.Where(r => r.WineOrder.Customer.Email == email).Include(wo => wo.WineOrder).ThenInclude(w => w.OrderItems).ThenInclude(oi => oi.Wine).ToListAsync();
         }
