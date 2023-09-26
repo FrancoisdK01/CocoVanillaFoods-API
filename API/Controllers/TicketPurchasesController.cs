@@ -168,7 +168,6 @@ namespace API.Controllers
             // Debugging lines
             Console.WriteLine($"Scanning Token: {token}");
 
-
             // Fetch TicketPurchasedStatus first
             var status = await _context.TicketPurchasedStatuses.FirstOrDefaultAsync(s => s.ScanningToken == token);
 
@@ -182,48 +181,40 @@ namespace API.Controllers
                                        .Include(tp => tp.TicketPurchasedStatus)
                                        .FirstOrDefaultAsync(tp => tp.Id == status.TicketPurchaseId);
 
-            var manualStatus = await _context.TicketPurchasedStatuses
-                                .Where(s => s.TicketPurchaseId == ticket.Id)
-                                .FirstOrDefaultAsync();
-
-            //Console.WriteLine($"Manually fetched status: {JsonConvert.SerializeObject(manualStatus, Formatting.Indented)}");
-
-
-            // Debugging lines
-            Console.WriteLine($"Ticket found: {ticket}");
-            //Console.WriteLine($"Ticket found: {JsonConvert.SerializeObject(ticket, Formatting.Indented)}");
-
-
-
             if (ticket == null || ticket.TicketPurchasedStatus == null)
             {
                 return NotFound(new { message = "Ticket or Ticket Status not found." });
             }
 
-            // Check if TicketPurchasedStatus exists on the ticket
-            if (ticket.TicketPurchasedStatus == null)
+            // Convert the current UTC time to South African Standard Time
+            DateTime currentLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("South Africa Standard Time"));
+
+            // Check if the scanning is within two hours before the event
+            if (ticket.EventDate > currentLocalTime.AddHours(2))
             {
-                return NotFound(new { message = "TicketPurchasedStatus not found on the ticket." });
+                return BadRequest(new { message = "Ticket can only be scanned two hours before the event." });
             }
 
+            // Check if the ticket is already scanned
             if (status.IsScanned)
             {
                 return BadRequest(new { message = $"Ticket already scanned at {status.ScannedAt}." });
             }
-            // Updating the IsScanned and ScannedAt properties of status.
-            status.IsScanned = true;
-            DateTime utcNow = DateTime.UtcNow;
-            TimeZoneInfo saTimeZone = TimeZoneInfo.FindSystemTimeZoneById("South Africa Standard Time");
-            DateTime localTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, saTimeZone);
-            status.ScannedAt = localTime;
-            // Saving changes.
 
+            // Update the IsScanned and ScannedAt properties of the status
+            status.IsScanned = true;
+            status.ScannedAt = currentLocalTime;
+
+            // Save changes
             _context.TicketPurchasedStatuses.Update(status);
             await _context.SaveChangesAsync();
 
+            // Debugging lines
+            Console.WriteLine($"Ticket successfully scanned.");
 
             return Ok(new { message = "Ticket successfully scanned." });
         }
+
 
         private async Task SendEmail(string email, string qrCode, Customer customer, Event eventDetails)
         {
