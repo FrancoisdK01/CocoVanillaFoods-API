@@ -163,7 +163,6 @@ namespace API.Controllers
 
         // POST: api/Tickets/Scan/{token}
         [HttpPost("Scan/{token}")]
-        [DynamicAuthorize]
         public async Task<IActionResult> ScanTicket(string token)
         {
             // Debugging lines
