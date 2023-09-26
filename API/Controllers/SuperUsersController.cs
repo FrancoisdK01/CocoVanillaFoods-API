@@ -140,7 +140,9 @@ namespace API.Controllers
                 ID_Number = superUserModel.IDNumber,
                 Date_Created = DateTime.Now,
                 Date_of_last_update = DateTime.Now,
-                UserID = user.Id
+                UserID = user.Id,
+                Gender = registerModel.Gender,
+                Title = registerModel.Title,
             };
 
             _context.SuperUser.Add(superuser);
