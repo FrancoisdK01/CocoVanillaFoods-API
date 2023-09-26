@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
@@ -122,11 +125,14 @@ namespace API.Controllers
             RegisterViewModel registerModel = viewModel.RegisterModel;
             EmployeeViewModel employeeModel = viewModel.EmployeeModel;
 
-            // Retrieve the superuser ID from the logged-in user
-            var superuserEmail = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+            string authHeader = HttpContext.Request.Headers["Authorization"];
+            string token = authHeader.Replace("Bearer ", "");
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var jwtToken = jwtHandler.ReadJwtToken(token);
+            var userEmailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            
             // Retrieve the superuser based on their email
-            var superUser = await _userManager.FindByEmailAsync(superuserEmail);
+            var superUser = await _userManager.FindByEmailAsync(userEmailClaim);
             if (superUser == null)
             {
                 return BadRequest("Superuser not found");
