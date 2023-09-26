@@ -146,9 +146,6 @@ namespace API.Data
              .HasForeignKey(wli => wli.WineID)
              .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<VAT>().HasData(
-                 new VAT { VATID = 1, Percentage = 15, Date = new DateTime(2018, 4, 1) }
-                );
 
             //WishListitem and Wishlist
             modelBuilder.Entity<WishlistItem>()
