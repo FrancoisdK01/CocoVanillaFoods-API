@@ -33,7 +33,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetSystemPrivileges")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<SystemPrivilege>>> GetSystemPrivileges()
+        public async Task<ActionResult<IEnumerable<SystemPrivilege>>> GetAllSystemPrivileges()
         {
             return await _context.SystemPrivileges.ToListAsync();
         }
@@ -42,7 +42,7 @@ namespace API.Controllers
         // GET: api/SystemPrivileges/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<SystemPrivilege>> GetSystemPrivilege(string id)
+        public async Task<ActionResult<SystemPrivilege>> GetSingleSystemPrivilegeEntry(string id)
         {
             var systemPrivilege = await _context.SystemPrivileges.FindAsync(id);
 
@@ -58,7 +58,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutSystemPrivilege(string id, SystemPrivilegeViewModel systemPrivilege)
+        public async Task<IActionResult> UpdateSystemPrivilege(string id, SystemPrivilegeViewModel systemPrivilege)
         {
             var existingSystemPrivilege = await _context.SystemPrivileges.FindAsync(id);
 
@@ -131,7 +131,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("AddPrivilege")]
         [DynamicAuthorize]
-        public async Task<ActionResult<SystemPrivilege>> PostSystemPrivilege(SystemPrivilegeViewModel viewModel)
+        public async Task<ActionResult<SystemPrivilege>> AddSystemPrivilege(SystemPrivilegeViewModel viewModel)
         {
             // Check if the role name already exists in SystemPrivileges
             if (await _context.SystemPrivileges.AnyAsync(s => s.Name == viewModel.Name))
@@ -193,7 +193,7 @@ namespace API.Controllers
 
                             await _context.SaveChangesAsync();
 
-                            return CreatedAtAction("GetSystemPrivilege", new { id = privilege.Id }, privilege);
+                            return CreatedAtAction("GetSingleSystemPrivilegeEntry", new { id = privilege.Id }, privilege);
                         }
                         else
                         {

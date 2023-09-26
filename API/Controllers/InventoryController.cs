@@ -19,7 +19,7 @@ namespace API.Controllers
         // GET: api/Inventory
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<Inventory>>> GetInventory()
+        public async Task<ActionResult<IEnumerable<Inventory>>> GetAllInventory()
         {
             return await _context.Inventories.ToListAsync();
             // GET request to retrieve all inventory items from the database.
@@ -27,7 +27,7 @@ namespace API.Controllers
 
         // GET: api/Inventory/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Inventory>> GetInventory(int id)
+        public async Task<ActionResult<Inventory>> GetSingleInventoryEntry(int id)
         {
             var inventory = await _context.Inventories.FindAsync(id);
             // GET request to retrieve a specific inventory item by its ID from the database.
@@ -45,7 +45,7 @@ namespace API.Controllers
         // PUT: api/Inventory/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutInventory(int id, Inventory inventory)
+        public async Task<IActionResult> UpdateInventory(int id, Inventory inventory)
         {
             var editInventory = _context.Inventories.FirstOrDefault(i => i.InventoryID == id);
 
@@ -60,38 +60,12 @@ namespace API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
-
-            //var newInventory = new Inventory
-            //{
-            //    // Stays the same as previous thingies
-            //    InventoryID = editInventory.InventoryID,
-            //    VarietalID = editInventory.VarietalID,
-            //    WineID = editInventory.WineID,
-            //    WineTypeID = editInventory.WineTypeID,
-
-            //    // Updated values
-            //    QuantityOnHand = inventory.QuantityOnHand,
-            //    StockLimit = inventory.StockLimit,
-            //};
-
-            //_context.Inventories.Update(newInventory);
-
-            //var result = await _context.SaveChangesAsync();
-
-            //if (result > 0)
-            //{
-            //    return Ok();
-            //}
-            //else
-            //{
-            //    return BadRequest();
-            //}
         }
 
         // POST: api/Inventory
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Inventory>> PostInventory(Inventory inventory)
+        public async Task<ActionResult<Inventory>> AddInventory(Inventory inventory)
         {
             var wine = _context.Wines.FirstOrDefault(w => w.WineID == inventory.WineID);
 
@@ -116,7 +90,7 @@ namespace API.Controllers
 
            if(result > 0)
             {
-                return CreatedAtAction("GetInventory", new { id = inventory.InventoryID }, inventory);
+                return CreatedAtAction("GetSingleInventoryEntry", new { id = inventory.InventoryID }, inventory);
             }
             else
             {

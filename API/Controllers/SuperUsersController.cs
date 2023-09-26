@@ -38,7 +38,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetSuperusers")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<SuperUser>>> GetSuperUser()
+        public async Task<ActionResult<IEnumerable<SuperUser>>> GetAllSuperUsers()
         {
             return await _context.SuperUser.ToListAsync();
         }
@@ -46,7 +46,7 @@ namespace API.Controllers
         // GET: api/SuperUsers/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<SuperUser>> GetSuperUser(string id)
+        public async Task<ActionResult<SuperUser>> GetSingleSuperUserEntry(string id)
         {
             var superUser = await _context.SuperUser.FindAsync(id);
 
@@ -62,7 +62,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("UpdateSuperUser/{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutSuperUser(string id, SuperUser superUser)
+        public async Task<IActionResult> UpdateSuperUserAccount(string id, SuperUser superUser)
         {
             var existingSuperUser = await _context.SuperUser.FindAsync(id);
 
@@ -104,7 +104,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("AddSuperuser")]
         [DynamicAuthorize]
-        public async Task<ActionResult<SuperUser>> PostSuperUser(SuperUserRegistrationViewModel viewModel)
+        public async Task<ActionResult<SuperUser>> AddSuperUserAccount(SuperUserRegistrationViewModel viewModel)
         {
             RegisterViewModel registerModel = viewModel.RegisterModel;
             SuperUserViewModel superUserModel = viewModel.SuperUserModel;
@@ -179,7 +179,7 @@ namespace API.Controllers
 
                 _emailService.SendEmail(evm);
 
-                return CreatedAtAction("GetSuperUser", new { id = superuser.Id }, superuser);
+                return CreatedAtAction("GetSingleSuperUserEntry", new { id = superuser.Id }, superuser);
             }
             else
             {
@@ -192,7 +192,7 @@ namespace API.Controllers
         // DELETE: api/SuperUsers/5
         [HttpDelete("DeleteSuperuser/{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> DeleteSuperUser(string id)
+        public async Task<IActionResult> DeleteSuperUserAccount(string id)
         {
             var superuser = await _context.SuperUser.FindAsync(id);
             if (superuser == null)

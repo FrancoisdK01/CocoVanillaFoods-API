@@ -27,7 +27,7 @@ namespace API.Controllers
 
         [HttpGet("{email}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Wishlist>> GetWishlist(string email)
+        public async Task<ActionResult<Wishlist>> GetSingleCustomerWishlist(string email)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
 
@@ -50,7 +50,7 @@ namespace API.Controllers
 
         [HttpPost("{email}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Wishlist>> AddToWishlist(string email, [FromBody] WishlistItem wishlistItem)
+        public async Task<ActionResult<Wishlist>> UserAddToWishlist(string email, [FromBody] WishlistItem wishlistItem)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
 
@@ -88,12 +88,12 @@ namespace API.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetWishlist), new { email = email }, wishlist);
+            return CreatedAtAction(nameof(GetSingleCustomerWishlist), new { email = email }, wishlist);
         }
 
         [HttpDelete("{email}/{wishlistItemId}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> RemoveFromWishlist(string email, int wishlistItemId)
+        public async Task<IActionResult> ClearFromWishlist(string email, int wishlistItemId)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
 

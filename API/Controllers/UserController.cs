@@ -38,7 +38,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public async Task<ActionResult<object>> Login(LoginViewModel lvm)
+        public async Task<ActionResult<object>> UserLogin(LoginViewModel lvm)
         {
             var user = await _userManager.FindByEmailAsync(lvm.email);
 
@@ -48,7 +48,7 @@ namespace API.Controllers
                 {
                     // Generate and send the 2FA code via email
                     var code = await _userManager.GenerateTwoFactorTokenAsync(user, "email");
-                    Send2FACodeByEmail(user, code);
+                    UserSend2FACodeByEmail(user, code);
 
 
                     // Return a response indicating 2FA is enabled
@@ -86,7 +86,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Register")]
-        public async Task<ActionResult<UserViewModel>> Register(RegisterViewModel rvm)
+        public async Task<ActionResult<UserViewModel>> UserRegister(RegisterViewModel rvm)
         {
             var user = await _userManager.FindByEmailAsync(rvm.Email);
             var cust = await _context.Customers.FirstOrDefaultAsync(x => x.Email == rvm.Email);
@@ -156,7 +156,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Logout")]   
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> UserLogout()
         {
             try
             {
@@ -223,7 +223,7 @@ namespace API.Controllers
         }
 
         //2FA code Generator
-        private void Send2FACodeByEmail(User user, string code)
+        private void UserSend2FACodeByEmail(User user, string code)
         {
             // Generate the email message with the code
             var evm = new EmailViewModel
@@ -247,7 +247,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetUserByEmail/{email}")]
-        public async Task<IActionResult> GetUserIdByEmail(string email)
+        public async Task<IActionResult> GetSingleUserIdByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -263,7 +263,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("VerifyCode")]
-        public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
+        public async Task<IActionResult> ValidateCode(VerifyCodeViewModel model)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user != null)
@@ -309,7 +309,7 @@ namespace API.Controllers
         [HttpPut]
         [Route("UpdateLoginDetails/{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> UpdateLoginDetails(string id, LoginUpdateViewModel model)
+        public async Task<IActionResult> UserUpdateLoginDetails(string id, LoginUpdateViewModel model)
         {
             var loggedInUser = await _userManager.FindByIdAsync(id);
             var loggedInCust = await _context.Customers.FirstOrDefaultAsync(x => x.UserID == id);
@@ -355,7 +355,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        public async Task<IActionResult> UserForgotPassword(ForgotPasswordViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             var newPassword = GeneratePassword();
@@ -472,7 +472,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetGenderDistribution")]
         [DynamicAuthorize]
-        public IActionResult GetGenderDistribution()
+        public IActionResult GenerateGenderDistribution()
         {
             var genderDistribution = _context.Customers.GroupBy(c => c.Gender)
                                                       .Select(g => new { Gender = g.Key, Count = g.Count() })

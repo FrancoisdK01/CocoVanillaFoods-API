@@ -63,20 +63,54 @@ public class DynamicAuthorizeAttribute : TypeFilterAttribute
 
         private List<string> GetRequiredPrivilegesForMethod(string controllerName, string methodName)
         {
-            // Assuming that each methodName can have multiple SystemPrivilegeIds
-            return _context.MethodPrivilegeMappings
-                           .Where(m => m.ControllerName == controllerName && m.MethodName == methodName)
-                           .Select(m => m.SystemPrivilegeId)
-                           .ToList();
+            try
+            {
+                // Assuming that each methodName can have multiple SystemPrivilegeIds
+                return _context.MethodPrivilegeMappings
+                               .Where(m => m.ControllerName == controllerName && m.MethodName == methodName)
+                               .Select(m => m.SystemPrivilegeId)
+                               .ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log exception details
+                Console.WriteLine(ex);
+                // Return an empty list or throw an exception depending on your use case
+                return new List<string>();
+            }
         }
 
         private List<string> GetUserPrivileges(string username)
         {
-            var user = _context.Users.FirstOrDefault(u => u.UserName == username);
-            var roleIds = _context.UserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToList();
-            var privilegeIds = _context.SystemPrivileges.Where(sp => roleIds.Contains(sp.Id)).Select(sp => sp.Id).ToList();
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserName == username);
+                if (user == null)
+                {
+                    // Log error or throw exception
+                    Console.WriteLine($"User with username {username} not found.");
+                    return new List<string>();
+                }
 
-            return privilegeIds;
+                var roleIds = _context.UserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToList();
+                if (roleIds.Count == 0)
+                {
+                    // Log error or throw exception
+                    Console.WriteLine($"No roles found for user with username {username}.");
+                    return new List<string>();
+                }
+
+                var privilegeIds = _context.SystemPrivileges.Where(sp => roleIds.Contains(sp.Id)).Select(sp => sp.Id).ToList();
+                return privilegeIds;
+            }
+            catch (Exception ex)
+            {
+                // Log exception details
+                Console.WriteLine(ex);
+                // Return an empty list or throw an exception depending on your use case
+                return new List<string>();
+            }
         }
+
     }
 }

@@ -24,7 +24,7 @@ namespace API.Controllers
 
         [HttpGet("{email}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Cart>> GetCart(string email)
+        public async Task<ActionResult<Cart>> GetSingleCart(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -53,7 +53,7 @@ namespace API.Controllers
 
         [HttpPost("{email}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Cart>> AddToCart(string email, [FromBody] CartItem cartItem)
+        public async Task<ActionResult<Cart>> UserAddToCart(string email, [FromBody] CartItem cartItem)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
 
@@ -94,7 +94,7 @@ namespace API.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetCart), new { email = email }, cart);
+            return CreatedAtAction(nameof(GetSingleCart), new { email = email }, cart);
         }
 
 
@@ -150,7 +150,7 @@ namespace API.Controllers
 
         [HttpGet("{email}/total")]
         [DynamicAuthorize]
-        public async Task<ActionResult<double>> GetCartTotal(string email)
+        public async Task<ActionResult<double>> GetSingleCartTotal(string email)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
 
@@ -169,7 +169,7 @@ namespace API.Controllers
 
         [HttpPut("{email}/applyDiscount")]
         [DynamicAuthorize]
-        public async Task<IActionResult> ApplyDiscount(string email, [FromBody] double newTotal)
+        public async Task<IActionResult> ValidateDiscount(string email, [FromBody] double newTotal)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
             var cart = await _context.Carts.FirstOrDefaultAsync(c => c.CustomerID == customer.Id);

@@ -33,7 +33,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetCustomers")]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<Customer>>> GetAllCustomerAccounts()
         {
             return await _context.Customers.ToListAsync();
         }
@@ -42,7 +42,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("GetUser/{email}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> GetCustomer(string email)
+        public async Task<IActionResult> GetSingleCustomerAccount(string email)
         {
             var user = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
             if (user == null)
@@ -58,7 +58,7 @@ namespace API.Controllers
 
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutCustomer(string id, Customer customer)
+        public async Task<IActionResult> UpdateCustomerAccount(string id, Customer customer)
         {
             var customerDetailsBeforeUpdate = await _context.Customers.FindAsync(id);
             var existingCustomer = await _context.Customers.FindAsync(id);
@@ -131,7 +131,7 @@ namespace API.Controllers
 
         // DELETE: api/Customers/5
         [HttpDelete("DeleteCustomer/{id}")]
-        public async Task<IActionResult> DeleteCustomer(string id)
+        public async Task<IActionResult> DeleteCustomerAccount(string id)
         {
             // Start an async transaction
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -222,7 +222,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("AgeDistribution")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Dictionary<string, int>>> GetAgeDistribution()
+        public async Task<ActionResult<Dictionary<string, int>>> AgeDistributionForCharts()
         {
             var users = await _context.Customers.ToListAsync();
 

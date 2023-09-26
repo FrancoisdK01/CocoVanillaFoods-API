@@ -15,8 +15,6 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin, Superuser")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class VATsController : ControllerBase
     {
         private readonly MyDbContext _context;
@@ -29,7 +27,7 @@ namespace API.Controllers
         // GET: api/VATs
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<VAT>>> GetVATs()
+        public async Task<ActionResult<IEnumerable<VAT>>> GetAllVATs()
         {
             return await _context.VATs.ToListAsync();
         }
@@ -37,7 +35,7 @@ namespace API.Controllers
         // GET: api/VATs/Latest
         [HttpGet("Latest")]
         [DynamicAuthorize]
-        public async Task<IActionResult> GetLatestVAT()
+        public async Task<IActionResult> GetSingleVATEntry()
         {
             try
             {
@@ -73,7 +71,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutVAT(int id, VAT vAT)
+        public async Task<IActionResult> UpdateVAT(int id, VAT vAT)
         {
             if (id != vAT.VATID)
             {
@@ -105,7 +103,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<VAT>> PostVAT(VAT vAT)
+        public async Task<ActionResult<VAT>> AddVAT(VAT vAT)
         {
             _context.VATs.Add(vAT);
             await _context.SaveChangesAsync();

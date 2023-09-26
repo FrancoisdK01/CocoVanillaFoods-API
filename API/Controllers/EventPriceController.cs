@@ -24,7 +24,7 @@ namespace API.Controllers
         // GET: api/EventPrices
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<EventPrice>>> GetEventPrices()
+        public async Task<ActionResult<IEnumerable<EventPrice>>> GetAllEventPrices()
         {
             return await _context.EventPrices.ToListAsync();
         }
@@ -32,7 +32,7 @@ namespace API.Controllers
         // GET: api/EventPrices/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<EventPrice>> GetEventPrice(int id)
+        public async Task<ActionResult<EventPrice>> GetSingleEventPrice(int id)
         {
             var eventPrice = await _context.EventPrices.FindAsync(id);
 
@@ -48,7 +48,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutEventPrice(int id, EventPrice eventPrice)
+        public async Task<IActionResult> UpdateEventPrice(int id, EventPrice eventPrice)
         {
             if (id != eventPrice.EventPriceID)
             {
@@ -80,12 +80,12 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<EventPrice>> PostEventPrice(EventPrice eventPrice)
+        public async Task<ActionResult<EventPrice>> AddEventPrice(EventPrice eventPrice)
         {
             _context.EventPrices.Add(eventPrice);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEventPrice", new { id = eventPrice.EventPriceID }, eventPrice);
+            return CreatedAtAction("GetSingleEventPrice", new { id = eventPrice.EventPriceID }, eventPrice);
         }
 
         // DELETE: api/EventPrices/5

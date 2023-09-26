@@ -23,14 +23,14 @@ namespace API.Controllers
 
         // GET: api/FAQs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FAQ>>> GetFAQs()
+        public async Task<ActionResult<IEnumerable<FAQ>>> GetALLFAQs()
         {
             return await _context.FAQs.ToListAsync();
         }
 
         // GET: api/FAQs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<FAQ>> GetFAQ(int id)
+        public async Task<ActionResult<FAQ>> GetSingleFAQEntry(int id)
         {
             var fAQ = await _context.FAQs.FindAsync(id);
 
@@ -46,7 +46,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutFAQ(int id, FAQ fAQ)
+        public async Task<IActionResult> UpdateFAQ(int id, FAQ fAQ)
         {
             if (id != fAQ.FAQID)
             {
@@ -78,12 +78,12 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<FAQ>> PostFAQ(FAQ fAQ)
+        public async Task<ActionResult<FAQ>> AddFAQ(FAQ fAQ)
         {
             _context.FAQs.Add(fAQ);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetFAQ", new { id = fAQ.FAQID }, fAQ);
+            return CreatedAtAction("GetSingleFAQEntry", new { id = fAQ.FAQID }, fAQ);
         }
 
         // DELETE: api/FAQs/5

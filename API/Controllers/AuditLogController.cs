@@ -32,7 +32,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("AddAuditLog")]
         [DynamicAuthorize]
-        public async Task<ActionResult<AuditTrail>> writeToAuditLog(AuditTrail auditLog)
+        public async Task<ActionResult<AuditTrail>> AddToAuditLog(AuditTrail auditLog)
         {
             var loggedInUser = await _userManager.FindByEmailAsync(auditLog.UserEmail);
 

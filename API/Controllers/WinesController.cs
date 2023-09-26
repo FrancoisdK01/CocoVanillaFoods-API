@@ -75,7 +75,7 @@ namespace API.Controllers
         // GET: api/Wines
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<Wine>>> GetWines()
+        public async Task<ActionResult<IEnumerable<Wine>>> GetAllWines()
         {
             var wines = await _context.Wines.ToListAsync();
 
@@ -86,7 +86,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("CustomerWines")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<Wine>>> GetWinesForCustomers()
+        public async Task<ActionResult<IEnumerable<Wine>>> GetAllWinesForCustomers()
         {
             var wines = await _context.Wines.ToListAsync();
 
@@ -96,7 +96,7 @@ namespace API.Controllers
         // GET: api/Wines/5
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<Wine>> GetWine(int id)
+        public async Task<ActionResult<Wine>> GetSingleWineEntry(int id)
         {
             var wine = await _context.Wines.FindAsync(id);
 
@@ -111,7 +111,7 @@ namespace API.Controllers
         // PUT: api/Wines/5
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutWine(int id, [FromForm] WineFormViewModel wineForm)
+        public async Task<IActionResult> UpdateWine(int id, [FromForm] WineFormViewModel wineForm)
         {
             if (id != wineForm.WineID)
             {
@@ -177,7 +177,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<Wine>> PostWine([FromForm] WineFormViewModel wineForm)
+        public async Task<ActionResult<Wine>> AddWine([FromForm] WineFormViewModel wineForm)
         {
 
             var fileName = $"{Guid.NewGuid()}_{wineForm.File.FileName}";
@@ -213,7 +213,7 @@ namespace API.Controllers
             _context.WinePrice.Add(winePrice);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetWine", new { id = wine.WineID }, wine);
+            return CreatedAtAction("GetSingleWineEntry", new { id = wine.WineID }, wine);
         }
 
 

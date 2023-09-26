@@ -23,7 +23,7 @@ namespace API.Controllers
 
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<SupplierOrder>>> GetSupplierOrders()
+        public async Task<ActionResult<IEnumerable<SupplierOrder>>> GetAllSupplierOrders()
         {
             return await _context.SupplierOrders
                                  .Include(so => so.Supplier)
@@ -33,7 +33,7 @@ namespace API.Controllers
 
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<SupplierOrder>> GetSupplierOrder(int id)
+        public async Task<ActionResult<SupplierOrder>> GetSingeSupplierOrder(int id)
         {
             var supplierOrder = await _context.SupplierOrders
                                                .Include(so => so.Supplier)
@@ -50,7 +50,7 @@ namespace API.Controllers
 
         [HttpPut("{id}/status")]
         [DynamicAuthorize]
-        public async Task<IActionResult> PutSupplierOrder(int id, UpdateSupplierOrderStatusDTO statusDTO)
+        public async Task<IActionResult> UpdateSupplierOrder(int id, UpdateSupplierOrderStatusDTO statusDTO)
         {
             if (id != statusDTO.SupplierOrderID)
             {
@@ -106,7 +106,7 @@ namespace API.Controllers
 
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<SupplierOrder>> PostSupplierOrder(SupplierOrder supplierOrder)
+        public async Task<ActionResult<SupplierOrder>> AddSupplierOrder(SupplierOrder supplierOrder)
         {
             supplierOrder.SupplierOrderRefNum = generateOrderRefNum();
             var inventory = await _context.Inventories.FirstOrDefaultAsync(x => x.InventoryID == supplierOrder.InventoryID);
@@ -130,7 +130,7 @@ namespace API.Controllers
             // Step 3: Save the SupplierOrderStatus
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSupplierOrder", new { id = supplierOrder.SupplierOrderID }, supplierOrder);
+            return CreatedAtAction("GetSingeSupplierOrder", new { id = supplierOrder.SupplierOrderID }, supplierOrder);
         }
 
 

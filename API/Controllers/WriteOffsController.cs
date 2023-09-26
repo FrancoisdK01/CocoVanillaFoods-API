@@ -24,7 +24,7 @@ namespace API.Controllers
         // GET: api/WriteOffs
         [HttpGet]
         [DynamicAuthorize]
-        public async Task<ActionResult<IEnumerable<WriteOff>>> GetWriteOffs()
+        public async Task<ActionResult<IEnumerable<WriteOff>>> GetAllWriteOffs()
         {
             return await _context.WriteOffs.ToListAsync();
         }     
@@ -35,7 +35,7 @@ namespace API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<WriteOff>> PostWriteOff(WriteOff writeOff)
+        public async Task<ActionResult<WriteOff>> AddWriteOff(WriteOff writeOff)
         {                  
 
             var newwriteoff = new WriteOff
