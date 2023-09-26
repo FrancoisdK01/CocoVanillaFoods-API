@@ -193,9 +193,9 @@ namespace API.Controllers
 
 
         [HttpPut]
-        [Route("UpdateRefundStatus/{refundRequestId}")]
+        [Route("UpdateRefundStatus/{refundRequestId}/{discountCode?}/{allNotApproved?}")]
         [DynamicAuthorize]
-        public IActionResult UpdateRefundStatus(int refundRequestId, [FromBody] List<RefundItemUpdateViewModel> itemsStatuses)
+        public IActionResult UpdateRefundStatus(int refundRequestId, [FromBody] List<RefundItemUpdateViewModel> itemsStatuses, string discountCode = null, bool allNotApproved = false)
         {
             try
             {
@@ -262,7 +262,15 @@ namespace API.Controllers
                     // Send SMS
                     var to = $"+27{userPhoneNumber.Substring(1)}";  // Assuming phoneNumber is like '0721843438'
                     var from = "+18589018233";
-                    var message = $"Your refund request for order number {wineOrder.OrderRefNum} has been completed. \nShould you wish to see more information, please few your refunds page.";
+                    var message = allNotApproved
+                        ? $"Your refund request for order number {wineOrder.OrderRefNum} has not been approved."
+                        : $"Your refund request for order number {wineOrder.OrderRefNum} has been completed.";
+
+                    // Only append discount code if it's not null or empty
+                    if (!string.IsNullOrEmpty(discountCode) && !allNotApproved)
+                    {
+                        message += $"\nYour discount code is: {discountCode}";
+                    }
 
                     var smsResponse = MessageResource.Create(
                         body: message,
