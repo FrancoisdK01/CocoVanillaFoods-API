@@ -34,20 +34,40 @@ namespace API.Controllers
             return await _context.VATs.ToListAsync();
         }
 
-        // GET: api/VATs/5
-        [HttpGet("{id}")]
+        // GET: api/VATs/Latest
+        [HttpGet("Latest")]
         [DynamicAuthorize]
-        public async Task<ActionResult<VAT>> GetVAT(int id)
+        public async Task<IActionResult> GetLatestVAT()
         {
-            var vAT = await _context.VATs.FindAsync(id);
-
-            if (vAT == null)
+            try
             {
-                return NotFound();
-            }
+                DateTime currentDate = DateTime.UtcNow.AddHours(2);
 
-            return vAT;
+                var activeVAT = await _context.VATs
+                                    .Where(v => v.Date <= currentDate)
+                                    .OrderByDescending(v => v.Date)
+                                    .FirstOrDefaultAsync();
+
+                if (activeVAT == null)
+                {
+                    return NotFound("No VAT record found.");
+                }
+
+                // Use a proper logging mechanism here if needed
+                // _logger.LogInformation($"Latest VAT: {activeVAT}");
+
+                return Ok(activeVAT.Percentage);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception using a proper logging mechanism
+                // _logger.LogError(ex, "Error fetching the latest VAT");
+                return StatusCode(500, "Internal server error");
+            }
         }
+
+
+
 
         // PUT: api/VATs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -90,7 +110,7 @@ namespace API.Controllers
             _context.VATs.Add(vAT);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVAT", new { id = vAT.VATID }, vAT);
+            return CreatedAtAction("PostVAT", new { id = vAT.VATID }, vAT);
         }
 
         // DELETE: api/VATs/5
