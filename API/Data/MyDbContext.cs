@@ -113,6 +113,11 @@ namespace API.Data
                 .HasForeignKey(w => w.VarietalID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<VAT>().HasData(
+                 new VAT { VATID = 1, Percentage = 15, Date = new DateTime(2018, 4, 1) }
+                    );
+
+
             // WineType and Varietal relationship
             modelBuilder.Entity<Varietal>()
                 .HasOne(v => v.WineType)
