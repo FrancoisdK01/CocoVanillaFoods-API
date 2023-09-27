@@ -33,7 +33,7 @@ namespace API.Controllers
 
         [HttpGet("{id}")]
         [DynamicAuthorize]
-        public async Task<ActionResult<SupplierOrder>> GetSingeSupplierOrder(int id)
+        public async Task<ActionResult<SupplierOrder>> GetSingleSupplierOrder(int id)
         {
             var supplierOrder = await _context.SupplierOrders
                                                .Include(so => so.Supplier)
@@ -130,7 +130,7 @@ namespace API.Controllers
             // Step 3: Save the SupplierOrderStatus
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSingeSupplierOrder", new { id = supplierOrder.SupplierOrderID }, supplierOrder);
+            return CreatedAtAction("GetSingleSupplierOrder", new { id = supplierOrder.SupplierOrderID }, supplierOrder);
         }
 
 
