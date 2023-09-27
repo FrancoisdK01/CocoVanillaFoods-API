@@ -220,6 +220,11 @@ namespace API.Data
               .WithOne(tp => tp.QrCode)
               .HasForeignKey<QrCode>(qr => qr.TicketPurchaseId); // Use TicketPurchaseId instead
 
+            modelBuilder.Entity<BackupTimer>().HasData(
+              new BackupTimer { Id = 1, LastBackup = DateTime.Now});
+
+            modelBuilder.Entity<TimerFrequency>().HasData(
+                new TimerFrequency { Id = 1, HourFrequency = 1 });
 
             base.OnModelCreating(modelBuilder);
         }
@@ -265,6 +270,8 @@ namespace API.Data
         public DbSet<WinePrice> WinePrice { get; set; }
         public DbSet<RefundItem> RefundItems { get; set; }
         public DbSet<MethodPrivilegeMapping> MethodPrivilegeMappings { get; set; }
+        public DbSet<BackupTimer> BackupTimers { get; set; }
+        public DbSet<TimerFrequency> TimerFrequency { get; set; }
 
     }
 }

@@ -131,6 +131,7 @@ namespace API.Controllers
 
         // DELETE: api/Customers/5
         [HttpDelete("DeleteCustomer/{id}")]
+        [DynamicAuthorize]
         public async Task<IActionResult> DeleteCustomerAccount(string id)
         {
             // Start an async transaction

@@ -3,6 +3,7 @@ using API;
 using API.Controllers;
 using API.Data;
 using API.Model;
+using API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -63,6 +64,9 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<MyDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
+
+builder.Services.AddHostedService<BackupHostedService>();
+builder.Services.AddSingleton<IBackupService, BackupService>();
 
 var app = builder.Build();
 
