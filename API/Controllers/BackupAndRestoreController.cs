@@ -11,13 +11,13 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BackupAndRestore : ControllerBase
+    public class BackupAndRestoreController : ControllerBase
     {
         public readonly MyDbContext _context;
         public readonly UserManager<User> _userManager;
         private readonly IConfiguration _config;
 
-        public BackupAndRestore(MyDbContext context, UserManager<User> userManager, IConfiguration config)
+        public BackupAndRestoreController(MyDbContext context, UserManager<User> userManager, IConfiguration config)
         {
             _config = config;
             _context = context;
