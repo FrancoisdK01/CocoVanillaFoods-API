@@ -26,7 +26,8 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("BackupDatabase")]
-        public IActionResult Backup()
+        [DynamicAuthorize]
+        public IActionResult BackupDatabase()
         {
             string connectionString = _config.GetConnectionString("MyConnection");
             string databaseName = "Promenade";
@@ -58,6 +59,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("RestoreDatabase/{backupFilePath}")]
+        [DynamicAuthorize]
         public IActionResult RestoreDatabase(string backupFilePath)
         {
             string connectionString = _config.GetConnectionString("MyConnection");
@@ -107,7 +109,8 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("UpdateTimer/{timer}")]
-        public async Task<IActionResult> UpdateTimer(int timer)
+        [DynamicAuthorize]
+        public async Task<IActionResult> UpdateTimerBackupFrequency(int timer)
         {
             var timerData = await _context.TimerFrequency.FirstOrDefaultAsync();
             if (timerData == null)
@@ -131,7 +134,8 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetTimer")]
-        public async Task<ActionResult<IEnumerable<TimerFrequency>>> GetTimer()
+        [DynamicAuthorize]
+        public async Task<ActionResult<IEnumerable<TimerFrequency>>> GetTimerBackupFrequency()
         {
             return _context.TimerFrequency.ToList();
         }
