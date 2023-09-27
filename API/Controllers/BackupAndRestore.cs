@@ -32,7 +32,7 @@ namespace API.Controllers
             string databaseName = "Promenade";
             string dateTimeString = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             string backupFileName = $"{databaseName}_backup_{dateTimeString}.bak";
-            string backupFilePath = Path.Combine("C:\\", backupFileName);
+            string backupFilePath = Path.Combine("C:\\SQLBackups", backupFileName);
 
 
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -46,7 +46,7 @@ namespace API.Controllers
                     {
                         command.ExecuteNonQuery();
                         connection.Close();
-                        return Ok("Backup successfully created at " + backupFilePath);
+                        return Ok();
                     }
                     catch (Exception ex)
                     {
@@ -57,12 +57,12 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Route("RestoreDatabase")]
+        [Route("RestoreDatabase/{backupFilePath}")]
         public IActionResult RestoreDatabase(string backupFilePath)
         {
             string connectionString = _config.GetConnectionString("MyConnection");
             string databaseName = "Promenade";
-
+            string backupFile = Path.Combine("C:\\SQLBackups", backupFilePath);
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -81,8 +81,8 @@ namespace API.Controllers
                             Console.WriteLine(command.CommandText);
                         }
 
-                        // Perform the restore operation
-                        command.CommandText = $"RESTORE DATABASE {databaseName} FROM DISK='{backupFilePath}' WITH REPLACE";
+                        // Perform the restore operation 
+                        command.CommandText = $"RESTORE DATABASE {databaseName} FROM DISK='{backupFile}' WITH REPLACE";
                         command.ExecuteNonQuery();
 
                         // Set back to multi-user mode
@@ -93,7 +93,7 @@ namespace API.Controllers
                 }
 
                 // Return success response
-                return Ok("Database successfully restored.");
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -106,16 +106,16 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Route("UpdateTimer")]
-        public async Task<IActionResult> UpdateTimer(int id, int timerFrequency)
+        [Route("UpdateTimer/{timer}")]
+        public async Task<IActionResult> UpdateTimer(int timer)
         {
-            var timerData = await _context.TimerFrequency.FirstOrDefaultAsync(x => x.Id == id);
+            var timerData = await _context.TimerFrequency.FirstOrDefaultAsync();
             if (timerData == null)
             {
                 return BadRequest();
             }
 
-            timerData.HourFrequency = timerFrequency;
+            timerData.Frequency = timer;
 
             try
             {
@@ -127,6 +127,13 @@ namespace API.Controllers
             }
 
             return Ok(timerData);
+        }
+
+        [HttpGet]
+        [Route("GetTimer")]
+        public async Task<ActionResult<IEnumerable<TimerFrequency>>> GetTimer()
+        {
+            return _context.TimerFrequency.ToList();
         }
 
     }

@@ -18,7 +18,7 @@ namespace API.Services
         public async Task CreateBackupAsync()
         {
             string backupFileName = $"{databaseName}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.bak";
-            string backupFilePath = Path.Combine("C:\\", backupFileName);
+            string backupFilePath = Path.Combine("C:\\SQLBackups", backupFileName);
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {

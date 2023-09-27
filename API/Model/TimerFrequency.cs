@@ -3,6 +3,6 @@
     public class TimerFrequency
     {
         public int Id { get; set; }
-        public int HourFrequency { get; set; }
+        public int Frequency { get; set; }
     }
 }
