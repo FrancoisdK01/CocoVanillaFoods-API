@@ -1,4 +1,5 @@
 ﻿using API.Data;
+using API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,9 @@ namespace API
 
             var twilioSettings = Configuration.GetSection("Twilio");
             TwilioClient.Init(twilioSettings["AccountSid"], twilioSettings["AuthToken"]);
+
+            services.AddHostedService<BackupHostedService>();
+            services.AddSingleton<IBackupService, BackupService>();
 
             services.AddDataProtection();
 
