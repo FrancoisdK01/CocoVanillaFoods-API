@@ -95,7 +95,7 @@ namespace API.Controllers
             _context.Varietals.Add(varietal);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVarietal", new { id = varietal.VarietalID }, varietal);
+            return CreatedAtAction("GetSingleVarietalEntry", new { id = varietal.VarietalID }, varietal);
         }
 
 

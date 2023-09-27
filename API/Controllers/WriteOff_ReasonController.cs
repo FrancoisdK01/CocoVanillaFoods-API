@@ -85,7 +85,7 @@ namespace API.Controllers
             _context.WriteOffReasons.Add(writeOff_Reason);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetWriteOff_Reason", new { id = writeOff_Reason.WriteOff_ReasonID }, writeOff_Reason);
+            return CreatedAtAction("GetSingleWriteOff_ReasonEntry", new { id = writeOff_Reason.WriteOff_ReasonID }, writeOff_Reason);
         }
 
         // DELETE: api/WriteOff_Reason/5

@@ -85,7 +85,7 @@ namespace API.Controllers
             _context.WineTypes.Add(wineType);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetWineType", new { id = wineType.WineTypeID }, wineType);
+            return CreatedAtAction("GetSingleWineTypeEntry", new { id = wineType.WineTypeID }, wineType);
         }
 
         // DELETE: api/WineTypes/5

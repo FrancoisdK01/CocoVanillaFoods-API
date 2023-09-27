@@ -108,7 +108,7 @@ namespace API.Controllers
             _context.VATs.Add(vAT);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostVAT", new { id = vAT.VATID }, vAT);
+            return CreatedAtAction("AddVAT", new { id = vAT.VATID }, vAT);
         }
 
         // DELETE: api/VATs/5
