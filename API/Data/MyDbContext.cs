@@ -224,7 +224,7 @@ namespace API.Data
               new BackupTimer { Id = 1, LastBackup = DateTime.Now});
 
             modelBuilder.Entity<TimerFrequency>().HasData(
-                new TimerFrequency { Id = 1, HourFrequency = 1 });
+                new TimerFrequency { Id = 1, Frequency = 60 });
 
             base.OnModelCreating(modelBuilder);
         }

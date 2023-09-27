@@ -21,7 +21,7 @@ namespace API.Services
             {
                 var context = scope.ServiceProvider.GetRequiredService<MyDbContext>();
                 var backupTimer = context.Set<TimerFrequency>().FirstOrDefault();
-                timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromHours(backupTimer.HourFrequency));
+                timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(backupTimer.Frequency));
             }// Check every hour
             return Task.CompletedTask;
         }
@@ -42,7 +42,7 @@ namespace API.Services
 
                 var lastBackup = backupTimer.LastBackup;
                 Console.WriteLine("lastBackup", lastBackup);
-                var nextBackupTime = lastBackup.AddHours(timerFreq.HourFrequency);
+                var nextBackupTime = lastBackup.AddMinutes(timerFreq.Frequency);
                 Console.WriteLine("nextBackupTimer", nextBackupTime);
 
                 if (DateTime.Now >= nextBackupTime)
