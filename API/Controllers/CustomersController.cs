@@ -58,7 +58,7 @@ namespace API.Controllers
 
         [HttpPut("{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> UpdateCustomerAccount(string id, Customer customer)
+        public async Task<IActionResult> UserUpdateCustomerAccount(string id, Customer customer)
         {
             var customerDetailsBeforeUpdate = await _context.Customers.FindAsync(id);
             var existingCustomer = await _context.Customers.FindAsync(id);
@@ -132,7 +132,7 @@ namespace API.Controllers
         // DELETE: api/Customers/5
         [HttpDelete("DeleteCustomer/{id}")]
         [DynamicAuthorize]
-        public async Task<IActionResult> DeleteCustomerAccount(string id)
+        public async Task<IActionResult> UserDeleteCustomerAccount(string id)
         {
             // Start an async transaction
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -183,7 +183,7 @@ namespace API.Controllers
                     //Check if the user has any tickets they can still use
                     // Check for tickets to future events
                     var futureEventTickets = await _context.TicketPurchases
-                        .Where(tp => tp.UserEmail == customer.Email && tp.EventDate > DateTime.UtcNow)
+                        .Where(tp => tp.UserEmail == customer.Email && tp.EventDate > DateTime.Now)
                         .ToListAsync();
 
                     if (futureEventTickets.Count > 0)
