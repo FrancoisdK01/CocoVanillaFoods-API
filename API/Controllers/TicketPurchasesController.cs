@@ -54,7 +54,7 @@ namespace API.Controllers
 
             // Save the TicketPurchase first to generate an ID
             _context.TicketPurchases.Add(ticket);
-            await _context.SaveChangesAsync();  // Save the TicketPurchase
+            await _context.SaveChangesAsync();
 
             // Now that the TicketPurchase is saved, it should have an Id.
             int ticketPurchaseId = ticket.Id;
@@ -69,7 +69,7 @@ namespace API.Controllers
             };
 
             _context.TicketPurchasedStatuses.Add(status);
-            await _context.SaveChangesAsync();  // Save TicketPurchasedStatus
+            await _context.SaveChangesAsync();
 
             // Generate a QR code
             var qrCode = GenerateQRCode($"http://localhost:4200/TicketPurchases/Scan/{status.ScanningToken}");
@@ -83,9 +83,16 @@ namespace API.Controllers
             _context.QrCodes.Add(qr);
             await _context.SaveChangesAsync();
 
-
-            // Send the email to the customer
-            await SendEmail(customer.Email, qrCode, customer, eventDetails);
+            try
+            {
+                // Send the email to the customer
+                await SendEmail(customer.Email, qrCode, customer, eventDetails);
+            }
+            catch (MailKit.Security.AuthenticationException ex)
+            {
+                // Log the exception or handle it according to your need
+                Console.WriteLine($"Email could not be sent. Exception: {ex.Message}");
+            }
 
             return CreatedAtAction("GetSingleTicketPurchaseEntry", new { id = ticket.Id }, ticket);
         }
