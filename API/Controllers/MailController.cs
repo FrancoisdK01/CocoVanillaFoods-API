@@ -21,9 +21,10 @@ namespace API.Controllers
 
         [HttpPost]
         [DynamicAuthorize]
-        public IActionResult SystemSendEmail(EmailViewModel emailViewModel)
+        public async Task<IActionResult> SystemSendEmail(EmailViewModel emailViewModel)
         {
-            _emailService.SendEmail(emailViewModel);
+            await _emailService.SendSimpleMessage(emailViewModel);
+            //_emailService.SendEmail(emailViewModel);
 
             return Ok();
         }

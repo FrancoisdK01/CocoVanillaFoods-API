@@ -191,7 +191,8 @@ namespace API.Controllers
                                         "
                         };
 
-                        _emailService.SendEmail(evm);
+                        //_emailService.SendEmail(evm);
+                        await _emailService.SendSimpleMessage(evm);
 
                         return CreatedAtAction("GetSingleEmployeeEntry", new { id = employee.Id }, employee);
                     }

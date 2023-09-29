@@ -288,7 +288,8 @@ namespace API.Controllers
 
                 if (evm != null)
                 {
-                    _emailService.SendEmail(evm);
+                    await _emailService.SendSimpleMessage(evm);
+                    //_emailService.SendEmail(evm);
                 }
 
                 _context.Entry(order).State = EntityState.Modified;

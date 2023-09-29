@@ -223,7 +223,7 @@ namespace API.Controllers
         }
 
         //2FA code Generator
-        private void UserSend2FACodeByEmail(User user, string code)
+        private async void UserSend2FACodeByEmail(User user, string code)
         {
             // Generate the email message with the code
             var evm = new EmailViewModel
@@ -241,8 +241,8 @@ namespace API.Controllers
                                         <p>The Promenade Team</p>
                                         "
             };
-
-            _emailService.SendEmail(evm);
+            await _emailService.SendSimpleMessage(evm);
+            //_emailService.SendEmail(evm);
         }
 
         [HttpGet]
@@ -395,7 +395,8 @@ namespace API.Controllers
             var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
             if (result.Succeeded)
             {
-                _emailService.SendEmail(evm);
+                await _emailService.SendSimpleMessage(evm);
+                //_emailService.SendEmail(evm);
             }
             else
             {

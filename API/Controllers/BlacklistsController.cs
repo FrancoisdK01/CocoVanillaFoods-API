@@ -92,7 +92,7 @@ namespace API.Controllers
         }
 
         // DELETE: api/Blacklists/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
         [DynamicAuthorize]
         public async Task<IActionResult> DeleteCustomerFromBlacklist(BlacklistDeleteViewModel deleteViewModel)
         {
@@ -115,13 +115,13 @@ namespace API.Controllers
                     <p>If you have any questions or concerns, please do not hesitate to contact our support team.</p>
                     <p>Thank you for your understanding and continued trust in us.</p>
                     <p>Kind regards,</p>
-                    <p>[Your Company Name] Team</p>
+                    <p>Promenade Team</p>
                 "
             };
 
             try
             {
-                _emailService.SendEmail(email);
+                await _emailService.SendSimpleMessage(email);
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
