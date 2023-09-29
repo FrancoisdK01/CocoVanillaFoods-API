@@ -220,8 +220,8 @@ namespace API.Controllers
         {
             var emailServer = "smtp.gmail.com";
             var emailPort = 587;
-            var emailUser = "pfpfrancois2001@gmail.com";
-            var emailPassword = "wupastwcxrbihgfa";
+            var emailUser = "promenadetestacc2@gmail.com";
+            var emailPassword = "kriunnuftrotvecb";
 
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("The Promenade", emailUser));
