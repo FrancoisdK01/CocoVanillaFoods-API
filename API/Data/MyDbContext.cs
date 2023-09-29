@@ -40,6 +40,13 @@ namespace API.Data
                     .HasForeignKey(e => e.EventTypeID)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+            modelBuilder.Entity<TicketPurchase>()
+                        .HasOne(tp => tp.Event)  // Assume TicketPurchase has a navigation property called Event
+                         .WithMany(e => e.TicketPurchase)  // Assume Event has a collection navigation property called TicketPurchases
+                          .HasForeignKey(tp => tp.EventId)  // Assume the foreign key in TicketPurchase is named EventID
+                            .OnDelete(DeleteBehavior.Restrict);
+
+
 
             // Seed EventType data
             modelBuilder.Entity<EventType>().HasData(
