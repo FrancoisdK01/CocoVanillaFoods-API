@@ -176,8 +176,8 @@ namespace API.Controllers
                                         <p>The Promenade Team</p>
                                         "
                 };
-
-                _emailService.SendEmail(evm);
+                await _emailService.SendSimpleMessage(evm);
+                //_emailService.SendEmail(evm);
 
                 return CreatedAtAction("GetSingleSuperUserEntry", new { id = superuser.Id }, superuser);
             }
@@ -306,7 +306,8 @@ namespace API.Controllers
 
             try
             {
-                _emailService.SendEmail(evm);
+                await _emailService.SendSimpleMessage(evm);
+                //_emailService.SendEmail(evm);
                 return Ok();
             }
             catch

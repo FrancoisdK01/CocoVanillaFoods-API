@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Model;
+using API.ViewModels;
 using iTextSharp.text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +21,13 @@ namespace API.Controllers
     {
         private readonly MyDbContext _context;
         private readonly IConfiguration _config;
+        private readonly IEmailService _emailService;
 
-        public TicketPurchasesController(MyDbContext context, IConfiguration configuration)
+        public TicketPurchasesController(MyDbContext context, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
             _config = configuration;
+            _emailService = emailService;
         }
 
         [HttpPost]
@@ -86,7 +89,18 @@ namespace API.Controllers
             try
             {
                 // Send the email to the customer
-                await SendEmail(customer.Email, qrCode, customer, eventDetails);
+                //await _emailService.SendSimpleMessage(evm);
+                var evm = new EmailViewModel
+                {
+                    To = customer.Email,
+                    Subject = "QRCode for event",
+                    Body = $"Thank you for your purchase for the event: {eventDetails.Name} on {eventDetails.EventDate}." + "\n" +
+                    $"Please find below your QR code. Keep it safe and present it at the entrance.\nWe look forward to seeing you!" +
+                    $"Warm regards,\nThe Promenade Team"
+                };
+                var qrCodeBytes = Convert.FromBase64String(qrCode);
+                await _emailService.SendEmailWithAttachment(evm, qrCodeBytes, "PromenadeTicket.png");
+                //await SendEmail(customer.Email, qrCode, customer, eventDetails);
             }
             catch (MailKit.Security.AuthenticationException ex)
             {
@@ -232,7 +246,7 @@ namespace API.Controllers
             var emailServer = _config["EmailHost"];
             var emailPort = 587;
             var emailUser = _config["EmailUserName"];
-            var emailPassword = _config["EmailPassword"] ;
+            var emailPassword = _config["EmailPassword"];
 
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("The Promenade", emailUser));
