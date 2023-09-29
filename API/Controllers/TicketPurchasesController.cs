@@ -92,6 +92,7 @@ namespace API.Controllers
             {
                 // Log the exception or handle it according to your need
                 Console.WriteLine($"Email could not be sent. Exception: {ex.Message}");
+                return BadRequest(new { message = "Email not sent." });
             }
 
             return CreatedAtAction("GetSingleTicketPurchaseEntry", new { id = ticket.Id }, ticket);
