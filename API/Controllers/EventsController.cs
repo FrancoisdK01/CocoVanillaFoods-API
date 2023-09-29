@@ -156,6 +156,10 @@ namespace API.Controllers
                 eventItem.EventTypeID = eventForm?.EventTypeID;
             }
 
+            var ticketPurchased = _context.TicketPurchases.FirstOrDefault(tp => tp.EventId == eventItem.EventID);
+            ticketPurchased.EventDate = eventForm.EventDate;
+
+
             _context.Entry(eventItem).State = EntityState.Modified;
 
             try
