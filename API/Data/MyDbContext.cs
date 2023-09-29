@@ -233,6 +233,20 @@ namespace API.Data
             modelBuilder.Entity<TimerFrequency>().HasData(
                 new TimerFrequency { Id = 1, Frequency = 60 });
 
+            // Configure the relationship between Customer and WineOrder
+            modelBuilder.Entity<WineOrder>()
+                .HasOne(wo => wo.Customer) // WineOrder has one Customer
+                .WithMany(c => c.WineOrders) // Customer has many WineOrders
+                .HasForeignKey(wo => wo.CustomerId) // Foreign key in WineOrder
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Configure the relationship between Customer and TicketPurchases
+            modelBuilder.Entity<TicketPurchase>()
+                .HasOne(tp => tp.Customer)
+                .WithMany(c => c.TicketPurchases)
+                .HasForeignKey(tp => tp.CustomerId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             base.OnModelCreating(modelBuilder);
         }
 

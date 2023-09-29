@@ -26,6 +26,10 @@ namespace API.Model
 
         public virtual Event Event { get; set; }
 
+        public string CustomerId { get; set; } // Change type to string
+
+        [ForeignKey("CustomerId")]
+        public virtual Customer Customer { get; set; }
 
     }
 }

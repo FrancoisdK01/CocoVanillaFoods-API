@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -59,6 +60,26 @@ namespace API
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            // Global exception handling
+            app.UseExceptionHandler(appError =>
+            {
+                appError.Run(async context =>
+                {
+                    context.Response.StatusCode = 500; // Internal Server Error
+                    context.Response.ContentType = "application/json";
+
+                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                    if (contextFeature != null)
+                    {
+                        // Log the exception here
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(new
+                        {
+                            error = "An unexpected error occurred."
+                        }));
+                    }
+                });
+            });
 
             app.UseHttpsRedirection();
 
