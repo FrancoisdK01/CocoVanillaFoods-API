@@ -53,5 +53,8 @@ namespace API.Model
         public Cart Cart { get; set; }
 
         public virtual ICollection<WineOrder> WineOrders { get; set; }
+
+        public virtual ICollection<TicketPurchase> TicketPurchases { get; set; }
+
     }
 }
