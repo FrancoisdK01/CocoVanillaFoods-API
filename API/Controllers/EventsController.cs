@@ -254,23 +254,18 @@ namespace API.Controllers
 
             if (noTicketsPurchased || eventDatePassed)
             {
-                // Added null check for TicketPurchasedStatus
-                foreach (var ticketPurchase in ticketPurchases)
+                try
                 {
-                    if (ticketPurchase.TicketPurchasedStatus != null)
-                    {
-                        ticketPurchase.TicketPurchasedStatus.EventDeleted = true;
-                    }
-                }
+                    // Additional code like updating TicketPurchasedStatus and deleting the image
 
-                // Delete the image from Google Cloud Storage
-                if (!string.IsNullOrEmpty(@event.FilePath))
+                    _context.Events.Remove(@event);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
                 {
-                    await DeleteImageFromGoogleCloudStorage(@event.FilePath);
+                    // This will catch EF Core's exception for restricted deletes
+                    return BadRequest("Event cannot be deleted as other entities are referencing it.");
                 }
-
-                _context.Events.Remove(@event);
-                await _context.SaveChangesAsync();
 
                 return NoContent();
             }

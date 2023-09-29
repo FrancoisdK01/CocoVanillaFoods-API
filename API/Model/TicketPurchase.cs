@@ -24,6 +24,8 @@ namespace API.Model
         [ForeignKey("QrId")]
         public virtual QrCode QrCode { get; set; }
 
+        public virtual Event Event { get; set; }
+
 
     }
 }

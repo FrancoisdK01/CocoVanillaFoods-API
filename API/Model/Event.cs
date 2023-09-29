@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using iTextSharp.text;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -26,6 +28,8 @@ namespace API.Model
         public int? EventTypeID { get; set; }
         [ForeignKey("EventTypeID")]
         public EventType EventType { get; set; }
+
+        public ICollection<TicketPurchase> TicketPurchase { get; set; }
 
     }
 }
