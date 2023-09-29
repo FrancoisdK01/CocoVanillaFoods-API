@@ -8,6 +8,7 @@ using MimeKit;
 using Newtonsoft.Json;
 using QRCoder;
 using System;
+using System.Configuration;
 using System.Globalization;
 using static QRCoder.PayloadGenerator;
 
@@ -18,15 +19,17 @@ namespace API.Controllers
     public class TicketPurchasesController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly IConfiguration _config;
 
-        public TicketPurchasesController(MyDbContext context)
+        public TicketPurchasesController(MyDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _config = configuration;
         }
 
         [HttpPost]
         [DynamicAuthorize]
-        public async Task<ActionResult<TicketPurchase>> AddTicket(TicketPurchaseDTO ticketDTO)
+        public async Task<ActionResult<TicketPurchase>> UserAddTicket(TicketPurchaseDTO ticketDTO)
         {
             // Lookup the event details and customer based on the DTO data
             var eventDetails = await _context.Events.FirstOrDefaultAsync(e => e.EventID == ticketDTO.EventId);
@@ -218,10 +221,10 @@ namespace API.Controllers
 
         private async Task SendEmail(string email, string qrCode, Customer customer, Event eventDetails)
         {
-            var emailServer = "smtp.gmail.com";
+            var emailServer = _config["EmailHost"];
             var emailPort = 587;
-            var emailUser = "pfpfrancois2001@gmail.com";
-            var emailPassword = "wupastwcxrbihgfa";
+            var emailUser = _config["EmailUserName"];
+            var emailPassword = _config["EmailPassword"] ;
 
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("The Promenade", emailUser));
