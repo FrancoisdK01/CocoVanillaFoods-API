@@ -54,8 +54,8 @@ jobs:
           working-directory: ./Backend
 
       - name: Build and Publish
-        working-directory: './API'  # This should be set relative to the root of your GitHub repository.
-        run: dotnet publish -c Release -o ./myapp
+        working-directory: './API'  # Navigate to the API directory
+        run: dotnet publish -c Release -o ./myapp -p:PublishProfile=API.csproj
 
       # Setup Azure CLI
       - name: Install Azure CLI
