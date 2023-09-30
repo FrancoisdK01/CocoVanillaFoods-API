@@ -10,41 +10,58 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: windows-latest
-    environment:
-      name: 'Production'
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '6.0.x'
-        include-prerelease: true
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+          include-prerelease: true
 
-    - name: Build and Publish
-      run: dotnet publish -c Release -o ./myapp
-      working-directory: .
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
 
-    # Deploy to Azure Web App
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'vititechAPI'
-        slot-name: 'Production'
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1AF78051BFA04B02B3E1D2DA0D31A008 }}
-        package: ./myapp
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ./myapp
 
-    # Upload to Azure Blob
-    - name: Upload to Azure Blob
-      uses: Azure/blob-upload-action@v1
-      with:
-        connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-        container_name: vititechblobcontainer
-        source_dir: './myapp'
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'vititechAPI'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1AF78051BFA04B02B3E1D2DA0D31A008 }}
+          package: .
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.x'
+          working-directory: ./Backend
+
+      - name: Build and Publish
+        run: dotnet publish -c Release -o ./myapp
+        working-directory: ./Backend
+
+      - name: Upload to Azure Blob
+        uses: Azure/blob-upload-action@v1
+        with:
+          connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          container_name: vititechblobcontainer
+          source_dir: './Backend/myapp'
 
 
