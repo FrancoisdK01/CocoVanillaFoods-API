@@ -54,8 +54,8 @@ jobs:
           working-directory: ./Backend
 
       - name: Build and Publish
-        run: dotnet publish -c Release -o ./myapp
-        working-directory: ./Backend
+        working-directory: './'  # Navigate to the API directory
+        run: dotnet publish -c Release -o ./myapp -p:PublishProfile=API.csproj
 
       # Setup Azure CLI
       - name: Install Azure CLI
