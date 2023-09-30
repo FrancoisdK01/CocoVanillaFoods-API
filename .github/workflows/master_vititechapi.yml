@@ -55,3 +55,10 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1AF78051BFA04B02B3E1D2DA0D31A008 }}
           package: .
+
+      - name: Upload to Azure Blob  # <-- New step for blob upload
+        uses: Azure/blob-upload-action@v1
+        with:
+          connection_string: ${{ DefaultEndpointsProtocol=https;AccountName=csb100320029c4ba133;AccountKey=C+Jkg2TrVZNkv7SQzJTjYIfQDBuTeb71DMvAoQCpd69hS0Tqj8etokuWix4OgfiYvL4Ed2ieLk4L+AStqCLGrA==;EndpointSuffix=core.windows.net }}
+          container_name: vititechblobcontainer
+          source_dir: './path-to-your-build-artifact-folder'  # Replace this with the correct folder path
