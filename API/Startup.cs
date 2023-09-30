@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using Twilio;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace API
 {
@@ -36,6 +37,15 @@ namespace API
 
             var twilioSettings = Configuration.GetSection("Twilio");
             TwilioClient.Init(twilioSettings["AccountSid"], twilioSettings["AuthToken"]);
+
+            //Azure deployment
+            services.AddDbContext<MyDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("MyConnection"),
+                 sqlServerOptionsAction: sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure();
+                })
+              );
 
             services.AddHostedService<BackupHostedService>();
             services.AddSingleton<IBackupService, BackupService>();

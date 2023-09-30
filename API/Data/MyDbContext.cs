@@ -11,6 +11,7 @@ namespace API.Data
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -246,6 +247,22 @@ namespace API.Data
                 .WithMany(c => c.TicketPurchases)
                 .HasForeignKey(tp => tp.CustomerId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            //Azure edits
+            modelBuilder.Entity<Inventory>()
+            .Property(b => b.WinePrice)
+            .HasColumnType("decimal(18, 2)");
+
+            modelBuilder.Entity<TicketPurchase>()
+            .Property(tp => tp.TicketPrice)
+            .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<TicketPurchase>()
+                .HasOne(tp => tp.QrCode)
+                .WithOne(qr => qr.TicketPurchase)
+                .HasForeignKey<TicketPurchase>(tp => tp.QrId);  // Assuming QrCodeId is the FK
+
+
 
             base.OnModelCreating(modelBuilder);
         }
