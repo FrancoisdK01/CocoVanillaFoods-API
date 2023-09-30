@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and Publish
         run: dotnet publish -c Release -o ./myapp
-        working-directory: ./Backend
+        working-directory: VITITECH./Backend
 
       # Setup Azure CLI
       - name: Install Azure CLI
