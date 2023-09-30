@@ -14,25 +14,23 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '6.0.x'
-          include-prerelease: true
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+        include-prerelease: true
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+    - name: Build and Publish
+      run: dotnet publish -c Release -o ./Backend/myapp
+      working-directory: .
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v2
+      with:
+        name: .net-app
+        path: ./Backend/myapp
 
   deploy:
     runs-on: windows-latest
@@ -42,23 +40,25 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: .net-app
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v2
+      with:
+        name: .net-app
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'vititechAPI'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1AF78051BFA04B02B3E1D2DA0D31A008 }}
-          package: .
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'vititechAPI'
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1AF78051BFA04B02B3E1D2DA0D31A008 }}
+        package: .
 
-      - name: Upload to Azure Blob
-        uses: Azure/blob-upload-action@v1
-        with:
-          connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          container_name: vititechblobcontainer
-          source_dir: '${{env.DOTNET_ROOT}}/myapp'
+    - name: Upload to Azure Blob
+      uses: Azure/blob-upload-action@v1
+      with:
+        connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+        container_name: vititechblobcontainer
+        source_dir: './net-app' # this should be the folder where your downloaded artifact is
+
+
