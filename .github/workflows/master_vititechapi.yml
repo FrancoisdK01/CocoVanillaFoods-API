@@ -38,10 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-            # List directory contents for debugging
-      - name: List directory contents
-        run: ls -R
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -58,8 +54,8 @@ jobs:
           working-directory: ./Backend
 
       - name: Build and Publish
+        working-directory: './API'  # This should be set relative to the root of your GitHub repository.
         run: dotnet publish -c Release -o ./myapp
-        working-directory: VITITECH./Backend
 
       # Setup Azure CLI
       - name: Install Azure CLI
