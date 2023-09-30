@@ -57,11 +57,16 @@ jobs:
         run: dotnet publish -c Release -o ./myapp
         working-directory: ./Backend
 
+      # Setup Azure CLI
+      - name: Install Azure CLI
+        run: choco install azure-cli
+
+      # Upload to Azure Blob
       - name: Upload to Azure Blob
-        uses: Azure/blob-upload-action@v1
-        with:
-          connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          container_name: vititechblobcontainer
-          source_dir: './Backend/myapp'
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+        run: |
+          az storage blob upload-batch -d vititechblobcontainer -s ./Backend/myapp
+
 
 
