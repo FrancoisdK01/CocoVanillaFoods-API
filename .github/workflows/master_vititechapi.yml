@@ -9,23 +9,31 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_NAME: vititechAPI
+  WORKING_DIRECTORY: Backend
+  DOTNET_VERSION: '6.0.x'
+
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
           include-prerelease: true
 
       - name: Build with dotnet
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: dotnet build --configuration Release
 
       - name: dotnet publish
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: dotnet publish -c Release -o ./myapp
 
   deploy:
@@ -36,37 +44,29 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'vititechAPI'
-          slot-name: 'Production'
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1AF78051BFA04B02B3E1D2DA0D31A008 }}
-          package: .
+          package: './myapp'
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.x'
-          working-directory: ./Backend
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          working-directory: ${{ env.WORKING_DIRECTORY }}
 
-      - name: Build and Publish
-        working-directory: './API'  # Navigate to the API directory
-        run: dotnet publish -c Release -o ./myapp -p:PublishProfile=API.csproj
-
-      # Setup Azure CLI
-      - name: Install Azure CLI
-        run: choco install azure-cli
-
-      # Upload to Azure Blob
       - name: Upload to Azure Blob
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
         run: |
-          az storage blob upload-batch -d vititechblobcontainer -s ./Backend/myapp
+          az storage blob upload-batch -d vititechblobcontainer -s ${{ env.WORKING_DIRECTORY }}/myapp
+
 
 
 
