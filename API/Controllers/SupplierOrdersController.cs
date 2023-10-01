@@ -28,6 +28,7 @@ namespace API.Controllers
             return await _context.SupplierOrders
                                  .Include(so => so.Supplier)
                                  .Include(so => so.SupplierOrderStatus)
+                                 .OrderBy(so => so.DateOrdered)  // Order by DateOrdered
                                  .ToListAsync();
         }
 
