@@ -257,12 +257,6 @@ namespace API.Data
             .Property(tp => tp.TicketPrice)
             .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<TicketPurchase>()
-                .HasOne(tp => tp.QrCode)
-                .WithOne(qr => qr.TicketPurchase)
-                .HasForeignKey<TicketPurchase>(tp => tp.QrId);  // Assuming QrCodeId is the FK
-
-
 
             base.OnModelCreating(modelBuilder);
         }
@@ -310,6 +304,8 @@ namespace API.Data
         public DbSet<MethodPrivilegeMapping> MethodPrivilegeMappings { get; set; }
         public DbSet<BackupTimer> BackupTimers { get; set; }
         public DbSet<TimerFrequency> TimerFrequency { get; set; }
+        public DbSet<DamageImage> DamageImages { get; set; }
+
 
     }
 }
