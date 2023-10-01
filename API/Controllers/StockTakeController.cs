@@ -24,7 +24,7 @@ namespace API.Controllers
         {
             // Order stocktake items by DateDone before returning them
             return await _context.StockTakes
-                                 .OrderBy(stockTake => stockTake.DateDone)
+                                 .OrderByDescending(stockTake => stockTake.DateDone)
                                  .ToListAsync();
         }
 

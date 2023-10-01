@@ -8,7 +8,7 @@ namespace API.Model
         [Key]
         public int Id { get; set; }
         public string UserEmail { get; set; }
-        public int EventId { get; set; }
+        public int? EventId { get; set; }
         public DateTime EventDate { get; set; }
         public DateTime PurchaseDate { get; set; }
         public decimal TicketPrice { get; set; }
