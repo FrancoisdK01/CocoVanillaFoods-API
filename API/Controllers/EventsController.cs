@@ -157,7 +157,15 @@ namespace API.Controllers
             }
 
             var ticketPurchased = _context.TicketPurchases.FirstOrDefault(tp => tp.EventId == eventItem.EventID);
-            ticketPurchased.EventDate = eventForm.EventDate;
+
+            // Only update TicketPurchase if one exists for the given EventID
+            if (ticketPurchased != null)
+            {
+                ticketPurchased.EventDate = eventForm.EventDate;
+            }
+            // No else clause returning BadRequest, because an event without a TicketPurchase is legitimate
+
+
 
 
             _context.Entry(eventItem).State = EntityState.Modified;
