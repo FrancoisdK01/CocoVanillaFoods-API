@@ -123,6 +123,27 @@ namespace API.Controllers
             var images = await _context.DamageImages.ToListAsync();
             return Ok(images);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDamageImage(int id)
+        {
+            var damageImage = await _context.DamageImages.FindAsync(id);
+            if (damageImage == null)
+            {
+                return NotFound();
+            }
+
+            // Delete the image from Google Cloud Storage
+            if (!string.IsNullOrEmpty(damageImage.FilePath))
+            {
+                await DeleteImageFromGoogleCloudStorage(damageImage.FilePath);
+            }
+
+            _context.DamageImages.Remove(damageImage);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
 
