@@ -8,3 +8,5 @@ https://github.com/Informatics-370/Group8Angular.git
 RASA Chatbot API: 
 https://github.com/Informatics-370/rasa.git
 
+Ionic Mobile Application:
+https://github.com/Informatics-370/mobileapp.git
