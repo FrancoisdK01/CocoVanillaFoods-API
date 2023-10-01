@@ -22,9 +22,12 @@ namespace API.Controllers
         [DynamicAuthorize]
         public async Task<ActionResult<IEnumerable<StockTake>>> GetAllStockTakes()
         {
-            return await _context.StockTakes.ToListAsync();
-            // GET request to retrieve all stocktake items from the database.
+            // Order stocktake items by DateDone before returning them
+            return await _context.StockTakes
+                                 .OrderBy(stockTake => stockTake.DateDone)
+                                 .ToListAsync();
         }
+
 
         [HttpPost]
         [Route("AddStockTake")]
