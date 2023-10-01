@@ -42,10 +42,10 @@ namespace API.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<TicketPurchase>()
-                        .HasOne(tp => tp.Event)  // Assume TicketPurchase has a navigation property called Event
-                         .WithMany(e => e.TicketPurchase)  // Assume Event has a collection navigation property called TicketPurchases
-                          .HasForeignKey(tp => tp.EventId)  // Assume the foreign key in TicketPurchase is named EventID
-                            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(tp => tp.Event)
+                .WithMany(e => e.TicketPurchase)
+                .HasForeignKey(tp => tp.EventId)
+            .OnDelete(DeleteBehavior.SetNull);  // or .OnDelete(DeleteBehavior.Cascade);
 
 
 
