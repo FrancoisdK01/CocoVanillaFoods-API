@@ -86,6 +86,23 @@ namespace API.Controllers
             _context.QrCodes.Add(qr);
             await _context.SaveChangesAsync();
 
+        //After: Create plain text for the ticket
+
+       //string plainTextData = $"Event Name: {eventDetails.Name}, Event Date: {eventDetails.EventDate}, User Email: {ticketDTO.UserEmail}";
+
+       //     // Generate QR code with this plain text data
+       //     var qrCode = GenerateQRCode(plainTextData);
+
+       //     // Rest of your code to save the QR code and send the email remains the same.
+       //     QrCode qr = new QrCode
+       //     {
+       //         QrCodeBase64 = qrCode,
+       //         TicketPurchaseId = ticket.Id // Assuming TicketPurchaseId is the foreign key
+       //     };
+
+       //     _context.QrCodes.Add(qr);
+       //     await _context.SaveChangesAsync();
+
             try
             {
                 // Send the email to the customer
