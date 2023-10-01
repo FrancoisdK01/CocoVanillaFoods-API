@@ -33,7 +33,6 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult> UploadDamageImage([FromForm] IFormFile file)
         {
-           
 
             var fileName = $"{Guid.NewGuid()}_{file.FileName}";
             var filePath = await UploadFileToGoogleCloudStorage(fileName, file.OpenReadStream());
@@ -46,6 +45,7 @@ namespace API.Controllers
             var damageImage = new DamageImage
             {
                 FilePath = filePath,
+                EventID = int.Parse(fileName.Substring(fileName.IndexOf('.')-1,1)),
                 // Additional fields like UserId, Description, Timestamp, etc.
             };
 
