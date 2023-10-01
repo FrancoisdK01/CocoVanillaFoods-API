@@ -45,7 +45,7 @@ namespace API.Controllers
             var damageImage = new DamageImage
             {
                 FilePath = filePath,
-                EventID = int.Parse(fileName.Substring(fileName.IndexOf('.')-1,1)),
+                EventID = int.Parse(fileName.Substring(fileName.IndexOf('~') + 1, fileName.IndexOf('.') - fileName.IndexOf('~') - 1)),
                 // Additional fields like UserId, Description, Timestamp, etc.
             };
 
