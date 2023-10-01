@@ -30,6 +30,7 @@ namespace API.Model
         public EventType EventType { get; set; }
 
         public ICollection<TicketPurchase> TicketPurchase { get; set; }
+        public ICollection<DamageImage>? DamageImages { get; set; }
 
     }
 }

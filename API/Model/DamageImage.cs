@@ -10,5 +10,10 @@ namespace API.Model
 
         [Required]
         public string FilePath { get; set; }
+
+        public int? EventID { get; set; }
+
+        [ForeignKey("EventID")]
+        public Event Event { get; set; }
     }
 }
