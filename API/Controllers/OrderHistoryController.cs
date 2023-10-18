@@ -230,17 +230,16 @@ namespace API.Controllers
                     {
                         To = customer.Email,
                         Subject = "Your order has been placed",
-                        Body = $@"
-                  <h1>Order Placed Confirmation</h1>
-                  <p>Dear {customer.First_Name},</p>
-                  <p>We are writing to confirm that your order has been successfully placed.</p>
-                  <ul>
-                    <li>Order Reference: {order.OrderRefNum}</li>
-                  </ul>
-                  <p>To initiate a refund, kindly visit the 'Orders' page within your account and follow the prompt to request a refund. Our customer service team will assist you throughout the process.</p>
-                  <p>We value your trust in our brand and are committed to ensuring your satisfaction.</p>
-                  <p>Warm regards,</p>
-                  <p>The Promenade Team</p>
+                        Body = $@"Order Placed Confirmation
+                              Dear {customer.First_Name},
+                              We are writing to confirm that your order has been successfully placed.
+                  
+                              Order Reference: {order.OrderRefNum}
+                  
+                              To initiate a refund, kindly visit the 'Orders' page within your account and follow the prompt to request a refund. Our customer service team will assist you throughout the process.
+                              We value your trust in our brand and are committed to ensuring your satisfaction.
+                              Warm regards,
+                              The Promenade Team
                   "
                     };
                 }
@@ -252,20 +251,19 @@ namespace API.Controllers
                     {
                         To = customer.Email,
                         Subject = "Your order is at Promenade",
-                        Body = $@"
-                  <h1>Order Confirmation: Ready for Collection</h1>
-                  <p>Dear {customer.First_Name},</p>
-                  <p>We are pleased to inform you that your order has been processed and is now ready for collection.</p>
-                  <p>Please ensure you have your order reference number with you when you arrive for a seamless collection process.</p>
-                  <ul>
-                    <li>Order Reference: {order.OrderRefNum}</li>
-                  </ul>
-                  <p>Our team has ensured that your order is packed with care, awaiting your collection at the venue. 
-                        Should you have any questions, or require any further assistance, please do not hesitate to contact our customer service team.</p>
-                  <p>Thank you for choosing us.</p>
-                  <p>Warm regards,</p>
-                  <p>The Promenade Team</p>
-                  "
+                        Body = $@"Order Confirmation: Ready for Collection
+                          Dear {customer.First_Name},
+                          We are pleased to inform you that your order has been processed and is now ready for collection.
+                          Please ensure you have your order reference number with you when you arrive for a seamless collection process.
+                  
+                          Order Reference: {order.OrderRefNum}
+                  
+                          Our team has ensured that your order is packed with care, awaiting your collection at the venue. 
+                             Should you have any questions, or require any further assistance, please do not hesitate to contact our customer service team.
+                          Thank you for choosing us.
+                          Warm regards,
+                          The Promenade Team
+                          "
                     };
                 }
                 else if (newStatus == 4)  // Assuming 4 corresponds to "Collected"
@@ -275,14 +273,13 @@ namespace API.Controllers
                     {
                         To = customer.Email,
                         Subject = "Your order has been Collected",
-                        Body = $@"
-                  <h1>Order Collected</h1>
-                  <p>Dear {customer.First_Name},</p>
-                  <p>We are pleased to inform you that your order has been successfully collected.</p>
-                  <p>Thank you for choosing us.</p>
-                  <p>Warm regards,</p>
-                  <p>The Promenade Team</p>
-                  "
+                        Body = $@"Order Collected
+                            Dear {customer.First_Name},
+                            We are pleased to inform you that your order has been successfully collected.
+                            Thank you for choosing us.
+                            Warm regards,
+                            The Promenade Team
+                            "
                     };
                 }
 

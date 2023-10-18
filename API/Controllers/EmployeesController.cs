@@ -130,7 +130,7 @@ namespace API.Controllers
             var jwtHandler = new JwtSecurityTokenHandler();
             var jwtToken = jwtHandler.ReadJwtToken(token);
             var userEmailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
-            
+
             // Retrieve the superuser based on their email
             var superUser = await _userManager.FindByEmailAsync(userEmailClaim);
             if (superUser == null)
@@ -177,17 +177,15 @@ namespace API.Controllers
                         {
                             To = registerModel.Email,
                             Subject = "Welcome to the Promenade",
-                            Body = $@"
-                                        <h1>Welcome to the team {registerModel.FirstName}</h1>
-                                        <p>We are so happy to have you working for us.</p>
-                                        <p>Please find your login details below and feel free to update your details once you have settled in with the system.</p>
-                                        <ul>
-                                            <li>Email Address: {registerModel.Email}</li>
-                                            <li>Password: {generatedPassword}</li>
-                                        </ul>
-                                        <p>We can't wait to see you in our offices.</p>
-                                        <p>Kind regards,</p>
-                                        <p>The Promenade Team</p>
+                            Body = $@"Welcome to the team {registerModel.FirstName}
+                                        We are so happy to have you working for us.</p>
+                                        Please find your login details below and feel free to update your details once you have settled in with the system.</p>
+                                        
+                                        Email Address: {registerModel.Email}
+                                        Password: {generatedPassword}
+                                        We can't wait to see you in our offices.</p>
+                                        Kind regards,</p>
+                                        The Promenade Team</p>
                                         "
                         };
 
@@ -229,7 +227,7 @@ namespace API.Controllers
                         await _userManager.DeleteAsync(user);
                         await _context.SaveChangesAsync();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         return BadRequest(ex.Message);
                     }
