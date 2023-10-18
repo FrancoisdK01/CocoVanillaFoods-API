@@ -108,14 +108,14 @@ namespace API.Controllers
                 To = blacklist.Email,
                 Subject = "Your account has been removed from the blacklist.",
                 Body = $@"
-                    <h1>Hello {customerName.First_Name + " " + customerName.Last_Name},</h1>
-                    <p>We are pleased to inform you that your account has been removed from our blacklist. This means you are now eligible to purchase event tickets using your account.</p>
-                    <p><strong>Reason for removal:</strong> {deleteViewModel.reason}</p>
-                    <p>We apologize for any inconvenience caused during the period your account was blacklisted. We value your patronage and look forward to serving you in the future.</p>
-                    <p>If you have any questions or concerns, please do not hesitate to contact our support team.</p>
-                    <p>Thank you for your understanding and continued trust in us.</p>
-                    <p>Kind regards,</p>
-                    <p>Promenade Team</p>
+                    Hello {customerName.First_Name + " " + customerName.Last_Name},
+                    We are pleased to inform you that your account has been removed from our blacklist. This means you are now eligible to purchase event tickets using your account.
+                    Reason for removal: {deleteViewModel.reason}
+                    We apologize for any inconvenience caused during the period your account was blacklisted. We value your patronage and look forward to serving you in the future.
+                    If you have any questions or concerns, please do not hesitate to contact our support team.
+                    Thank you for your understanding and continued trust in us.
+                    Kind regards,
+                    Promenade Team
                 "
             };
 

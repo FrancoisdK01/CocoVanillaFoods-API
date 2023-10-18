@@ -163,17 +163,16 @@ namespace API.Controllers
                 {
                     To = registerModel.Email,
                     Subject = "Welcome to the Promenade",
-                    Body = $@"
-                                        <h1>Welcome to the team {registerModel.FirstName}</h1>
-                                        <p>We are so happy to have you working for us.</p>
-                                        <p>Please find your login details below and feel free to update your details once you have settled in with the system.</p>
-                                        <ul>
-                                            <li>Email Address: {registerModel.Email}</li>
-                                            <li>Password: {generatedPassword}</li>
-                                        </ul>
-                                        <p>We can't wait to see you in our offices.</p>
-                                        <p>Kind regards,</p>
-                                        <p>The Promenade Team</p>
+                    Body = $@"Welcome to the team {registerModel.FirstName}
+                                        We are so happy to have you working for us.
+                                        Please find your login details below and feel free to update your details once you have settled in with the system.
+                                        
+                                        Email Address: {registerModel.Email}
+                                        Password: {generatedPassword}
+                                        
+                                        We can't wait to see you in our offices.
+                                        Kind regards,
+                                        The Promenade Team
                                         "
                 };
                 await _emailService.SendSimpleMessage(evm);
@@ -291,15 +290,14 @@ namespace API.Controllers
             {
                 To = model.UserEmail,
                 Subject = "Account Update Notification from the Promenade",
-                Body = $@"
-                        <h1>Hello {user.DisplayName},</h1>
-                        <p>We hope this message finds you well. We wanted to notify you that your account details at the Promenade have been updated successfully.</p>
-                        <p>For security reasons and to ensure the integrity of your account, we require you to log in again to see the changes and continue using our system.</p>
+                Body = $@"Hello {user.DisplayName},
+                        We hope this message finds you well. We wanted to notify you that your account details at the Promenade have been updated successfully.
+                        For security reasons and to ensure the integrity of your account, we require you to log in again to see the changes and continue using our system.
                         
-                        <p>If you did not request this change or believe this is an error, please contact our support immediately.</p>
-                        <p>Thank you for your understanding and continued trust in us.</p>
-                        <p>Kind regards,</p>
-                        <p>The Promenade Team</p>
+                        If you did not request this change or believe this is an error, please contact our support immediately.
+                        Thank you for your understanding and continued trust in us.
+                        Kind regards,
+                        The Promenade Team
                     "
             };
 

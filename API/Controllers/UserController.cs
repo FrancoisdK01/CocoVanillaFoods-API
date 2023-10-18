@@ -230,16 +230,11 @@ namespace API.Controllers
             {
                 To = user.Email,
                 Subject = "2-Factor Authentication code: " + code,
-                Body = $@"
-                                        <h5>Below you will find your 2-Factor authentication code, please use this code to access your account</h5>
-                                        
-                                        <ul>
-                                            <li>Code: {code}</li>
-                                        </ul>
-
-                                        <p>Kind regards,</p>
-                                        <p>The Promenade Team</p>
-                                        "
+                Body = $@"Below you will find your 2-Factor authentication code, please use this code to access your account
+                            Code: {code}
+                            Kind regards,
+                            The Promenade Team
+                            "
             };
             await _emailService.SendSimpleMessage(evm);
             //_emailService.SendEmail(evm);
@@ -370,25 +365,24 @@ namespace API.Controllers
                 To = user.Email,
                 Subject = "Reset Password",
                 Body = $@"
-                    <h4>Reset Password</h4>
-                    <h6>You have requested to reset your password.</h6>
-                    <p>Please follow the following steps to update your login details:</p>
-                    <ol>
-                        <li>Find your login details below these steps</li>
-                        <li>Go to our website and login your account with the details provided</li>
-                        <li>If you wish to update your login details instead of keeping this password: Go to the account page</li>
-                        <li>Click on the Username and password tab in die sidebar</li>
-                        <li>Update your details and log into your account with your updated details</li>
-                    </ol>
+                    Reset Password
+                    You have requested to reset your password.
+                    Please follow the following steps to update your login details:
+                    
+                    Find your login details below these steps
+                    Go to our website and login your account with the details provided
+                    If you wish to update your login details instead of keeping this password: Go to the account page
+                    Click on the Username and password tab in die sidebar
+                    Update your details and log into your account with your updated details
+                    
 
-                    <p> You updated login details follow </p>
-                    <ul>
-                        <li>Email: {user.Email}</li>
-                        <li>Password: {newPassword}</li>
-                    </ul>
-                    <p>If you did not request a password reset, please ignore this email.</p>
-                    <p>Kind regards,</p>
-                    <p>The Promenade Team</p>
+                    You updated login details follow
+                    Email: {user.Email}
+                    Password: {newPassword}
+                    
+                    If you did not request a password reset, please ignore this email.
+                    Kind regards,
+                    The Promenade Team
                 "
             };
 
