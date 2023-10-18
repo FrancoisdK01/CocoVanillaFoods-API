@@ -160,13 +160,13 @@ namespace API.Data
             {
                 "BlacklistsController", "ChatBotController", "DiscountsController", "EarlyBirdsController",
                 "EventPriceController", "EventsController", "EventTypeController", "HelpResourceController",
-                "MailController", "SupplierOrdersController", "VarietalsController", "WinesController", "WineTypesController"
+                "MailController", "SupplierOrdersController","UserController", "VarietalsController", "WinesController", "WineTypesController"
             };
 
             var employeeControllers = new[]
             {
                 "ChatBotController", "HelpResourceController", "InventoryController", "MailController",
-                "StockTakeController", "SupplierOrdersController", "SuppliersController", "VarietalsController",
+                "StockTakeController", "SupplierOrdersController", "SuppliersController","UserController", "VarietalsController",
                 "WineTypesController", "WinesController", "WriteOffsController", "WriteOff_ReasonController"
             };
 
