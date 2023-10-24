@@ -165,6 +165,20 @@ namespace API.Controllers
                         SuperUserID = superuserID
                     };
 
+                    var customer = new Customer
+                    {
+                        First_Name = employeeModel.FirstName,
+                        Last_Name = employeeModel.LastName,
+                        Email = registerModel.Email,
+                        PhoneNumber = employeeModel.PhoneNumber,
+                        ID_Number = employeeModel.IDNumber,
+                        UserID = user.Id,
+                        Date_Created = DateTime.Now,
+                        Date_of_last_update = DateTime.Now,
+                        Gender = registerModel.Gender,
+                        Title = registerModel.Title,
+                    };
+                    _context.Customers.Add(customer);
                     _context.Employees.Add(employee);
                     var employeeSavedChanges = await _context.SaveChangesAsync();
 
@@ -177,17 +191,21 @@ namespace API.Controllers
                         {
                             To = registerModel.Email,
                             Subject = "Welcome to the Promenade",
-                            Body = $@"Welcome to the team {registerModel.FirstName}
-                                        We are so happy to have you working for us.</p>
-                                        Please find your login details below and feel free to update your details once you have settled in with the system.</p>
-                                        
-                                        Email Address: {registerModel.Email}
-                                        Password: {generatedPassword}
-                                        We can't wait to see you in our offices.</p>
-                                        Kind regards,</p>
-                                        The Promenade Team</p>
-                                        "
+                            Body = $@"
+Welcome to the team {registerModel.FirstName},
+
+We are so happy to have you working for us. Please find your login details below and feel free to update your details once you have settled in with the system.
+
+Email Address: {registerModel.Email}
+Password: {generatedPassword}
+
+We can't wait to see you in our offices.
+
+Kind regards,
+The Promenade Team
+    "
                         };
+
 
                         //_emailService.SendEmail(evm);
                         await _emailService.SendSimpleMessage(evm);

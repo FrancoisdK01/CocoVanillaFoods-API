@@ -9,10 +9,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Protocol;
+using NuGet.Protocol.Plugins;
+using Org.BouncyCastle.Utilities.Collections;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static QRCoder.PayloadGenerator;
 
 namespace API.Controllers
 {
@@ -229,13 +235,17 @@ namespace API.Controllers
             var evm = new EmailViewModel
             {
                 To = user.Email,
-                Subject = "2-Factor Authentication code: " + code,
-                Body = $@"Below you will find your 2-Factor authentication code, please use this code to access your account
-                            Code: {code}
-                            Kind regards,
-                            The Promenade Team
-                            "
+                Subject = $"2-Factor Authentication code: {code}",
+                Body = $@"
+Below you will find your 2-Factor authentication code, please use this code to access your account.
+
+Code: {code}
+
+Kind regards,
+The Promenade Team
+    "
             };
+
             await _emailService.SendSimpleMessage(evm);
             //_emailService.SendEmail(evm);
         }
@@ -365,28 +375,30 @@ namespace API.Controllers
                 To = user.Email,
                 Subject = "Reset Password",
                 Body = $@"
-                    Reset Password
-                    You have requested to reset your password.
-                    Please follow the following steps to update your login details:
-                    
-                    Find your login details below these steps
-                    Go to our website and login your account with the details provided
-                    If you wish to update your login details instead of keeping this password: Go to the account page
-                    Click on the Username and password tab in die sidebar
-                    Update your details and log into your account with your updated details
-                    
+Reset Password
 
-                    You updated login details follow
-                    Email: {user.Email}
-                    Password: {newPassword}
-                    
-                    If you did not request a password reset, please ignore this email.
-                    Kind regards,
-                    The Promenade Team
-                "
-            };
+You have requested to reset your password. Please follow the steps below to update your login details:
 
-            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+1. Find your login details below these steps.
+2. Go to our website and log into your account with the details provided.
+3. If you wish to update your login details instead of keeping this password:
+    a. Go to the account page.
+    b. Click on the \Username and password' tab in the sidebar.
+    c.Update your details and log into your account with your updated details.
+
+Your updated login details:
+Email: { user.Email}
+        Password: { newPassword}
+
+            If you did not request a password reset, please ignore this email.
+
+            Kind regards,
+            The Promenade Team
+    "
+};
+
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
             if (result.Succeeded)
             {
                 await _emailService.SendSimpleMessage(evm);
