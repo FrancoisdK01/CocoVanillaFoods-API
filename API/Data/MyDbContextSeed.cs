@@ -223,8 +223,8 @@ namespace API.Data
                             SystemPrivilegeId = employeePrivilegeId
                         });
                     }
-                    //if (customerControllerNames.Contains(type.Name) && methodPrefixes.Any(prefix => method.Name.StartsWith(prefix)))
-                    if (methodPrefixes.Any(prefix => method.Name.StartsWith(prefix)))
+                    if (customerControllerNames.Contains(type.Name) && methodPrefixes.Any(prefix => method.Name.StartsWith(prefix)))
+                    //if (methodPrefixes.Any(prefix => method.Name.StartsWith(prefix)))
                     {
                         mappings.Add(new MethodPrivilegeMapping
                         {
